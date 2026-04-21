@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -9,21 +9,40 @@
     "ignoreUnknown": false,
     "includes": [
       "**/*.js",
+      "**/*.jsx",
       "**/*.mjs",
       "**/*.cjs",
       "**/*.ts",
+      "**/*.tsx",
       "**/*.mts",
       "**/*.cts",
+      "**/*.svelte",
       "!**/node_modules",
       "!**/dist",
+      "!**/build",
+      "!**/out",
+      "!**/gen",
       "!**/tmp",
-      "!**/temp"
+      "!**/temp",
+      "!**/.svelte-kit"
     ]
+  },
+  "html": {
+    "experimentalFullSupportEnabled": true,
+    "formatter": {
+      "enabled": true,
+      "indentScriptAndStyle": true,
+      "whitespaceSensitivity": "ignore"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2
+    "indentStyle": "space"
   },
   "linter": {
     "enabled": true,
