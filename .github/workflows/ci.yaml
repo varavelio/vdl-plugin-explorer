@@ -21,4 +21,4 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           push: never
-          runCmd: /bin/bash -c "npm run ci"
+          runCmd: /bin/bash -c "task ci"
