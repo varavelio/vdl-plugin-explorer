@@ -22,6 +22,16 @@ coverage
 .env.*
 !.env.example
 
+# Explorer
+explorer/.output
+explorer/.vercel
+explorer/.netlify
+explorer/.wrangler
+explorer/.svelte-kit
+explorer/build
+explorer/vite.config.js.timestamp-*
+explorer/vite.config.ts.timestamp-*
+
 # IDE/Tools
 .vscode-test
 .eslintcache
