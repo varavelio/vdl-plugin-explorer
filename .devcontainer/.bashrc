@@ -4,7 +4,7 @@
 alias ll='ls -alhF'
 alias c='clear'
 alias n='npm'
-alias nr='npm run'
+alias t='task'
 
 # Set the user file-creation mode mask to 000, which allows all
 # users read, write, and execute permissions for newly created files.
