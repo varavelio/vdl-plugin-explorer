@@ -1,5 +1,18 @@
+FROM alpine:3.23.3 AS fetcher
+
+WORKDIR /fetcher
+
+RUN \
+  apk add --quiet curl unzip && \
+  # Fetch task
+  sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /fetcher v3.50.0 && \
+  chmod +x ./task
+  
 # Use node as the base image
 FROM node:24.14.0-trixie
+
+# Install task
+COPY --from=fetcher /fetcher/task /usr/local/bin/task
 
 # Set environment variables
 ENV DEBIAN_FRONTEND="noninteractive"
