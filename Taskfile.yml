@@ -50,13 +50,13 @@ tasks:
     desc: "Format all code"
     cmds:
       - npx --no biome format --write --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
-      - dprint fmt --config ./dprint.json --log-level warn
+      - npx --no dprint fmt --config ./dprint.json --log-level warn
 
   lint:
     desc: "Lint all code"
     cmds:
       - npx --no biome check --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
-      - dprint check --config ./dprint.json --log-level warn
+      - npx --no dprint check --config ./dprint.json --log-level warn
       - cd ./explorer && npx --no svelte-kit sync
       - cd ./explorer && npx --no svelte-check --tsconfig ./tsconfig.json
       - cd ./plugin && npx --no vdl-plugin check
