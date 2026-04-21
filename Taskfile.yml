@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+#####################################################################
+# Docs: https://taskfile.dev                                        #
+#                                                                   #
+# Use npx with the "--no" argument to ensure that dependencies with #
+# versions different from those in package.json are not downloaded. #
+#####################################################################
+
+version: "3"
+
+tasks:
+  default:
+    desc: List all available commands
+    cmd: task --list-all
+
+  ##############
+  # ROOT TASKS #
+  ##############
+
+  ci:
+    desc: "Run full CI pipeline (deps, lint, build)"
+    cmds:
+      - task: deps
+      - task: lint
+      - task: build
+
+  deps:
+    desc: "Install dependencies for all subdirectories"
+    cmds:
+      - npm install
+      - cd ./explorer && npm install
+      - cd ./plugin && npm install
+
+  dev:
+    desc: "Explorer: Start development server"
+    dir: ./explorer
+    cmd: npx --no vite dev
+
+  build:
+    desc: "Build the project"
+    cmds:
+      - cd ./explorer && npx --no vite build
+      - cd ./plugin && npx --no vdl-plugin build
+      - rm -rf ./dist && mkdir -p ./dist
+      - cp ./plugin/dist/index.js ./dist/index.js
+      - rm -rf ./plugin/dist
+
+  format:
+    desc: "Format all code"
+    cmds:
+      - npx --no biome format --write --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
+      - dprint fmt --config ./dprint.json --log-level warn
+
+  lint:
+    desc: "Lint all code"
+    cmds:
+      - npx --no biome check --config-path ./biome.json --log-level warn --no-errors-on-unmatched .
+      - dprint check --config ./dprint.json --log-level warn
+      - cd ./explorer && npx --no svelte-kit sync
+      - cd ./explorer && npx --no svelte-check --tsconfig ./tsconfig.json
+      - cd ./plugin && npx --no vdl-plugin check
