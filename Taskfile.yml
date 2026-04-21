@@ -14,10 +14,6 @@ tasks:
     desc: List all available commands
     cmd: task --list-all
 
-  ##############
-  # ROOT TASKS #
-  ##############
-
   ci:
     desc: "Run full CI pipeline (deps, lint, build)"
     cmds:
