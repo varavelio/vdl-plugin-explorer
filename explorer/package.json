@@ -1,0 +1,17 @@
+{
+  "name": "@varavel/vdl-plugin-explorer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "-": "Run commands using the root's Taskfile.yml file"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "3.0.10",
+    "@sveltejs/kit": "2.57.1",
+    "@sveltejs/vite-plugin-svelte": "7.0.0",
+    "svelte": "5.55.4",
+    "svelte-check": "4.4.6",
+    "typescript": "6.0.3",
+    "vite": "8.0.9"
+  }
+}
