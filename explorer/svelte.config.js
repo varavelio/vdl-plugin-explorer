@@ -12,12 +12,14 @@ const config = {
       strict: true,
     }),
 
-    // Enable hash routing since this SPA is meant to be a single HTML file
+    // Enable hash routing since this SPA is designed to be a single HTML file.
+    // This also disables page options like prerendering and server-side rendering
+    // which aren't compatible with the single hash-based routing.
     router: {
       type: "hash",
     },
 
-    // Always output a single self contained HTML file
+    // Always output the SPA as a single self contained HTML file.
     output: {
       bundleStrategy: "inline",
     },
