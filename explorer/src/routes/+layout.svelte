@@ -23,18 +23,14 @@
       showSidebarBottom={viewport.isMobile}
     >
       {#snippet headerLeft()}
-        <header class="hidden not-only:w-full desk:block ml-2">
-          <a href="https://vdl.varavel.com" target="_blank">
-            <Logo class="h-8" />
-          </a>
+        <header class="hidden desk:block ml-2">
+          <a href="#/"><Logo class="h-8" /></a>
         </header>
       {/snippet}
 
       {#snippet headerCenter()}
         <header class="w-full desk:hidden">
-          <a href="https://vdl.varavel.com" target="_blank">
-            <Logo class="mx-auto h-8" />
-          </a>
+          <a href="#/"><Logo class="mx-auto h-8" /></a>
         </header>
       {/snippet}
 
