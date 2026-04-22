@@ -5,7 +5,7 @@
   import { AppLayout } from "@varavel/ui/layouts";
   import { viewport } from "@varavel/ui/runtime";
   import Logo from "$lib/components/Logo.svelte";
-  import { store } from "$lib/store.svelte";
+  import { store } from "$lib/store";
   import SidebarCenter from "./components/SidebarCenter.svelte";
 
   let { children } = $props();

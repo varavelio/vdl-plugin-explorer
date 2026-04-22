@@ -64,12 +64,10 @@ function enrichIrSchema(ir: IrSchema): RichIrSchema {
     return { ...en, id };
   });
 
-  const constants: RichIrSchema["constants"] = ir.constants.map(
-    (constant) => {
-      const id = slugify(`${constant.name}-${hash(constant)}`);
-      return { ...constant, id };
-    },
-  );
+  const constants: RichIrSchema["constants"] = ir.constants.map((constant) => {
+    const id = slugify(`${constant.name}-${hash(constant)}`);
+    return { ...constant, id };
+  });
 
   const docs: RichIrSchema["docs"] = ir.docs.map((doc) => {
     const title = mdTitle(doc.content);
@@ -112,10 +110,10 @@ function findLocalMock(): IrSchema {
   if (!dev) return EMPTY_IR;
 
   // Find the local IR mock file using Vite's import.meta.glob
-  const files = import.meta.glob("../../../ir.local.json", { eager: true });
+  const files = import.meta.glob("../../../../ir.local.json", { eager: true });
 
   // biome-ignore lint/suspicious/noExplicitAny: The type of the mock module is not known at compile time
-  const mockModule = files["../../../ir.local.json"] as any;
+  const mockModule = files["../../../../ir.local.json"] as any;
   if (!mockModule?.default) return EMPTY_IR;
 
   console.log("[DEV] Default IR loaded from ir.local.json");
