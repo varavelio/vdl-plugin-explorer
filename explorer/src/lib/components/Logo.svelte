@@ -2,7 +2,7 @@
   import type { ClassValue } from "svelte/elements";
 
   interface Props {
-    class: ClassValue;
+    class?: ClassValue;
     // biome-ignore lint/suspicious/noExplicitAny: can be any other attribute
     [key: string]: any;
   }
