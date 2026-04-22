@@ -13,6 +13,7 @@
     "@tailwindcss/vite": "4.2.4",
     "@varavel/ui": "0.1.4",
     "@varavel/vdl-plugin-sdk": "0.5.4",
+    "minisearch": "7.2.0",
     "svelte": "5.55.4",
     "svelte-check": "4.4.6",
     "tailwindcss": "4.2.4",
