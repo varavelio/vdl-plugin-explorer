@@ -7,7 +7,7 @@
   import Logo from "$lib/components/Logo.svelte";
   import { store } from "$lib/store";
   import SearchButton from "./components/SearchButton.svelte";
-  import SidebarCenter from "./components/SidebarCenter.svelte";
+  import SidebarNav from "./components/SidebarNav.svelte";
 
   let { children } = $props();
 </script>
@@ -61,7 +61,7 @@
       {/snippet}
 
       {#snippet sidebarCenter()}
-        <SidebarCenter />
+        <SidebarNav />
       {/snippet}
 
       {#snippet sidebarBottom()}
