@@ -31,7 +31,7 @@ tasks:
   dev:
     desc: "Explorer: Start development server"
     dir: ./explorer
-    cmd: npx --no vite dev
+    cmd: npx --no vite dev --host 0.0.0.0
 
   build:
     desc: "Build the project"
