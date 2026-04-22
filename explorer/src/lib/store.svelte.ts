@@ -6,6 +6,23 @@ import { browser, dev } from "$app/environment";
 // root of the project. This allows you to work with a static IR schema without
 // needing to run the VDL plugin or have a backend server running.
 
+/**
+ * Declare the global interface for the expected window varriable injected
+ * by the VDL plugin at build time.
+ */
+declare global {
+  interface Window {
+    /**
+     * This is injected by the VDL plugin at build time. It contains the IR
+     * schema generated from the source code.
+     */
+    __vdl_ir?: IrSchema;
+  }
+}
+
+/**
+ * An empty IR schema used as a fallback when no IR is available.
+ */
 const EMPTY_IR: IrSchema = {
   entryPoint: "",
   types: [],
@@ -39,20 +56,6 @@ function findLocalMock(): IrSchema {
 }
 
 /**
- * Declare the global interface for the expected window varriable injected
- * by the VDL plugin at build time.
- */
-declare global {
-  interface Window {
-    /**
-     * This is injected by the VDL plugin at build time. It contains the IR
-     * schema generated from the source code.
-     */
-    __vdl_ir: IrSchema;
-  }
-}
-
-/**
  * Store class holds all the application shared state.
  */
 export class Store {
@@ -78,7 +81,7 @@ export class Store {
 
     // Load production IR from the global variable injected by the VDL plugin
     // in the window object.
-    if (!dev && !isEmptyObject(window.__vdl_ir)) {
+    if (!dev && window.__vdl_ir && !isEmptyObject(window.__vdl_ir)) {
       this.ir = window.__vdl_ir;
     }
 
