@@ -10,6 +10,8 @@ temp/
 *.tsbuildinfo
 *.temp.json
 *.local.json
+*_temp.vdl
+*_local.vdl
 
 # Logs
 logs
