@@ -1,16 +1,5 @@
 import { browser } from "$app/environment";
-import { loadIrSchema, type RichIrSchema } from "$lib/store/ir";
-
-/**
- * Empty rich IR used before browser-side initialization.
- */
-const EMPTY_RICH_IR: RichIrSchema = {
-  entryPoint: "",
-  types: [],
-  enums: [],
-  constants: [],
-  docs: [],
-};
+import { EMPTY_RICH_IR, loadIrSchema, type RichIrSchema } from "$lib/store/ir";
 
 /**
  * Store class holds all the application shared state.

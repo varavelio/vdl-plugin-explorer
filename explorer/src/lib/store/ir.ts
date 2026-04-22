@@ -28,15 +28,20 @@ declare global {
 }
 
 /**
- * An empty IR schema used as a fallback when no IR is available.
+ * An empty IR schema.
  */
-const EMPTY_IR: IrSchema = {
+export const EMPTY_IR: IrSchema = {
   entryPoint: "",
   types: [],
   enums: [],
   constants: [],
   docs: [],
 };
+
+/**
+ * An enriched empty IR schema.
+ */
+export const EMPTY_RICH_IR = enrichIrSchema(EMPTY_IR);
 
 /**
  * IR schema enriched with stable identifiers and derived documentation metadata.
