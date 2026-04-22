@@ -1,6 +1,8 @@
 <script lang="ts">
   import "../app.css";
+  import { UiProvider } from "@varavel/ui";
+
   let { children } = $props();
 </script>
 
-{@render children()}
+<UiProvider>{@render children()}</UiProvider>
