@@ -61,7 +61,10 @@ function removePositionReplacer(key: string, value: unknown): unknown {
 export const generate = definePlugin((input) => {
   const outFile = resolveOutFile(input);
   const ir = escapeScriptTag(JSON.stringify(input.ir, removePositionReplacer));
-  const html = template.replace("var __vdl_ir = {};", `var __vdl_ir = ${ir};`);
+  const html = template.replace(
+    "window.__vdl_ir = {};",
+    `window.__vdl_ir = ${ir};`,
+  );
 
   return {
     files: [
