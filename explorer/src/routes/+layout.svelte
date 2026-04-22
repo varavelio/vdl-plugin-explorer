@@ -1,6 +1,6 @@
 <script lang="ts">
   import "../app.css";
-  import { ThemePicker, UiProvider } from "@varavel/ui";
+  import { GithubButton, ThemePicker, UiProvider } from "@varavel/ui";
   import { AppLayout } from "@varavel/ui/layouts";
   import { viewport } from "@varavel/ui/runtime";
 
@@ -10,33 +10,35 @@
 </script>
 
 <UiProvider>
-  <AppLayout primaryRegion="sidebar" maxWidth="md">
-    {#snippet sidebarTop()}
-      <header class="hidden w-full desk:block">
+  <AppLayout primaryRegion="header" maxWidth="md">
+    {#snippet headerLeft()}
+      <header class="hidden not-only:w-full desk:block">
         <a href="https://vdl.varavel.com" target="_blank">
-          <Logo class="mx-auto w-27.5 desk:w-30" />
+          <Logo class="w-30" />
         </a>
       </header>
-    {/snippet}
-
-    {#snippet sidebarCenter()}
-    <!--  -->
-    {/snippet}
-
-    {#snippet headerLeft()}
-    <!--  -->
     {/snippet}
 
     {#snippet headerCenter()}
       <header class="w-full desk:hidden">
         <a href="https://vdl.varavel.com" target="_blank">
-          <Logo class="mx-auto w-27.5 desk:w-30" />
+          <Logo class="mx-auto w-27.5" />
         </a>
       </header>
     {/snippet}
 
     {#snippet headerRight()}
-      <div>
+      <div class="flex items-center gap-2">
+        {#if viewport.isDesktop}
+          <GithubButton
+            user="varavelio"
+            repo="vdl-plugin-explorer"
+            showStars={true}
+            showTag={false}
+            showForks={false}
+          />
+        {/if}
+
         <ThemePicker
           class={{"-mr-2 [&_svg]:size-5": viewport.isMobile}}
           variant={viewport.isMobile ? "ghost" : "outline"}
@@ -44,6 +46,30 @@
           square={viewport.isMobile}
         />
       </div>
+    {/snippet}
+
+    {#snippet sidebarTop()}
+    <!--  -->
+    {/snippet}
+
+    {#snippet sidebarCenter()}
+    <!--  -->
+    {/snippet}
+
+    {#snippet sidebarBottom()}
+      {#if viewport.isMobile}
+        <div class="w-full space-y-2">
+          <GithubButton
+            user="varavelio"
+            repo="vdl-plugin-explorer"
+            size="sm"
+            showStars={true}
+            showTag={false}
+            showForks={false}
+            wide={true}
+          />
+        </div>
+      {/if}
     {/snippet}
 
     {#snippet main()}
