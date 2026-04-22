@@ -8,6 +8,8 @@ jspm_packages/
 tmp/
 temp/
 *.tsbuildinfo
+*.temp.json
+*.local.json
 
 # Logs
 logs
