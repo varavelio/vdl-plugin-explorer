@@ -16,6 +16,11 @@ const config = {
     router: {
       type: "hash",
     },
+
+    // Always output a single self contained HTML file
+    output: {
+      bundleStrategy: "inline",
+    },
   },
 };
 
