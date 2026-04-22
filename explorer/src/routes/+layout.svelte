@@ -6,6 +6,7 @@
   import { viewport } from "@varavel/ui/runtime";
   import Logo from "$lib/components/Logo.svelte";
   import { store } from "$lib/store";
+  import SearchButton from "./components/SearchButton.svelte";
   import SidebarCenter from "./components/SidebarCenter.svelte";
 
   let { children } = $props();
@@ -53,6 +54,10 @@
             square={viewport.isMobile}
           />
         </div>
+      {/snippet}
+
+      {#snippet sidebarTop()}
+        <SearchButton />
       {/snippet}
 
       {#snippet sidebarCenter()}
