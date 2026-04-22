@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BookOpenText, Pi, Sigma, Type } from "@lucide/svelte";
+  import { BookOpenText, Braces, ListTree, Pin } from "@lucide/svelte";
   import { Nav } from "@varavel/ui";
   import { page } from "$app/state";
   import { store } from "$lib/store";
@@ -19,7 +19,7 @@
   {/if}
 
   {#if store.ir.types.length > 0}
-    <Nav.Group label="Types" icon={Type} open>
+    <Nav.Group label="Types" icon={Braces} open>
       {#each store.ir.types as type}
         <Nav.Item
           label={type.name}
@@ -31,7 +31,7 @@
   {/if}
 
   {#if store.ir.enums.length > 0}
-    <Nav.Group label="Enums" icon={Sigma} open>
+    <Nav.Group label="Enums" icon={ListTree} open>
       {#each store.ir.enums as enm}
         <Nav.Item
           label={enm.name}
@@ -43,7 +43,7 @@
   {/if}
 
   {#if store.ir.constants.length > 0}
-    <Nav.Group label="Constants" icon={Pi} open>
+    <Nav.Group label="Constants" icon={Pin} open>
       {#each store.ir.constants as constant}
         <Nav.Item
           label={constant.name}
