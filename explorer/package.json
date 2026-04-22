@@ -6,6 +6,7 @@
     "-": "Run commands using the root's Taskfile.yml file"
   },
   "devDependencies": {
+    "@lucide/svelte": "1.3.0",
     "@sveltejs/adapter-static": "3.0.10",
     "@sveltejs/kit": "2.57.1",
     "@sveltejs/vite-plugin-svelte": "7.0.0",
