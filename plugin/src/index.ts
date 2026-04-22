@@ -1,17 +1,16 @@
 import { definePlugin } from "@varavel/vdl-plugin-sdk";
+import { escapeScriptTag } from "@varavel/vdl-plugin-sdk/utils/strings";
+import template from "../../explorer/build/index.html?raw";
 
 export const generate = definePlugin((input) => {
-  // Your plugin logic goes here
-  // Feel free to explore the plugin input
-  console.log(input.version); // The VDL version without v prefix
-  console.log(input.options); // Any option that the user passed to the plugin via vdl.config.vdl
-  console.log(input.ir); // VDL intermediate representation from where your plugin generates code
+  const ir = escapeScriptTag(JSON.stringify(input.ir));
+  const html = template.replace("var __vdl_ir = {};", `var __vdl_ir = ${ir};`);
 
   return {
     files: [
       {
-        path: "hello.txt",
-        content: "Hello from VDL Plugin",
+        path: "index.html",
+        content: html,
       },
     ],
   };
