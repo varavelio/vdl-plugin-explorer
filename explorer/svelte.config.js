@@ -11,6 +11,11 @@ const config = {
     adapter: adapter({
       strict: true,
     }),
+
+    // Enable hash routing since this SPA is meant to be a single HTML file
+    router: {
+      type: "hash",
+    },
   },
 };
 
