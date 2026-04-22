@@ -41,16 +41,26 @@ const EMPTY_IR: IrSchema = {
 /**
  * IR schema enriched with stable identifiers and derived documentation metadata.
  *
- * Each type, enum, constant, and doc receives an `id` field. Docs also include
- * a parsed `title` and `firstParagraph` for easier rendering and lookup.
+ * Each type, enum, constant, and doc receives an `id` and `urlPath` fields. Docs also
+ * include a parsed `title` and `firstParagraph` for easier rendering and lookup.
  */
 export type RichIrSchema = {
   entryPoint: string;
-  types: (IrSchema["types"][number] & { id: string })[];
-  enums: (IrSchema["enums"][number] & { id: string })[];
-  constants: (IrSchema["constants"][number] & { id: string })[];
+  types: (IrSchema["types"][number] & {
+    id: string;
+    urlPath: string;
+  })[];
+  enums: (IrSchema["enums"][number] & {
+    id: string;
+    urlPath: string;
+  })[];
+  constants: (IrSchema["constants"][number] & {
+    id: string;
+    urlPath: string;
+  })[];
   docs: (IrSchema["docs"][number] & {
     id: string;
+    urlPath: string;
     title: string;
     firstParagraph: string;
   })[];
@@ -88,24 +98,28 @@ function createId(name: string, obj: unknown): string {
 function enrichIrSchema(ir: IrSchema): RichIrSchema {
   const types: RichIrSchema["types"] = ir.types.map((type) => {
     const id = createId(type.name, type);
-    return { ...type, id };
+    const urlPath = `#/types/${id}`;
+    return { ...type, id, urlPath };
   });
 
   const enums: RichIrSchema["enums"] = ir.enums.map((en) => {
     const id = createId(en.name, en);
-    return { ...en, id };
+    const urlPath = `#/enums/${id}`;
+    return { ...en, id, urlPath };
   });
 
   const constants: RichIrSchema["constants"] = ir.constants.map((constant) => {
     const id = createId(constant.name, constant);
-    return { ...constant, id };
+    const urlPath = `#/constants/${id}`;
+    return { ...constant, id, urlPath };
   });
 
   const docs: RichIrSchema["docs"] = ir.docs.map((doc) => {
     const title = mdTitle(doc.content);
     const firstParagraph = mdFirstParagraph(doc.content) ?? "";
     const id = createId(title, doc);
-    return { ...doc, id, title, firstParagraph };
+    const urlPath = `#/docs/${id}`;
+    return { ...doc, id, urlPath, title, firstParagraph };
   });
 
   return {
