@@ -1,9 +1,7 @@
 <script lang="ts">
   import { BookOpenText } from "@lucide/svelte";
-  import { Breadcrumbs, Prose } from "@varavel/ui";
-  import DOMPurify from "dompurify";
-  import { marked } from "marked";
-  import { browser } from "$app/environment";
+  import { Breadcrumbs } from "@varavel/ui";
+  import MarkdownContent from "$lib/components/MarkdownContent.svelte";
   import NotFound from "$lib/components/NotFound.svelte";
   import { store } from "$lib/store";
   import type { PageProps } from "./$types";
@@ -12,14 +10,6 @@
 
   let doc = $derived.by(() => {
     return store.ir.docs.find((doc) => doc.id === params.id);
-  });
-
-  let html = $derived.by(() => {
-    if (!browser) return "";
-    if (!doc) return "";
-    const parsed = marked.parse(doc.content) as string;
-    const escaped = DOMPurify.sanitize(parsed);
-    return escaped;
   });
 
   let pageTitle = $derived.by(() => {
@@ -43,5 +33,5 @@
       { label: doc.title }
     ]}
   />
-  <Prose class="p-4 pt-0" fluid>{@html html}</Prose>
+  <MarkdownContent class="p-4 pt-0" content={doc.content} />
 {/if}
