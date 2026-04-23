@@ -16,7 +16,7 @@
 </script>
 
 <Breadcrumbs
-  class="w-full bg-base-100 p-4 desk:sticky desk:top-0"
+  class="w-full bg-base-100 p-4 desk:sticky desk:top-0 desk:z-10"
   items={[{ label: section, icon }, { label: title }]}
 />
 
