@@ -1,10 +1,11 @@
 <script lang="ts">
   import { Braces } from "@lucide/svelte";
   import { Card, Heading } from "@varavel/ui";
+  import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
   import AnnotationList from "$lib/components/AnnotationList.svelte";
   import EntityPage from "$lib/components/EntityPage.svelte";
-  import { countLabel } from "$lib/components/ir";
   import NotFound from "$lib/components/NotFound.svelte";
+  import SectionCard from "$lib/components/SectionCard.svelte";
   import TypeRefView from "$lib/components/TypeRefView.svelte";
   import { store } from "$lib/store";
   import type { PageProps } from "./$types";
@@ -22,16 +23,18 @@
 
     if (typeDef.typeRef.kind === "object") {
       nextTags.push(
-        countLabel(typeDef.typeRef.objectFields?.length ?? 0, "field"),
+        pluralize("field", typeDef.typeRef.objectFields?.length ?? 0, true),
       );
     }
 
     if (typeDef.typeRef.kind === "array") {
-      nextTags.push(countLabel(typeDef.typeRef.arrayDims ?? 1, "dimension"));
+      nextTags.push(
+        pluralize("dimension", typeDef.typeRef.arrayDims ?? 1, true),
+      );
     }
 
     if (typeDef.annotations.length > 0) {
-      nextTags.push(countLabel(typeDef.annotations.length, "annotation"));
+      nextTags.push(pluralize("annotation", typeDef.annotations.length, true));
     }
 
     return nextTags;
@@ -51,25 +54,19 @@
 {:else}
   <EntityPage
     section="Types"
-    kind="Type"
     title={typeDef.name}
     icon={Braces}
     {tags}
     doc={typeDef.doc}
   >
-    <section class="space-y-3">
-      <Heading level="2" size="lg">Definition</Heading>
-
-      <Card bg="100" shadow="none">
-        <TypeRefView typeRef={typeDef.typeRef} />
-      </Card>
-    </section>
+    <SectionCard title="Definition">
+      <TypeRefView typeRef={typeDef.typeRef} />
+    </SectionCard>
 
     {#if typeDef.annotations.length > 0}
-      <section class="space-y-3">
-        <Heading level="2" size="lg">Annotations</Heading>
+      <SectionCard title="Annotations">
         <AnnotationList annotations={typeDef.annotations} />
-      </section>
+      </SectionCard>
     {/if}
   </EntityPage>
 {/if}
