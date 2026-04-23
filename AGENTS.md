@@ -20,4 +20,5 @@ When updating this document, do so with the context of the entire document in mi
 
 - Keep implementations aligned with SDK patterns from the manual.
 - Use the SDK utility functions when possible to avoid duplicating code.
+- The explorer UI favors small shared components for recurring IR presentation concerns (page chrome, markdown docs, recursive type rendering, recursive literal rendering) instead of duplicating that logic across routes.
 - `e2e/` this directory contains end to end tests. Recommended structure: one fixture folder per test.
