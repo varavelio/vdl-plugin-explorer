@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { Badge, Breadcrumbs, Card, Heading } from "@varavel/ui";
+  import { Badge, Breadcrumbs, Heading } from "@varavel/ui";
   import type { Component, Snippet } from "svelte";
   import MarkdownContent from "./MarkdownContent.svelte";
+  import SectionCard from "./SectionCard.svelte";
 
   interface Props {
     section: string;
@@ -32,10 +33,7 @@
   </section>
 
   {#if doc}
-    <section class="space-y-2">
-      <Heading level="2" size="lg">Docs</Heading>
-      <Card bg="100" shadow="none"><MarkdownContent content={doc} /></Card>
-    </section>
+    <SectionCard title="Docs"><MarkdownContent content={doc} /></SectionCard>
   {/if}
 
   {@render children?.()}
