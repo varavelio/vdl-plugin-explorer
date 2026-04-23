@@ -1,11 +1,11 @@
 import type { IrSchema } from "@varavel/vdl-plugin-sdk";
-import { hash as createHash } from "@varavel/vdl-plugin-sdk/utils/crypto";
+import { fingerprint as createFingerprint } from "@varavel/vdl-plugin-sdk/utils/crypto";
 import {
   firstParagraph as mdFirstParagraph,
   title as mdTitle,
 } from "@varavel/vdl-plugin-sdk/utils/markdown";
 import { isEmptyObject } from "@varavel/vdl-plugin-sdk/utils/predicates";
-import { firstNChars, slugify } from "@varavel/vdl-plugin-sdk/utils/strings";
+import { slugify } from "@varavel/vdl-plugin-sdk/utils/strings";
 import { browser, dev } from "$app/environment";
 
 /**
@@ -84,11 +84,8 @@ export type RichIrSchema = {
  */
 function createId(name: string, obj: unknown): string {
   const slug = slugify(name);
-  let hash = createHash(obj);
-  hash = hash.replace(/[^a-zA-Z0-9]/g, "");
-  hash = firstNChars(hash, 8, false);
-  hash = hash.toLowerCase();
-  return `${slug}-${hash}`;
+  const fingerprint = createFingerprint(obj);
+  return `${slug}-${fingerprint}`;
 }
 
 /**
