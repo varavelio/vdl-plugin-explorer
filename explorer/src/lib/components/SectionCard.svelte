@@ -21,5 +21,5 @@
 
 <section class="space-y-2">
   <Heading level={titleLevel} size={titleSize}>{title}</Heading>
-  <Card {bg}>{@render children()}</Card>
+  <Card {bg} shadow="none">{@render children()}</Card>
 </section>
