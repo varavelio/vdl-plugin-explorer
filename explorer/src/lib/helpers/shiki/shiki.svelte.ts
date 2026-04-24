@@ -11,6 +11,34 @@ const VDL_GRAMMAR_URL =
 type ShikiHighlighterLang = "vdl";
 
 /**
+ * Minimal shape of a text child node emitted by Shiki HTML transformers.
+ */
+export type ShikiHtmlTextChildNode = {
+  value?: string;
+};
+
+/**
+ * Minimal shape of an HTML node emitted by Shiki HTML transformers.
+ */
+export type ShikiHtmlNode = {
+  tagName?: string;
+  properties?: Record<string, unknown>;
+  children?: ShikiHtmlTextChildNode[];
+};
+
+/**
+ * Minimal transformer shape accepted by the local Shiki integration.
+ *
+ * @remarks
+ * We keep this type intentionally lightweight because Shiki is loaded from a
+ * CDN URL and does not provide local TypeScript types in this project.
+ */
+export type ShikiHtmlTransformer = {
+  name: string;
+  span?: (node: ShikiHtmlNode) => void;
+};
+
+/**
  * A class that provides syntax highlighting functionality using the Shiki library.
  */
 class ShikiHighlighter {
@@ -71,6 +99,8 @@ class ShikiHighlighter {
    * source code that you want to apply syntax highlighting to.
    * @param lang The programming language of the code. This should be a string that
    * matches one of the supported languages.
+   * @param theme The visual theme variant used to generate highlighted HTML.
+   * @param transformers Optional HTML transformers to mutate highlighted tokens.
    * @returns A promise that resolves to a string containing the HTML representation
    * of the highlighted code. This HTML can be directly inserted into the DOM
    * to display the highlighted code.
@@ -79,10 +109,15 @@ class ShikiHighlighter {
     code: string,
     lang: ShikiHighlighterLang = "vdl",
     theme: "light" | "dark" = "light",
+    transformers: ShikiHtmlTransformer[] = [],
   ): Promise<string> {
     if (!this.initialized) await this.init();
     const shikiTheme = theme === "dark" ? "github-dark" : "github-light";
-    return this.#highlighter.codeToHtml(code, { lang, theme: shikiTheme });
+    return this.#highlighter.codeToHtml(code, {
+      lang,
+      theme: shikiTheme,
+      transformers,
+    });
   }
 }
 
