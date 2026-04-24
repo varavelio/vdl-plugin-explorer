@@ -6,6 +6,7 @@
   import type { RichIrSchemaNode } from "$lib/store/ir";
   import type { PageProps } from "./$types";
   import DocNode from "./DocNode.svelte";
+  import EnumNode from "./EnumNode.svelte";
   import TypeNode from "./TypeNode.svelte";
 
   let { params }: PageProps = $props();
@@ -87,7 +88,7 @@
   {/if}
 
   {#if "members" in node}
-    <div class="p-4 pt-0">enum</div>
+    <div class="p-4 pt-0"><EnumNode enumDef={node} /></div>
   {/if}
 
   {#if "value" in node}
