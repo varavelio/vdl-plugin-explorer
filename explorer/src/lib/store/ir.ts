@@ -72,6 +72,18 @@ export type RichIrSchema = {
 };
 
 /**
+ * Union type representing any node in the enriched IR schema.
+ *
+ * This type is useful for components or functions that handle multiple IR entity
+ * types regardless of their specific category (type, enum, constant, or doc).
+ */
+export type RichIrSchemaNode =
+  | RichIrSchema["types"][number]
+  | RichIrSchema["enums"][number]
+  | RichIrSchema["constants"][number]
+  | RichIrSchema["docs"][number];
+
+/**
  * Build a deterministic, URL-friendly identifier for IR entities.
  *
  * The identifier combines a slugified label with the first 8 alphanumeric
