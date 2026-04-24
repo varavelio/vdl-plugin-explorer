@@ -78,11 +78,11 @@ class ShikiHighlighter {
   async highlight(
     code: string,
     lang: ShikiHighlighterLang = "vdl",
+    theme: "light" | "dark" = "light",
   ): Promise<string> {
-    if (!this.initialized) {
-      await this.init();
-    }
-    return this.#highlighter.codeToHtml(code, { lang, theme: "github-dark" });
+    if (!this.initialized) await this.init();
+    const shikiTheme = theme === "dark" ? "github-dark" : "github-light";
+    return this.#highlighter.codeToHtml(code, { lang, theme: shikiTheme });
   }
 }
 

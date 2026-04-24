@@ -1,8 +1,9 @@
 <script lang="ts">
   import { Badge, CodeBlock, Heading } from "@varavel/ui";
+  import { theme as runtimeTheme } from "@varavel/ui/runtime";
   import type { Snippet } from "svelte";
+  import { highlighter } from "$lib/helpers/shiki";
   import MarkdownContent from "./MarkdownContent.svelte";
-  import SectionCard from "./SectionCard.svelte";
 
   interface Props {
     title: string;
@@ -13,6 +14,17 @@
   }
 
   let { title, tags = [], doc, sourceCode, children }: Props = $props();
+
+  let highlightedHtml: string | undefined = $state(undefined);
+
+  $effect(() => {
+    let theme = runtimeTheme.resolved;
+    (async () => {
+      if (sourceCode) {
+        highlightedHtml = await highlighter.highlight(sourceCode, "vdl", theme);
+      }
+    })();
+  });
 </script>
 
 <div class="space-y-6">
@@ -37,6 +49,7 @@
       <Heading level="2" size="lg">Source</Heading>
       <CodeBlock
         rawCode={sourceCode}
+        {highlightedHtml}
         title="VDL"
         fileName="source.vdl"
         bordered
