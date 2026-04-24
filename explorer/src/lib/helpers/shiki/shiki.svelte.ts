@@ -14,16 +14,23 @@ type ShikiHighlighterLang = "vdl";
  * Minimal shape of a text child node emitted by Shiki HTML transformers.
  */
 export type ShikiHtmlTextChildNode = {
+  type?: string;
   value?: string;
 };
+
+/**
+ * Minimal shape for child nodes emitted by Shiki HTML transformers.
+ */
+export type ShikiHtmlChildNode = ShikiHtmlTextChildNode | ShikiHtmlNode;
 
 /**
  * Minimal shape of an HTML node emitted by Shiki HTML transformers.
  */
 export type ShikiHtmlNode = {
+  type?: string;
   tagName?: string;
   properties?: Record<string, unknown>;
-  children?: ShikiHtmlTextChildNode[];
+  children?: ShikiHtmlChildNode[];
 };
 
 /**

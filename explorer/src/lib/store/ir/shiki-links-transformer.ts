@@ -27,20 +27,52 @@ function normalizeNodeClasses(classValue: unknown): string[] {
 }
 
 /**
+ * Read plain text emitted by direct text children of a Shiki node.
+ *
+ * @param node Shiki node passed to the HTML transformer.
+ * @returns Concatenated text from direct text children.
+ */
+function getNodeDirectText(node: ShikiHtmlNode): string {
+  if (!node.children?.length) return "";
+
+  return node.children
+    .map((child) => ("value" in child ? child.value : undefined))
+    .filter((value): value is string => typeof value === "string")
+    .join("");
+}
+
+/**
  * Read plain text content from a Shiki span node.
  *
  * @param node Shiki node passed to the HTML transformer.
  * @returns The token text when available; otherwise `undefined`.
  */
 function getNodeTokenText(node: ShikiHtmlNode): string | undefined {
-  if (!node.children?.length) return undefined;
+  const tokenText = getNodeDirectText(node);
 
-  const tokenText = node.children
-    .map((child) => child.value)
-    .filter((value): value is string => typeof value === "string")
-    .join("");
+  const trimmedTokenText = tokenText.trim();
 
-  return tokenText.length > 0 ? tokenText : undefined;
+  return trimmedTokenText.length > 0 ? trimmedTokenText : undefined;
+}
+
+/**
+ * Read leading and trailing whitespace surrounding a token inside a span.
+ *
+ * @param node Shiki node passed to the HTML transformer.
+ * @returns Whitespace around the token text.
+ */
+function getNodeTokenWhitespace(node: ShikiHtmlNode): {
+  leading: string;
+  trailing: string;
+} {
+  const tokenText = getNodeDirectText(node);
+  if (!tokenText) {
+    return { leading: "", trailing: "" };
+  }
+
+  const leading = tokenText.match(/^\s*/)?.[0] ?? "";
+  const trailing = tokenText.match(/\s*$/)?.[0] ?? "";
+  return { leading, trailing };
 }
 
 /**
@@ -60,6 +92,35 @@ export function createIrNodeLinkTransformer(
 
       const href = linkDictionary.get(tokenText);
       if (!href) return;
+
+      const { leading, trailing } = getNodeTokenWhitespace(node);
+
+      if (leading || trailing) {
+        const inheritedStyle =
+          typeof node.properties?.style === "string"
+            ? node.properties.style
+            : "";
+
+        const linkNode: ShikiHtmlNode = {
+          type: "element",
+          tagName: "a",
+          properties: {
+            href,
+            class: INTERNAL_IR_LINK_CLASS,
+            ...(inheritedStyle ? { style: inheritedStyle } : {}),
+          },
+          children: [{ type: "text", value: tokenText }],
+        };
+
+        node.type = "element";
+        node.tagName = "span";
+        node.children = [
+          ...(leading ? [{ type: "text", value: leading }] : []),
+          linkNode,
+          ...(trailing ? [{ type: "text", value: trailing }] : []),
+        ];
+        return;
+      }
 
       node.tagName = "a";
 
