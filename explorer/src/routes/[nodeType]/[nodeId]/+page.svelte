@@ -73,7 +73,7 @@
 
 {#if node}
   <Breadcrumbs
-    class="w-full p-4 bg-base-100 desk:sticky desk:top-0"
+    class="w-full p-4 bg-base-100 desk:sticky desk:top-0 desk:z-20"
     items={[
       { label: nodeGroupType, icon: nodeGroupIcon },
       { label: title }
