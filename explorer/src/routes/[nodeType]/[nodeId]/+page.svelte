@@ -7,6 +7,8 @@
     Pin,
   } from "@lucide/svelte";
   import { Breadcrumbs } from "@varavel/ui";
+  import { tick } from "svelte";
+  import { browser } from "$app/environment";
   import NotFound from "$lib/components/NotFound.svelte";
   import { store } from "$lib/store";
   import type { RichIrSchemaNode } from "$lib/store/ir/index";
@@ -66,6 +68,20 @@
   let pageTitle = $derived.by(() => {
     if (!node) return "Not Found";
     return `${title} | ${nodeGroupType}`;
+  });
+
+  // Scroll to top when page changes
+  $effect(() => {
+    // Make this effect reactive to the nodeType and nodeId params.
+    params.nodeType;
+    params.nodeId;
+
+    if (!browser) return;
+    void tick().then(() => {
+      const main = document.querySelector<HTMLElement>("main");
+      if (!main) return;
+      main.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
   });
 </script>
 
