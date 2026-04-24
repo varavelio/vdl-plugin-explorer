@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { BookOpenText, Braces, ListTree, Pin } from "@lucide/svelte";
+  import {
+    BookOpenText,
+    Braces,
+    LayoutDashboard,
+    ListTree,
+    Pin,
+  } from "@lucide/svelte";
   import { Breadcrumbs } from "@varavel/ui";
   import NotFound from "$lib/components/NotFound.svelte";
   import { store } from "$lib/store";
@@ -75,6 +81,7 @@
   <Breadcrumbs
     class="w-full p-4 bg-base-100 desk:sticky desk:top-0 desk:z-20"
     items={[
+      { label: "Overview", icon: LayoutDashboard, href: "#/" },
       { label: nodeGroupType, icon: nodeGroupIcon },
       { label: title }
     ]}
