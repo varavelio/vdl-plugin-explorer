@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Badge, Heading } from "@varavel/ui";
+  import { Badge, CodeBlock, Heading } from "@varavel/ui";
   import type { Snippet } from "svelte";
   import MarkdownContent from "./MarkdownContent.svelte";
   import SectionCard from "./SectionCard.svelte";
@@ -31,8 +31,13 @@
   {/if}
 
   {#if sourceCode}
-    <SectionCard title="Source Code">
-      <pre class="overflow-x-auto"><code>{sourceCode}</code></pre>
+    <SectionCard title="Source" cardClass="p-0 border-0">
+      <CodeBlock
+        rawCode={sourceCode}
+        title="VDL"
+        fileName="source.vdl"
+        bordered
+      />
     </SectionCard>
   {/if}
 
