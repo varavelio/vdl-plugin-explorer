@@ -6,7 +6,7 @@
     "-": "Run commands using the root's Taskfile.yml file"
   },
   "devDependencies": {
-    "@varavel/vdl-plugin-sdk": "0.5.6",
+    "@varavel/vdl-plugin-sdk": "0.5.7",
     "typescript": "5.9.3"
   }
 }
