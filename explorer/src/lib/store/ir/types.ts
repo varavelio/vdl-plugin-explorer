@@ -37,6 +37,8 @@ export type RichIrSchemaSourceCode = {
 export type RichIrSchemaType = IrSchema["types"][number] & {
   id: string;
   urlPath: string;
+  /** The top-level type doc converted from markdown to HTML. */
+  htmldoc?: string;
   /** The canonical source code for this type without the type docstring. */
   sourceCode: RichIrSchemaSourceCode;
   /** The original IR node */
@@ -51,6 +53,8 @@ export type RichIrSchemaType = IrSchema["types"][number] & {
 export type RichIrSchemaEnum = IrSchema["enums"][number] & {
   id: string;
   urlPath: string;
+  /** The top-level enum doc converted from markdown to HTML. */
+  htmldoc?: string;
   /** The canonical source code for this enum without the enum docstring. */
   sourceCode: RichIrSchemaSourceCode;
   /** The original IR node */
@@ -65,6 +69,8 @@ export type RichIrSchemaEnum = IrSchema["enums"][number] & {
 export type RichIrSchemaConstant = IrSchema["constants"][number] & {
   id: string;
   urlPath: string;
+  /** The top-level constant doc converted from markdown to HTML. */
+  htmldoc?: string;
   /** The canonical source code for this constant without the constant docstring. */
   sourceCode: RichIrSchemaSourceCode;
   /** The original IR node */

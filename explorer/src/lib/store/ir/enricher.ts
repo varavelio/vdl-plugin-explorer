@@ -11,6 +11,15 @@ import { createIrNodeLinkDictionary, createIrNodeRoute } from "./links";
 import { createIrNodeLinkTransformer } from "./shiki-links-transformer";
 import type { RichIrSchema } from "./types";
 
+function markdownToHtmlDoc(markdown: string | undefined): string | undefined {
+  if (markdown === undefined) {
+    return undefined;
+  }
+
+  const parsed = marked.parse(markdown) as string;
+  return DOMPurify.sanitize(parsed);
+}
+
 /**
  * Enrich an IR schema with stable identifiers and derived doc metadata.
  *
@@ -43,9 +52,10 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
         shikiTransformers,
       );
       const sourceCode = { raw, htmlLight, htmlDark };
+      const htmldoc = markdownToHtmlDoc(type.doc);
 
       const sourceIr = { ...type };
-      return { ...type, id, urlPath, sourceCode, sourceIr };
+      return { ...type, id, urlPath, htmldoc, sourceCode, sourceIr };
     }),
   );
 
@@ -67,9 +77,10 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
         shikiTransformers,
       );
       const sourceCode = { raw, htmlLight, htmlDark };
+      const htmldoc = markdownToHtmlDoc(en.doc);
 
       const sourceIr = { ...en };
-      return { ...en, id, urlPath, sourceCode, sourceIr };
+      return { ...en, id, urlPath, htmldoc, sourceCode, sourceIr };
     }),
   );
 
@@ -95,9 +106,10 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
         shikiTransformers,
       );
       const sourceCode = { raw, htmlLight, htmlDark };
+      const htmldoc = markdownToHtmlDoc(constant.doc);
 
       const sourceIr = { ...constant };
-      return { ...constant, id, urlPath, sourceCode, sourceIr };
+      return { ...constant, id, urlPath, htmldoc, sourceCode, sourceIr };
     }),
   );
 
@@ -107,8 +119,7 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
     const { id, urlPath } = createIrNodeRoute("docs", title, doc);
 
     const raw = doc.content;
-    const parsed = marked.parse(raw) as string;
-    const htmlLight = DOMPurify.sanitize(parsed);
+    const htmlLight = markdownToHtmlDoc(raw) ?? "";
     const htmlDark = htmlLight;
     const sourceCode = { raw, htmlLight, htmlDark };
 
