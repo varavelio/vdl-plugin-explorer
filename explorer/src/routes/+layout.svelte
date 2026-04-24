@@ -5,14 +5,17 @@
   import { AppLayout } from "@varavel/ui/layouts";
   import { viewport } from "@varavel/ui/runtime";
   import Logo from "$lib/components/Logo.svelte";
+  import { highlighter } from "$lib/helpers/shiki";
   import { store } from "$lib/store";
   import SearchButton from "./components/SearchButton.svelte";
   import SidebarNav from "./components/SidebarNav.svelte";
 
   let { children } = $props();
+
+  let initialized = $derived(store.initialized && highlighter.initialized);
 </script>
 
-{#if !store.initialized}
+{#if !initialized}
   <div class="w-dvw h-dvh overflow-hidden flex items-center justify-center">
     <Loader size="lg" />
   </div>
