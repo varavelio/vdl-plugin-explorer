@@ -46,7 +46,6 @@
     <CodeBlock
       rawCode={sourceCode.raw}
       {highlightedHtml}
-      codeWrapperClass="p-4"
       title="VDL"
       fileName="source.vdl"
       bordered

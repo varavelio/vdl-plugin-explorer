@@ -2,17 +2,20 @@
 @import "@varavel/ui/theme.css";
 @source "../node_modules/@varavel/ui";
 
-/* Add style to links in shiki code highlighting */
-a.vdl-internal-link {
-  @apply cursor-pointer underline decoration-dashed decoration-current underline-offset-4;
-  @apply transition-opacity duration-200 ease-in-out;
-  &:hover {
-    @apply opacity-70;
-  }
-}
-
-/* Add line numbers to shiki code highlighting */
+/* Custom shiki code highlighting style */
 .shiki {
+  @apply p-4;
+
+  /* Add style to links */
+  a.vdl-internal-link {
+    @apply cursor-pointer underline decoration-dashed decoration-current underline-offset-4;
+    @apply transition-opacity duration-200 ease-in-out;
+    &:hover {
+      @apply opacity-70;
+    }
+  }
+
+  /* Add line numbers */
   code {
     counter-reset: step;
     counter-increment: step 0;
