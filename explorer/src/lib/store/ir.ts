@@ -1,4 +1,5 @@
 import type { IrSchema } from "@varavel/vdl-plugin-sdk";
+import { generateVdl } from "@varavel/vdl-plugin-sdk/utils/codegen";
 import { fingerprint as createFingerprint } from "@varavel/vdl-plugin-sdk/utils/crypto";
 import {
   firstParagraph as mdFirstParagraph,
@@ -51,6 +52,10 @@ export const EMPTY_RICH_IR = enrichIrSchema(EMPTY_IR);
 export type RichIrSchemaType = IrSchema["types"][number] & {
   id: string;
   urlPath: string;
+  /** The canonical source code for this type without the type docstring. */
+  sourceCode: string;
+  /** The original IR node */
+  sourceIr: IrSchema["types"][number];
 };
 
 /**
@@ -61,6 +66,10 @@ export type RichIrSchemaType = IrSchema["types"][number] & {
 export type RichIrSchemaEnum = IrSchema["enums"][number] & {
   id: string;
   urlPath: string;
+  /** The canonical source code for this enum without the enum docstring. */
+  sourceCode: string;
+  /** The original IR node */
+  sourceIr: IrSchema["enums"][number];
 };
 
 /**
@@ -71,6 +80,10 @@ export type RichIrSchemaEnum = IrSchema["enums"][number] & {
 export type RichIrSchemaConstant = IrSchema["constants"][number] & {
   id: string;
   urlPath: string;
+  /** The canonical source code for this constant without the constant docstring. */
+  sourceCode: string;
+  /** The original IR node */
+  sourceIr: IrSchema["constants"][number];
 };
 
 /**
@@ -84,6 +97,8 @@ export type RichIrSchemaDoc = IrSchema["docs"][number] & {
   urlPath: string;
   title: string;
   firstParagraph: string;
+  /** The original IR node */
+  sourceIr: IrSchema["docs"][number];
 };
 
 /**
@@ -142,19 +157,25 @@ function enrichIrSchema(ir: IrSchema): RichIrSchema {
   const types: RichIrSchema["types"] = ir.types.map((type) => {
     const id = createId(type.name, type);
     const urlPath = `#/types/${id}`;
-    return { ...type, id, urlPath };
+    const sourceCode = generateVdl(type, { docstrings: "strip-top-level" });
+    const sourceIr = { ...type };
+    return { ...type, id, urlPath, sourceCode, sourceIr };
   });
 
   const enums: RichIrSchema["enums"] = ir.enums.map((en) => {
     const id = createId(en.name, en);
     const urlPath = `#/enums/${id}`;
-    return { ...en, id, urlPath };
+    const sourceCode = generateVdl(en, { docstrings: "strip-top-level" });
+    const sourceIr = { ...en };
+    return { ...en, id, urlPath, sourceCode, sourceIr };
   });
 
   const constants: RichIrSchema["constants"] = ir.constants.map((constant) => {
     const id = createId(constant.name, constant);
     const urlPath = `#/constants/${id}`;
-    return { ...constant, id, urlPath };
+    const sourceCode = generateVdl(constant, { docstrings: "strip-top-level" });
+    const sourceIr = { ...constant };
+    return { ...constant, id, urlPath, sourceCode, sourceIr };
   });
 
   const docs: RichIrSchema["docs"] = ir.docs.map((doc) => {
@@ -162,7 +183,8 @@ function enrichIrSchema(ir: IrSchema): RichIrSchema {
     const firstParagraph = mdFirstParagraph(doc.content) ?? "";
     const id = createId(title, doc);
     const urlPath = `#/docs/${id}`;
-    return { ...doc, id, urlPath, title, firstParagraph };
+    const sourceIr = { ...doc };
+    return { ...doc, id, urlPath, title, firstParagraph, sourceIr };
   });
 
   return {
