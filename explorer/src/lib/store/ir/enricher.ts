@@ -6,7 +6,7 @@ import {
 } from "@varavel/vdl-plugin-sdk/utils/markdown";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
-import { highlighter } from "$lib/helpers/shiki";
+import { highlighter } from "$lib/shiki";
 import { createIrNodeLinkDictionary, createIrNodeRoute } from "./links";
 import { createIrNodeLinkTransformer } from "./shiki-links-transformer";
 import type { RichIrSchema } from "./types";

@@ -5,7 +5,7 @@
   import { AppLayout } from "@varavel/ui/layouts";
   import { viewport } from "@varavel/ui/runtime";
   import Logo from "$lib/components/Logo.svelte";
-  import { highlighter } from "$lib/helpers/shiki";
+  import { highlighter } from "$lib/shiki";
   import { store } from "$lib/store";
   import SearchButton from "./components/SearchButton.svelte";
   import SidebarNav from "./components/SidebarNav.svelte";

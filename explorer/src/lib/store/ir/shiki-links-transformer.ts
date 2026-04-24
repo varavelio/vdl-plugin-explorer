@@ -1,4 +1,4 @@
-import type { ShikiHtmlNode, ShikiHtmlTransformer } from "$lib/helpers/shiki";
+import type { ShikiHtmlNode, ShikiHtmlTransformer } from "$lib/shiki";
 
 /**
  * CSS class attached to internal schema reference links rendered by Shiki.
