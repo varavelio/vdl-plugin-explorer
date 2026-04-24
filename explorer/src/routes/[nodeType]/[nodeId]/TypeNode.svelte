@@ -37,7 +37,7 @@
   });
 
   let sourceCode = $derived.by(() => {
-    return generateVdl(typeDef);
+    return generateVdl(typeDef, { docstrings: "strip-first" });
   });
 </script>
 

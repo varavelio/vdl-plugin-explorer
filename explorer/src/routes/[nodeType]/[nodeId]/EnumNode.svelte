@@ -30,7 +30,7 @@
   });
 
   let sourceCode = $derived.by(() => {
-    return generateVdl(enumDef);
+    return generateVdl(enumDef, { docstrings: "strip-first" });
   });
 </script>
 
