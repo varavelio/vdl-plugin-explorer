@@ -1,3 +1,16 @@
 @import "tailwindcss";
 @import "@varavel/ui/theme.css";
 @source "../node_modules/@varavel/ui";
+
+/* Shiki links inserted by VDL transformer */
+a.vdl-internal-link {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+  text-decoration-style: dashed;
+  text-underline-offset: 0.25rem;
+  transition: opacity 0.2s ease;
+}
+a.vdl-internal-link:hover {
+  opacity: 0.7;
+}
