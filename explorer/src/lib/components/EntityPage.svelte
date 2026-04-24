@@ -2,28 +2,25 @@
   import { Badge, CodeBlock, Heading } from "@varavel/ui";
   import { theme as runtimeTheme } from "@varavel/ui/runtime";
   import type { Snippet } from "svelte";
-  import { highlighter } from "$lib/helpers/shiki";
+  import type { RichIrSchemaSourceCode } from "$lib/store/ir";
   import MarkdownContent from "./MarkdownContent.svelte";
 
   interface Props {
     title: string;
+    sourceCode: RichIrSchemaSourceCode;
     tags?: string[];
     doc?: string;
-    sourceCode?: string;
     children?: Snippet;
   }
 
   let { title, tags = [], doc, sourceCode, children }: Props = $props();
 
-  let highlightedHtml: string | undefined = $state(undefined);
-
-  $effect(() => {
-    let theme = runtimeTheme.resolved;
-    (async () => {
-      if (sourceCode) {
-        highlightedHtml = await highlighter.highlight(sourceCode, "vdl", theme);
-      }
-    })();
+  let highlightedHtml = $derived.by(() => {
+    if (!sourceCode) return undefined;
+    if (runtimeTheme.resolved === "dark") {
+      return sourceCode.htmlDark;
+    }
+    return sourceCode.htmlLight;
   });
 </script>
 
@@ -44,18 +41,16 @@
     {/if}
   </section>
 
-  {#if sourceCode}
-    <section class="space-y-4">
-      <Heading level="2" size="lg">Source</Heading>
-      <CodeBlock
-        rawCode={sourceCode}
-        {highlightedHtml}
-        title="VDL"
-        fileName="source.vdl"
-        bordered
-      />
-    </section>
-  {/if}
+  <section class="space-y-4">
+    <Heading level="2" size="lg">Source</Heading>
+    <CodeBlock
+      rawCode={sourceCode.raw}
+      {highlightedHtml}
+      title="VDL"
+      fileName="source.vdl"
+      bordered
+    />
+  </section>
 
   {@render children?.()}
 </div>
