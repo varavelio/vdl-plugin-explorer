@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Badge, CodeBlock, Heading } from "@varavel/ui";
   import { theme as runtimeTheme } from "@varavel/ui/runtime";
-  import type { Snippet } from "svelte";
   import type { RichIrSchemaSourceCode } from "$lib/store/ir/index";
   import MarkdownContent from "./MarkdownContent.svelte";
 
@@ -10,10 +9,9 @@
     sourceCode: RichIrSchemaSourceCode;
     tags?: string[];
     doc?: string;
-    children?: Snippet;
   }
 
-  let { title, tags = [], doc, sourceCode, children }: Props = $props();
+  let { title, tags = [], doc, sourceCode }: Props = $props();
 
   let highlightedHtml = $derived.by(() => {
     if (!sourceCode) return undefined;
@@ -51,6 +49,4 @@
       bordered
     />
   </section>
-
-  {@render children?.()}
 </div>

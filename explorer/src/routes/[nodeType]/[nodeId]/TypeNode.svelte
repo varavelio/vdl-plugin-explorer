@@ -1,9 +1,6 @@
 <script lang="ts">
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
-  import AnnotationList from "$lib/components/AnnotationList.svelte";
   import EntityPage from "$lib/components/EntityPage.svelte";
-  import SectionCard from "$lib/components/SectionCard.svelte";
-  import TypeRefView from "$lib/components/TypeRefView.svelte";
   import type { RichIrSchemaType } from "$lib/store/ir/index";
 
   interface Props {
@@ -41,14 +38,4 @@
   title={typeDef.name}
   doc={typeDef.doc}
   sourceCode={typeDef.sourceCode}
->
-  <SectionCard title="Definition">
-    <TypeRefView typeRef={typeDef.typeRef} />
-  </SectionCard>
-
-  {#if typeDef.annotations.length > 0}
-    <SectionCard title="Annotations">
-      <AnnotationList annotations={typeDef.annotations} />
-    </SectionCard>
-  {/if}
-</EntityPage>
+/>
