@@ -9,7 +9,7 @@
   import { Breadcrumbs } from "@varavel/ui";
   import { tick } from "svelte";
   import { browser } from "$app/environment";
-  import NotFound from "$lib/components/NotFound.svelte";
+  import ErrorPage from "$lib/components/ErrorPage.svelte";
   import { store } from "$lib/store";
   import type { RichIrSchemaNode } from "$lib/store/ir/index";
   import type { PageProps } from "./$types";
@@ -90,7 +90,7 @@
 </svelte:head>
 
 {#if !node}
-  <NotFound />
+  <ErrorPage />
 {/if}
 
 {#if node}

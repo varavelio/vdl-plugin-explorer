@@ -4,9 +4,15 @@
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
     class?: ClassValue;
+    title?: string;
+    message?: string;
   }
 
-  let { class: className }: Props = $props();
+  let {
+    class: className,
+    title = "Page Not Found",
+    message = "The page you are looking for does not exist.",
+  }: Props = $props();
 </script>
 
 <div
@@ -15,6 +21,6 @@
     className
   ]}
 >
-  <Heading size="2xl">Page Not Found</Heading>
-  <p class="text-content-muted">The page you are looking for does not exist.</p>
+  <Heading size="2xl">{title}</Heading>
+  <p class="text-content-muted">{message}</p>
 </div>
