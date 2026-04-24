@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { ListTree } from "@lucide/svelte";
   import { Card, Heading } from "@varavel/ui";
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
   import AnnotationList from "$lib/components/AnnotationList.svelte";
@@ -30,13 +29,7 @@
   });
 </script>
 
-<EntityPage
-  section="Enums"
-  title={enumDef.name}
-  icon={ListTree}
-  {tags}
-  doc={enumDef.doc}
->
+<EntityPage {tags} title={enumDef.name} doc={enumDef.doc}>
   <SectionCard title="Members">
     {#if enumDef.members.length === 0}
       <p class="text-content-muted text-sm">This enum has no members.</p>

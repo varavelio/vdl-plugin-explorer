@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Braces } from "@lucide/svelte";
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
   import AnnotationList from "$lib/components/AnnotationList.svelte";
   import EntityPage from "$lib/components/EntityPage.svelte";
@@ -37,13 +36,7 @@
   });
 </script>
 
-<EntityPage
-  section="Types"
-  title={typeDef.name}
-  icon={Braces}
-  {tags}
-  doc={typeDef.doc}
->
+<EntityPage {tags} title={typeDef.name} doc={typeDef.doc}>
   <SectionCard title="Definition">
     <TypeRefView typeRef={typeDef.typeRef} />
   </SectionCard>

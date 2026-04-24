@@ -1,27 +1,20 @@
 <script lang="ts">
-  import { Badge, Breadcrumbs, Heading } from "@varavel/ui";
-  import type { Component, Snippet } from "svelte";
+  import { Badge, Heading } from "@varavel/ui";
+  import type { Snippet } from "svelte";
   import MarkdownContent from "./MarkdownContent.svelte";
   import SectionCard from "./SectionCard.svelte";
 
   interface Props {
-    section: string;
     title: string;
-    icon?: Component;
     tags?: string[];
     doc?: string;
     children?: Snippet;
   }
 
-  let { section, title, icon, tags = [], doc, children }: Props = $props();
+  let { title, tags = [], doc, children }: Props = $props();
 </script>
 
-<Breadcrumbs
-  class="w-full bg-base-100 p-4 desk:sticky desk:top-0 desk:z-10"
-  items={[{ label: section, icon }, { label: title }]}
-/>
-
-<div class="space-y-6 p-4 pt-0">
+<div class="space-y-6">
   <section class="flex justify-between flex-wrap items-center gap-2">
     <Heading size="2xl">{title}</Heading>
 

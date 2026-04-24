@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { Pin } from "@lucide/svelte";
   import { Card, Heading } from "@varavel/ui";
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
   import AnnotationList from "$lib/components/AnnotationList.svelte";
@@ -39,13 +38,7 @@
   });
 </script>
 
-<EntityPage
-  section="Constants"
-  title={constantDef.name}
-  icon={Pin}
-  {tags}
-  doc={constantDef.doc}
->
+<EntityPage {tags} title={constantDef.name} doc={constantDef.doc}>
   <section class="space-y-2">
     <Heading level="2" size="lg">Value</Heading>
 
