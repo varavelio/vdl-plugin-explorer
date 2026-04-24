@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Card, Heading } from "@varavel/ui";
-  import { generateVdl } from "@varavel/vdl-plugin-sdk/utils/codegen";
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
   import AnnotationList from "$lib/components/AnnotationList.svelte";
   import EntityPage from "$lib/components/EntityPage.svelte";
@@ -37,13 +36,14 @@
 
     return nextTags;
   });
-
-  let sourceCode = $derived.by(() => {
-    return generateVdl(constantDef, { docstrings: "strip-first" });
-  });
 </script>
 
-<EntityPage {tags} title={constantDef.name} doc={constantDef.doc} {sourceCode}>
+<EntityPage
+  {tags}
+  title={constantDef.name}
+  doc={constantDef.doc}
+  sourceCode={constantDef.sourceCode}
+>
   <section class="space-y-2">
     <Heading level="2" size="lg">Value</Heading>
 

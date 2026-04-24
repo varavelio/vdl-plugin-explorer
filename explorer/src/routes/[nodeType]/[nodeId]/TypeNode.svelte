@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { generateVdl } from "@varavel/vdl-plugin-sdk/utils/codegen";
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
   import AnnotationList from "$lib/components/AnnotationList.svelte";
   import EntityPage from "$lib/components/EntityPage.svelte";
@@ -35,13 +34,14 @@
 
     return nextTags;
   });
-
-  let sourceCode = $derived.by(() => {
-    return generateVdl(typeDef, { docstrings: "strip-first" });
-  });
 </script>
 
-<EntityPage {tags} title={typeDef.name} doc={typeDef.doc} {sourceCode}>
+<EntityPage
+  {tags}
+  title={typeDef.name}
+  doc={typeDef.doc}
+  sourceCode={typeDef.sourceCode}
+>
   <SectionCard title="Definition">
     <TypeRefView typeRef={typeDef.typeRef} />
   </SectionCard>
