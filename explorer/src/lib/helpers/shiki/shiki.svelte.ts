@@ -19,6 +19,13 @@ class ShikiHighlighter {
    */
   initialized = $state(false);
 
+  /**
+   * A private variable that holds the promise for the initialization process. This is used
+   * to avoid race conditions when multiple calls to the highlight method are made before
+   * the highlighter is fully initialized.
+   */
+  #initPromise: Promise<void> | null = null;
+
   // biome-ignore lint/suspicious/noExplicitAny: We are using the CDN so we don't have types
   #highlighter: any = null;
 
@@ -32,23 +39,29 @@ class ShikiHighlighter {
    * ShikiHighlighter instance is created.
    */
   private async init() {
-    const [{ createHighlighter }, grammarRequest] = await Promise.all([
-      // @ts-expect-error: We are using the CDN so we don't have types
-      import("https://esm.run/shiki@4.0.2"),
-      fetch(VDL_GRAMMAR_URL),
-    ]);
+    if (this.#initPromise) return this.#initPromise;
 
-    if (!grammarRequest.ok) {
-      throw new Error("Failed to load VDL grammar for syntax highlighting");
-    }
-    const grammar = await grammarRequest.json();
+    this.#initPromise = (async () => {
+      const [{ createHighlighter }, grammarRequest] = await Promise.all([
+        // @ts-expect-error: We are using the CDN so we don't have types
+        import("https://esm.run/shiki@4.0.2"),
+        fetch(VDL_GRAMMAR_URL),
+      ]);
 
-    this.#highlighter = await createHighlighter({
-      themes: ["github-dark", "github-light"],
-      langs: [{ ...grammar, name: "vdl" }],
-    });
+      if (!grammarRequest.ok) {
+        throw new Error("Failed to load VDL grammar for syntax highlighting");
+      }
+      const grammar = await grammarRequest.json();
 
-    this.initialized = true;
+      this.#highlighter = await createHighlighter({
+        themes: ["github-dark", "github-light"],
+        langs: [{ ...grammar, name: "vdl" }],
+      });
+
+      this.initialized = true;
+    })();
+
+    return this.#initPromise;
   }
 
   /**
