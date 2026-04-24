@@ -44,6 +44,49 @@ export const EMPTY_IR: IrSchema = {
 export const EMPTY_RICH_IR = enrichIrSchema(EMPTY_IR);
 
 /**
+ * Enriched IR type entry.
+ *
+ * Adds stable identifier and router path metadata to the base schema item.
+ */
+export type RichIrSchemaType = IrSchema["types"][number] & {
+  id: string;
+  urlPath: string;
+};
+
+/**
+ * Enriched IR enum entry.
+ *
+ * Adds stable identifier and router path metadata to the base schema item.
+ */
+export type RichIrSchemaEnum = IrSchema["enums"][number] & {
+  id: string;
+  urlPath: string;
+};
+
+/**
+ * Enriched IR constant entry.
+ *
+ * Adds stable identifier and router path metadata to the base schema item.
+ */
+export type RichIrSchemaConstant = IrSchema["constants"][number] & {
+  id: string;
+  urlPath: string;
+};
+
+/**
+ * Enriched IR doc entry.
+ *
+ * Adds stable identifier, router path, and derived presentation metadata to the
+ * base schema item.
+ */
+export type RichIrSchemaDoc = IrSchema["docs"][number] & {
+  id: string;
+  urlPath: string;
+  title: string;
+  firstParagraph: string;
+};
+
+/**
  * IR schema enriched with stable identifiers and derived documentation metadata.
  *
  * Each type, enum, constant, and doc receives an `id` and `urlPath` fields. Docs also
@@ -51,24 +94,10 @@ export const EMPTY_RICH_IR = enrichIrSchema(EMPTY_IR);
  */
 export type RichIrSchema = {
   entryPoint: string;
-  types: (IrSchema["types"][number] & {
-    id: string;
-    urlPath: string;
-  })[];
-  enums: (IrSchema["enums"][number] & {
-    id: string;
-    urlPath: string;
-  })[];
-  constants: (IrSchema["constants"][number] & {
-    id: string;
-    urlPath: string;
-  })[];
-  docs: (IrSchema["docs"][number] & {
-    id: string;
-    urlPath: string;
-    title: string;
-    firstParagraph: string;
-  })[];
+  types: RichIrSchemaType[];
+  enums: RichIrSchemaEnum[];
+  constants: RichIrSchemaConstant[];
+  docs: RichIrSchemaDoc[];
 };
 
 /**
@@ -78,10 +107,10 @@ export type RichIrSchema = {
  * types regardless of their specific category (type, enum, constant, or doc).
  */
 export type RichIrSchemaNode =
-  | RichIrSchema["types"][number]
-  | RichIrSchema["enums"][number]
-  | RichIrSchema["constants"][number]
-  | RichIrSchema["docs"][number];
+  | RichIrSchemaType
+  | RichIrSchemaEnum
+  | RichIrSchemaConstant
+  | RichIrSchemaDoc;
 
 /**
  * Build a deterministic, URL-friendly identifier for IR entities.
