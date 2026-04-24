@@ -6,7 +6,7 @@
   import LiteralValueView from "$lib/components/LiteralValueView.svelte";
   import MarkdownContent from "$lib/components/MarkdownContent.svelte";
   import SectionCard from "$lib/components/SectionCard.svelte";
-  import type { RichIrSchemaEnum } from "$lib/store/ir";
+  import type { RichIrSchemaEnum } from "$lib/store/ir/index";
 
   interface Props {
     enumDef: RichIrSchemaEnum;

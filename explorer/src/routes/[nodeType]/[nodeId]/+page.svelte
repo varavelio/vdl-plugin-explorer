@@ -9,7 +9,7 @@
   import { Breadcrumbs } from "@varavel/ui";
   import NotFound from "$lib/components/NotFound.svelte";
   import { store } from "$lib/store";
-  import type { RichIrSchemaNode } from "$lib/store/ir";
+  import type { RichIrSchemaNode } from "$lib/store/ir/index";
   import type { PageProps } from "./$types";
   import ConstantNode from "./ConstantNode.svelte";
   import DocNode from "./DocNode.svelte";

@@ -4,7 +4,7 @@
   import AnnotationList from "$lib/components/AnnotationList.svelte";
   import EntityPage from "$lib/components/EntityPage.svelte";
   import LiteralValueView from "$lib/components/LiteralValueView.svelte";
-  import type { RichIrSchemaConstant } from "$lib/store/ir";
+  import type { RichIrSchemaConstant } from "$lib/store/ir/index";
 
   interface Props {
     constantDef: RichIrSchemaConstant;

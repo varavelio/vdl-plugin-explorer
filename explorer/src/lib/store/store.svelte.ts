@@ -1,5 +1,9 @@
 import { browser } from "$app/environment";
-import { EMPTY_RICH_IR, loadIrSchema, type RichIrSchema } from "$lib/store/ir";
+import {
+  EMPTY_RICH_IR,
+  loadIrSchema,
+  type RichIrSchema,
+} from "$lib/store/ir/index";
 
 /**
  * Store class holds all the application shared state.

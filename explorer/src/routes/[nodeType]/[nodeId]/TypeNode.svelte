@@ -4,7 +4,7 @@
   import EntityPage from "$lib/components/EntityPage.svelte";
   import SectionCard from "$lib/components/SectionCard.svelte";
   import TypeRefView from "$lib/components/TypeRefView.svelte";
-  import type { RichIrSchemaType } from "$lib/store/ir";
+  import type { RichIrSchemaType } from "$lib/store/ir/index";
 
   interface Props {
     typeDef: RichIrSchemaType;

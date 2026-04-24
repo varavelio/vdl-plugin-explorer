@@ -1,6 +1,6 @@
 <script lang="ts">
   import MarkdownContent from "$lib/components/MarkdownContent.svelte";
-  import type { RichIrSchemaDoc } from "$lib/store/ir";
+  import type { RichIrSchemaDoc } from "$lib/store/ir/index";
 
   interface Props {
     doc: RichIrSchemaDoc;

@@ -49,7 +49,13 @@ export const EMPTY_IR: IrSchema = {
 /**
  * An enriched empty IR schema.
  */
-export const EMPTY_RICH_IR = await enrichIrSchema(EMPTY_IR);
+export const EMPTY_RICH_IR: RichIrSchema = {
+  entryPoint: "",
+  types: [],
+  enums: [],
+  constants: [],
+  docs: [],
+};
 
 /** Contains the raw code and highlighted light and dark HTML representation of a source code */
 export type RichIrSchemaSourceCode = {
