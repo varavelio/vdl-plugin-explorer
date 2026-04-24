@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Card, Heading } from "@varavel/ui";
+  import { generateVdl } from "@varavel/vdl-plugin-sdk/utils/codegen";
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
   import AnnotationList from "$lib/components/AnnotationList.svelte";
   import EntityPage from "$lib/components/EntityPage.svelte";
@@ -27,9 +28,13 @@
 
     return nextTags;
   });
+
+  let sourceCode = $derived.by(() => {
+    return generateVdl(enumDef);
+  });
 </script>
 
-<EntityPage {tags} title={enumDef.name} doc={enumDef.doc}>
+<EntityPage {tags} title={enumDef.name} doc={enumDef.doc} {sourceCode}>
   <SectionCard title="Members">
     {#if enumDef.members.length === 0}
       <p class="text-content-muted text-sm">This enum has no members.</p>
