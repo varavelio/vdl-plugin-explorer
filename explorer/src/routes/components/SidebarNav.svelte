@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { BookOpenText, Braces, ListTree, Pin } from "@lucide/svelte";
+  import {
+    BookOpenText,
+    Braces,
+    LayoutDashboard,
+    ListTree,
+    Pin,
+  } from "@lucide/svelte";
   import { Nav } from "@varavel/ui";
   import { tick } from "svelte";
   import { browser } from "$app/environment";
@@ -35,6 +41,13 @@
 
 <div bind:this={navWrapper}>
   <Nav.Root>
+    <Nav.Item
+      label="Overview"
+      icon={LayoutDashboard}
+      href="#/"
+      active={page.url.hash === "#/" || page.url.hash === ""}
+    />
+
     {#if store.ir.docs.length > 0}
       <Nav.Group label="Docs" icon={BookOpenText} open>
         {#each store.ir.docs as doc (doc.urlPath)}
