@@ -8,10 +8,11 @@
     title: string;
     tags?: string[];
     doc?: string;
+    sourceCode?: string;
     children?: Snippet;
   }
 
-  let { title, tags = [], doc, children }: Props = $props();
+  let { title, tags = [], doc, sourceCode, children }: Props = $props();
 </script>
 
 <div class="space-y-6">
@@ -27,6 +28,12 @@
 
   {#if doc}
     <SectionCard title="Docs"><MarkdownContent content={doc} /></SectionCard>
+  {/if}
+
+  {#if sourceCode}
+    <SectionCard title="Source Code">
+      <pre class="overflow-x-auto"><code>{sourceCode}</code></pre>
+    </SectionCard>
   {/if}
 
   {@render children?.()}
