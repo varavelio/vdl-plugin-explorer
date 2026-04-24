@@ -7,7 +7,10 @@ import {
 } from "@varavel/vdl-plugin-sdk/utils/markdown";
 import { isEmptyObject } from "@varavel/vdl-plugin-sdk/utils/predicates";
 import { slugify } from "@varavel/vdl-plugin-sdk/utils/strings";
+import DOMPurify from "dompurify";
+import { marked } from "marked";
 import { browser, dev } from "$app/environment";
+import { highlighter } from "$lib/helpers/shiki";
 
 /**
  * Browser global values injected by the generated VDL explorer bundle.
@@ -42,7 +45,14 @@ export const EMPTY_IR: IrSchema = {
 /**
  * An enriched empty IR schema.
  */
-export const EMPTY_RICH_IR = enrichIrSchema(EMPTY_IR);
+export const EMPTY_RICH_IR = await enrichIrSchema(EMPTY_IR);
+
+/** Contains the raw code and highlighted light and dark HTML representation of a source code */
+export type RichIrSchemaSourceCode = {
+  raw: string;
+  htmlLight: string;
+  htmlDark: string;
+};
 
 /**
  * Enriched IR type entry.
@@ -53,7 +63,7 @@ export type RichIrSchemaType = IrSchema["types"][number] & {
   id: string;
   urlPath: string;
   /** The canonical source code for this type without the type docstring. */
-  sourceCode: string;
+  sourceCode: RichIrSchemaSourceCode;
   /** The original IR node */
   sourceIr: IrSchema["types"][number];
 };
@@ -67,7 +77,7 @@ export type RichIrSchemaEnum = IrSchema["enums"][number] & {
   id: string;
   urlPath: string;
   /** The canonical source code for this enum without the enum docstring. */
-  sourceCode: string;
+  sourceCode: RichIrSchemaSourceCode;
   /** The original IR node */
   sourceIr: IrSchema["enums"][number];
 };
@@ -81,7 +91,7 @@ export type RichIrSchemaConstant = IrSchema["constants"][number] & {
   id: string;
   urlPath: string;
   /** The canonical source code for this constant without the constant docstring. */
-  sourceCode: string;
+  sourceCode: RichIrSchemaSourceCode;
   /** The original IR node */
   sourceIr: IrSchema["constants"][number];
 };
@@ -97,6 +107,8 @@ export type RichIrSchemaDoc = IrSchema["docs"][number] & {
   urlPath: string;
   title: string;
   firstParagraph: string;
+  /** The original markdown and HTML of the doc */
+  sourceCode: RichIrSchemaSourceCode;
   /** The original IR node */
   sourceIr: IrSchema["docs"][number];
 };
@@ -153,38 +165,74 @@ function createId(name: string, obj: unknown): string {
  * @param ir Base IR schema to enrich.
  * @returns Enriched IR schema with identifiers and doc presentation fields.
  */
-function enrichIrSchema(ir: IrSchema): RichIrSchema {
-  const types: RichIrSchema["types"] = ir.types.map((type) => {
-    const id = createId(type.name, type);
-    const urlPath = `#/types/${id}`;
-    const sourceCode = generateVdl(type, { docstrings: "strip-top-level" });
-    const sourceIr = { ...type };
-    return { ...type, id, urlPath, sourceCode, sourceIr };
-  });
+async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
+  const types: RichIrSchema["types"] = await Promise.all(
+    ir.types.map(async (type) => {
+      const id = createId(type.name, type);
+      const urlPath = `#/types/${id}`;
 
-  const enums: RichIrSchema["enums"] = ir.enums.map((en) => {
-    const id = createId(en.name, en);
-    const urlPath = `#/enums/${id}`;
-    const sourceCode = generateVdl(en, { docstrings: "strip-top-level" });
-    const sourceIr = { ...en };
-    return { ...en, id, urlPath, sourceCode, sourceIr };
-  });
+      const raw = generateVdl(type, { docstrings: "strip-top-level" });
+      const htmlLight = await highlighter.highlight(raw, "vdl", "light");
+      const htmlDark = await highlighter.highlight(raw, "vdl", "dark");
+      const sourceCode = { raw, htmlLight, htmlDark };
 
-  const constants: RichIrSchema["constants"] = ir.constants.map((constant) => {
-    const id = createId(constant.name, constant);
-    const urlPath = `#/constants/${id}`;
-    const sourceCode = generateVdl(constant, { docstrings: "strip-top-level" });
-    const sourceIr = { ...constant };
-    return { ...constant, id, urlPath, sourceCode, sourceIr };
-  });
+      const sourceIr = { ...type };
+      return { ...type, id, urlPath, sourceCode, sourceIr };
+    }),
+  );
+
+  const enums: RichIrSchema["enums"] = await Promise.all(
+    ir.enums.map(async (en) => {
+      const id = createId(en.name, en);
+      const urlPath = `#/enums/${id}`;
+
+      const raw = generateVdl(en, { docstrings: "strip-top-level" });
+      const htmlLight = await highlighter.highlight(raw, "vdl", "light");
+      const htmlDark = await highlighter.highlight(raw, "vdl", "dark");
+      const sourceCode = { raw, htmlLight, htmlDark };
+
+      const sourceIr = { ...en };
+      return { ...en, id, urlPath, sourceCode, sourceIr };
+    }),
+  );
+
+  const constants: RichIrSchema["constants"] = await Promise.all(
+    ir.constants.map(async (constant) => {
+      const id = createId(constant.name, constant);
+      const urlPath = `#/constants/${id}`;
+
+      const raw = generateVdl(constant, { docstrings: "strip-top-level" });
+      const htmlLight = await highlighter.highlight(raw, "vdl", "light");
+      const htmlDark = await highlighter.highlight(raw, "vdl", "dark");
+      const sourceCode = { raw, htmlLight, htmlDark };
+
+      const sourceIr = { ...constant };
+      return { ...constant, id, urlPath, sourceCode, sourceIr };
+    }),
+  );
 
   const docs: RichIrSchema["docs"] = ir.docs.map((doc) => {
     const title = mdTitle(doc.content);
     const firstParagraph = mdFirstParagraph(doc.content) ?? "";
     const id = createId(title, doc);
     const urlPath = `#/docs/${id}`;
+
+    const raw = doc.content;
+    const parsed = marked.parse(raw) as string;
+    const htmlLight = DOMPurify.sanitize(parsed);
+    const htmlDark = htmlLight;
+    const sourceCode = { raw, htmlLight, htmlDark };
+
     const sourceIr = { ...doc };
-    return { ...doc, id, urlPath, title, firstParagraph, sourceIr };
+    return {
+      ...doc,
+      id,
+      urlPath,
+      title,
+      firstParagraph,
+      sourceCode,
+      sourceIr,
+    };
   });
 
   return {
@@ -263,14 +311,14 @@ function findProductionIr(): IrSchema {
  *
  * @returns A rich IR schema containing stable `id` fields and parsed doc metadata.
  */
-export function loadIrSchema(): RichIrSchema {
+export async function loadIrSchema(): Promise<RichIrSchema> {
   if (hasProductionIr()) {
-    return enrichIrSchema(findProductionIr());
+    return await enrichIrSchema(findProductionIr());
   }
 
   if (dev) {
-    return enrichIrSchema(findMockIr());
+    return await enrichIrSchema(findMockIr());
   }
 
-  return enrichIrSchema(EMPTY_IR);
+  return await enrichIrSchema(EMPTY_IR);
 }

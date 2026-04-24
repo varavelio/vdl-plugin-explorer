@@ -17,8 +17,14 @@ export class Store {
 
   constructor() {
     if (!browser || this.initialized) return;
+    this.init();
+  }
 
-    this.ir = loadIrSchema();
+  /**
+   * Initializes the store by loading the IR schema.
+   */
+  private async init() {
+    this.ir = await loadIrSchema();
     this.initialized = true;
   }
 }
