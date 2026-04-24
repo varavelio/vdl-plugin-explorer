@@ -1,20 +1,16 @@
 <script lang="ts">
   import { Braces } from "@lucide/svelte";
-  import { Card, Heading } from "@varavel/ui";
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
   import AnnotationList from "$lib/components/AnnotationList.svelte";
   import EntityPage from "$lib/components/EntityPage.svelte";
-  import NotFound from "$lib/components/NotFound.svelte";
   import SectionCard from "$lib/components/SectionCard.svelte";
   import TypeRefView from "$lib/components/TypeRefView.svelte";
-  import { store } from "$lib/store";
-  import type { PageProps } from "./$types";
+  import type { RichIrSchemaType } from "$lib/store/ir";
 
-  let { params }: PageProps = $props();
-
-  let typeDef = $derived.by(() => {
-    return store.ir.types.find((type) => type.id === params.id);
-  });
+  interface Props {
+    typeDef: RichIrSchemaType;
+  }
+  let { typeDef }: Props = $props();
 
   let tags = $derived.by(() => {
     if (!typeDef) return [];
@@ -39,34 +35,22 @@
 
     return nextTags;
   });
-
-  let pageTitle = $derived.by(() => {
-    return typeDef ? `${typeDef.name} | Types` : "Not Found";
-  });
 </script>
 
-<svelte:head>
-  <title>{pageTitle} | VDL Explorer</title>
-</svelte:head>
+<EntityPage
+  section="Types"
+  title={typeDef.name}
+  icon={Braces}
+  {tags}
+  doc={typeDef.doc}
+>
+  <SectionCard title="Definition">
+    <TypeRefView typeRef={typeDef.typeRef} />
+  </SectionCard>
 
-{#if !typeDef}
-  <NotFound />
-{:else}
-  <EntityPage
-    section="Types"
-    title={typeDef.name}
-    icon={Braces}
-    {tags}
-    doc={typeDef.doc}
-  >
-    <SectionCard title="Definition">
-      <TypeRefView typeRef={typeDef.typeRef} />
+  {#if typeDef.annotations.length > 0}
+    <SectionCard title="Annotations">
+      <AnnotationList annotations={typeDef.annotations} />
     </SectionCard>
-
-    {#if typeDef.annotations.length > 0}
-      <SectionCard title="Annotations">
-        <AnnotationList annotations={typeDef.annotations} />
-      </SectionCard>
-    {/if}
-  </EntityPage>
-{/if}
+  {/if}
+</EntityPage>

@@ -6,6 +6,7 @@
   import type { RichIrSchemaNode } from "$lib/store/ir";
   import type { PageProps } from "./$types";
   import DocNode from "./DocNode.svelte";
+  import TypeNode from "./TypeNode.svelte";
 
   let { params }: PageProps = $props();
 
@@ -82,7 +83,7 @@
   {/if}
 
   {#if "typeRef" in node}
-    <div class="p-4 pt-0">type</div>
+    <div class="p-4 pt-0"><TypeNode typeDef={node} /></div>
   {/if}
 
   {#if "members" in node}
