@@ -36,6 +36,6 @@
 <NodePage
   {tags}
   title={typeDef.name}
-  doc={typeDef.doc}
+  htmlDoc={typeDef.htmlDoc}
   sourceCode={typeDef.sourceCode}
 />

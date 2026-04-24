@@ -27,6 +27,6 @@
 <NodePage
   {tags}
   title={enumDef.name}
-  doc={enumDef.doc}
+  htmlDoc={enumDef.htmlDoc}
   sourceCode={enumDef.sourceCode}
 />

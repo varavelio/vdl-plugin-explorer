@@ -38,6 +38,6 @@
 <NodePage
   {tags}
   title={constantDef.name}
-  doc={constantDef.doc}
+  htmlDoc={constantDef.htmlDoc}
   sourceCode={constantDef.sourceCode}
 />
