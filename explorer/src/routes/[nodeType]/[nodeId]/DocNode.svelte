@@ -1,5 +1,5 @@
 <script lang="ts">
-  import MarkdownContent from "$lib/components/MarkdownContent.svelte";
+  import { Prose } from "@varavel/ui";
   import type { RichIrSchemaDoc } from "$lib/store/ir/index";
 
   interface Props {
@@ -8,4 +8,4 @@
   let { doc }: Props = $props();
 </script>
 
-<MarkdownContent class="p-4 pt-0" content={doc.content} />
+<Prose fluid class="p-4 pt-0">{@html doc.sourceCode.htmlLight}</Prose>
