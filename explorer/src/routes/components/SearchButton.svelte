@@ -217,12 +217,17 @@
   icon={Search}
   variant="outline"
   class="cursor-text"
+  alignContent="left"
   wide
   onclick={openSearch}
 >
-  Search...
-  <Kbd class="ml-2">{ctrlOrCmd}</Kbd>
-  <Kbd>K</Kbd>
+  <span class="bloc w-full flex items-center justify-between">
+    <span>Search...</span>
+    <span>
+      <Kbd class="ml-2">{ctrlOrCmd}</Kbd>
+      <Kbd>K</Kbd>
+    </span>
+  </span>
 </Button>
 
 <Dialog
