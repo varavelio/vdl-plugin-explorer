@@ -52,10 +52,10 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
         shikiTransformers,
       );
       const sourceCode = { raw, htmlLight, htmlDark };
-      const htmldoc = markdownToHtmlDoc(type.doc);
+      const htmlDoc = markdownToHtmlDoc(type.doc);
 
       const sourceIr = { ...type };
-      return { ...type, id, urlPath, htmldoc, sourceCode, sourceIr };
+      return { ...type, id, urlPath, htmlDoc, sourceCode, sourceIr };
     }),
   );
 
@@ -77,10 +77,10 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
         shikiTransformers,
       );
       const sourceCode = { raw, htmlLight, htmlDark };
-      const htmldoc = markdownToHtmlDoc(en.doc);
+      const htmlDoc = markdownToHtmlDoc(en.doc);
 
       const sourceIr = { ...en };
-      return { ...en, id, urlPath, htmldoc, sourceCode, sourceIr };
+      return { ...en, id, urlPath, htmlDoc, sourceCode, sourceIr };
     }),
   );
 
@@ -106,10 +106,10 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
         shikiTransformers,
       );
       const sourceCode = { raw, htmlLight, htmlDark };
-      const htmldoc = markdownToHtmlDoc(constant.doc);
+      const htmlDoc = markdownToHtmlDoc(constant.doc);
 
       const sourceIr = { ...constant };
-      return { ...constant, id, urlPath, htmldoc, sourceCode, sourceIr };
+      return { ...constant, id, urlPath, htmlDoc, sourceCode, sourceIr };
     }),
   );
 
