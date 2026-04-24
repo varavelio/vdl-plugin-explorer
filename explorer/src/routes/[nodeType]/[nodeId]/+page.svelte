@@ -4,9 +4,10 @@
   import NotFound from "$lib/components/NotFound.svelte";
   import { store } from "$lib/store";
   import type { RichIrSchemaNode } from "$lib/store/ir";
-  import type { LayoutProps } from "./$types";
+  import type { PageProps } from "./$types";
+  import DocNode from "./DocNode.svelte";
 
-  let { children, params }: LayoutProps = $props();
+  let { params }: PageProps = $props();
 
   let node = $derived.by(() => {
     if (!params.nodeType || !params.nodeId) return;
@@ -76,7 +77,19 @@
     ]}
   />
 
-  {#if children}
-    <div class="p-4 pt-0">{@render children()}</div>
+  {#if "content" in node}
+    <DocNode doc={node} />
+  {/if}
+
+  {#if "typeRef" in node}
+    <div class="p-4 pt-0">type</div>
+  {/if}
+
+  {#if "members" in node}
+    <div class="p-4 pt-0">enum</div>
+  {/if}
+
+  {#if "value" in node}
+    <div class="p-4 pt-0">constant</div>
   {/if}
 {/if}
