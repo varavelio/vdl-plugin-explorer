@@ -17,7 +17,7 @@ a.vdl-internal-link {
     counter-reset: step;
     counter-increment: step 0;
     .line::before {
-      @apply text-content-muted w-4 mr-2 inline-block text-right;
+      @apply text-content-muted w-4 mr-4 inline-block text-right;
       content: counter(step);
       counter-increment: step;
     }
