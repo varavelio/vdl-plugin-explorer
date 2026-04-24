@@ -42,9 +42,11 @@ function findMockIr(): IrSchema {
     | undefined;
 
   // Load the local IR mock file using Vite's import.meta.glob.
-  const files = import.meta.glob("../../../../ir.local.json", { eager: true });
+  const files = import.meta.glob("../../../../../ir.local.json", {
+    eager: true,
+  });
 
-  const mockModule = files["../../../../ir.local.json"] as IrMockModule;
+  const mockModule = files["../../../../../ir.local.json"] as IrMockModule;
   if (!mockModule?.default) return EMPTY_IR;
 
   console.log("[DEV] Default IR loaded from ir.local.json");
