@@ -5,6 +5,7 @@
   import { store } from "$lib/store";
   import type { RichIrSchemaNode } from "$lib/store/ir";
   import type { PageProps } from "./$types";
+  import ConstantNode from "./ConstantNode.svelte";
   import DocNode from "./DocNode.svelte";
   import EnumNode from "./EnumNode.svelte";
   import TypeNode from "./TypeNode.svelte";
@@ -92,6 +93,6 @@
   {/if}
 
   {#if "value" in node}
-    <div class="p-4 pt-0">constant</div>
+    <div class="p-4 pt-0"><ConstantNode constantDef={node} /></div>
   {/if}
 {/if}
