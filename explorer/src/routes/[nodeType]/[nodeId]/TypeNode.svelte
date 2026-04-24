@@ -1,7 +1,7 @@
 <script lang="ts">
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
-  import EntityPage from "$lib/components/EntityPage.svelte";
   import type { RichIrSchemaType } from "$lib/store/ir/index";
+  import NodePage from "./NodePage.svelte";
 
   interface Props {
     typeDef: RichIrSchemaType;
@@ -33,7 +33,7 @@
   });
 </script>
 
-<EntityPage
+<NodePage
   {tags}
   title={typeDef.name}
   doc={typeDef.doc}

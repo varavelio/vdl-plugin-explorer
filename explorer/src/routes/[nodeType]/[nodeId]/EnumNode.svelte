@@ -1,7 +1,7 @@
 <script lang="ts">
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
-  import EntityPage from "$lib/components/EntityPage.svelte";
   import type { RichIrSchemaEnum } from "$lib/store/ir/index";
+  import NodePage from "./NodePage.svelte";
 
   interface Props {
     enumDef: RichIrSchemaEnum;
@@ -24,7 +24,7 @@
   });
 </script>
 
-<EntityPage
+<NodePage
   {tags}
   title={enumDef.name}
   doc={enumDef.doc}

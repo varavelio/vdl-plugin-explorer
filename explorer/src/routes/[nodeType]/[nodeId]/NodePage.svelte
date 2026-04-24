@@ -2,7 +2,7 @@
   import { Badge, CodeBlock, Heading } from "@varavel/ui";
   import { theme as runtimeTheme } from "@varavel/ui/runtime";
   import type { RichIrSchemaSourceCode } from "$lib/store/ir/index";
-  import MarkdownContent from "./MarkdownContent.svelte";
+  import MarkdownContent from "../../../lib/components/MarkdownContent.svelte";
 
   interface Props {
     title: string;
