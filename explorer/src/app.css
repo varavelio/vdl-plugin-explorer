@@ -2,15 +2,24 @@
 @import "@varavel/ui/theme.css";
 @source "../node_modules/@varavel/ui";
 
-/* Shiki links inserted by VDL transformer */
+/* Add style to links in shiki code highlighting */
 a.vdl-internal-link {
-  cursor: pointer;
-  text-decoration: underline;
-  text-decoration-color: currentColor;
-  text-decoration-style: dashed;
-  text-underline-offset: 0.25rem;
-  transition: opacity 0.2s ease;
+  @apply cursor-pointer underline decoration-dashed decoration-current underline-offset-4;
+  @apply transition-opacity duration-200 ease-in-out;
+  &:hover {
+    @apply opacity-70;
+  }
 }
-a.vdl-internal-link:hover {
-  opacity: 0.7;
+
+/* Add line numbers to shiki code highlighting */
+.shiki {
+  code {
+    counter-reset: step;
+    counter-increment: step 0;
+    .line::before {
+      @apply text-content-muted w-4 mr-2 inline-block text-right;
+      content: counter(step);
+      counter-increment: step;
+    }
+  }
 }
