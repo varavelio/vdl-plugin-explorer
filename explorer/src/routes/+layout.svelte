@@ -48,7 +48,7 @@
           {/if}
 
           <ThemePicker
-            class={{"-mr-2 [&_svg]:size-5": viewport.isMobile}}
+            class={{"[&_svg]:size-5": viewport.isMobile}}
             variant={viewport.isMobile ? "ghost" : "outline"}
             showLabel={viewport.isDesktop}
             square={viewport.isMobile}
@@ -57,7 +57,7 @@
       {/snippet}
 
       {#snippet sidebarTop()}
-        <SearchButton />
+        <div class="pr-10 desk:pr-0"><SearchButton /></div>
       {/snippet}
 
       {#snippet sidebarCenter()}
