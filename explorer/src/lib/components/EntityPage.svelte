@@ -24,7 +24,7 @@
   });
 </script>
 
-<div class="space-y-6">
+<div class="space-y-10.75">
   <section class="space-y-10.75">
     <div class="flex justify-between flex-wrap items-center gap-2">
       <Heading size="3xl">{title}</Heading>
@@ -41,8 +41,8 @@
     {/if}
   </section>
 
-  <section class="space-y-4">
-    <Heading level="2" size="lg">Source</Heading>
+  <section class="space-y-6">
+    <Heading level="2" size="2xl">Source</Heading>
     <CodeBlock
       rawCode={sourceCode.raw}
       {highlightedHtml}
