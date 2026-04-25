@@ -29,8 +29,17 @@
       showSidebarBottom={viewport.isMobile}
     >
       {#snippet headerLeft()}
-        <header class="hidden desk:block ml-2">
+        <header class="hidden desk:flex ml-2 items-center gap-4">
           <a href="#/"><Logo class="h-8" /></a>
+          {#if viewport.isDesktop}
+            <GithubButton
+              user="varavelio"
+              repo="vdl-plugin-explorer"
+              showStars={true}
+              showTag={false}
+              showForks={false}
+            />
+          {/if}
         </header>
       {/snippet}
 
@@ -43,13 +52,6 @@
       {#snippet headerRight()}
         <div class="flex items-center gap-2">
           {#if viewport.isDesktop}
-            <GithubButton
-              user="varavelio"
-              repo="vdl-plugin-explorer"
-              showStars={true}
-              showTag={false}
-              showForks={false}
-            />
             <HeaderSchemaButton />
           {/if}
 
