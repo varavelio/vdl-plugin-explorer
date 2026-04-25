@@ -14,10 +14,7 @@ const config = {
     {
       src "../dist/index.js"
       schema "./schema/main.vdl"
-      outDir "../dist"
-      options {
-        outFile "demo.html"
-      }
+      outDir "./dist"
     }
   ]
 }
