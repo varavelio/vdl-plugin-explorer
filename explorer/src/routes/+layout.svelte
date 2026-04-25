@@ -7,6 +7,7 @@
   import Logo from "$lib/components/Logo.svelte";
   import { highlighter } from "$lib/shiki";
   import { store } from "$lib/store";
+  import HeaderSchemaButton from "./components/HeaderSchemaButton.svelte";
   import SearchButton from "./components/SearchButton.svelte";
   import SidebarNav from "./components/SidebarNav.svelte";
 
@@ -49,6 +50,7 @@
               showTag={false}
               showForks={false}
             />
+            <HeaderSchemaButton />
           {/if}
 
           <ThemePicker
