@@ -4,6 +4,11 @@
   import { theme } from "@varavel/ui/runtime";
   import { store } from "$lib/store";
 
+  interface Props {
+    alignContent?: "left" | "center";
+  }
+  let { alignContent = "center" }: Props = $props();
+
   let open = $state(false);
   const toggleOpen = () => (open = !open);
 
@@ -16,7 +21,9 @@
   });
 </script>
 
-<Button icon={ScrollText} variant="outline" onclick={toggleOpen}>Schema</Button>
+<Button icon={ScrollText} variant="outline" onclick={toggleOpen} {alignContent}>
+  Schema
+</Button>
 
 <Dialog
   bind:open
