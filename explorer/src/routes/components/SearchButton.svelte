@@ -324,7 +324,9 @@
         {/each}
       </div>
     {:else}
-      <div class="h-[400px] max-h-[80dvh] border-t flex flex-col items-center">
+      <div
+        class="h-[400px] max-h-[80dvh] border-t flex flex-col items-center p-4"
+      >
         <LibraryBig class="size-16 text-content-muted mt-10" />
         <p class="text-content-muted text-center mt-4">
           No results. Try searching for something.
