@@ -10,6 +10,9 @@ export {
   type RichIrSchemaDoc,
   type RichIrSchemaEnum,
   type RichIrSchemaNode,
+  type RichIrSchemaRpc,
+  type RichIrSchemaRpcOperation,
+  type RichIrSchemaRpcOperationKind,
   type RichIrSchemaSourceCode,
   type RichIrSchemaType,
 } from "./types";
