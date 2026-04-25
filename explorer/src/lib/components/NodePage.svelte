@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Badge, CodeBlock, Heading, Prose } from "@varavel/ui";
+  import { Badge, CodeBlock, Copy, Heading, Prose } from "@varavel/ui";
   import { theme as runtimeTheme } from "@varavel/ui/runtime";
   import type { SourceCode } from "$lib/store/ir/index";
 
@@ -10,6 +10,7 @@
     outputSourceCode?: SourceCode;
     tags?: string[];
     htmlDoc?: string;
+    rpcOperationUrl?: string;
   }
 
   let {
@@ -19,6 +20,7 @@
     sourceCode,
     inputSourceCode,
     outputSourceCode,
+    rpcOperationUrl,
   }: Props = $props();
 
   function pickSourceCode(code?: SourceCode) {
@@ -36,14 +38,25 @@
 
 <div class="space-y-10.75">
   <section class="space-y-10.75">
-    <div class="flex justify-between flex-wrap items-center gap-2">
-      <Heading size="3xl">{title}</Heading>
+    <div class="space-y-6">
+      <div class="flex justify-between flex-wrap items-center gap-2">
+        <Heading size="3xl">{title}</Heading>
 
-      <div class="flex flex-wrap gap-2">
-        {#each tags as tag}
-          <Badge size="sm" variant="soft">{tag}</Badge>
-        {/each}
+        <div class="flex flex-wrap gap-2">
+          {#each tags as tag (tag)}
+            <Badge size="sm" variant="soft">{tag}</Badge>
+          {/each}
+        </div>
       </div>
+
+      {#if rpcOperationUrl}
+        <CodeBlock
+          rawCode={rpcOperationUrl}
+          title="Endpoint"
+          showDownload={false}
+          bordered
+        />
+      {/if}
     </div>
 
     {#if htmlDoc}
