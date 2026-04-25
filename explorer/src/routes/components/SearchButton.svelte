@@ -4,8 +4,11 @@
     Braces,
     LibraryBig,
     ListTree,
+    NetworkIcon,
     Pin,
+    Radio,
     Search,
+    Zap,
   } from "@lucide/svelte";
   import { Button, Dialog, Input, Kbd } from "@varavel/ui";
   import { browser } from "$app/environment";
@@ -234,7 +237,7 @@
   bind:open
   size="md"
   title="Search"
-  description="Find docs, types, enums, and constants instantly."
+  description="Find docs, RPCs, types, enums, and constants instantly."
   padded={false}
 >
   <div class="border-t border-base-300">
@@ -273,6 +276,12 @@
             >
               {#if result.kind === "doc"}
                 <BookOpenText class="size-4" />
+              {:else if result.kind === "rpc"}
+                <NetworkIcon class="size-4" />
+              {:else if result.kind === "procedure"}
+                <Zap class="size-4" />
+              {:else if result.kind === "stream"}
+                <Radio class="size-4" />
               {:else if result.kind === "type"}
                 <Braces class="size-4" />
               {:else if result.kind === "enum"}
