@@ -38,6 +38,7 @@ tasks:
     cmds:
       - cd ./explorer && npx --no vite build
       - cd ./plugin && npx --no vdl-plugin build --out ../dist/index.js
+      - cd ./demo && npx vdl generate
 
   format:
     desc: "Format all code"
