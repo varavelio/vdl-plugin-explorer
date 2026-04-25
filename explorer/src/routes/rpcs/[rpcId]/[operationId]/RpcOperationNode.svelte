@@ -22,12 +22,18 @@
 
     return nextTags;
   });
+
+  let rpcOperationUrl = $derived.by(() => {
+    if (!rpcOperation) return "";
+    return `https://<baseURL>/${rpcOperation.rpcName}/${rpcOperation.name}`;
+  });
 </script>
 
 <NodePage
   {tags}
   title={rpcOperation.name}
   htmlDoc={rpcOperation.htmlDoc}
-  inputSourceCode={rpcOperation.inputSourceCode}
-  outputSourceCode={rpcOperation.outputSourceCode}
+  {rpcOperationUrl}
+  rpcInputSourceCode={rpcOperation.inputSourceCode}
+  rpcOutputSourceCode={rpcOperation.outputSourceCode}
 />
