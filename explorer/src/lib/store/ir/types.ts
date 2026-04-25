@@ -1,4 +1,4 @@
-import type { IrSchema } from "@varavel/vdl-plugin-sdk";
+import type { Field, IrSchema } from "@varavel/vdl-plugin-sdk";
 
 /**
  * An empty IR schema.
@@ -16,6 +16,7 @@ export const EMPTY_IR: IrSchema = {
  */
 export const EMPTY_RICH_IR: RichIrSchema = {
   entryPoint: "",
+  rpcs: [],
   types: [],
   enums: [],
   constants: [],
@@ -43,6 +44,50 @@ export type RichIrSchemaType = IrSchema["types"][number] & {
   sourceCode: RichIrSchemaSourceCode;
   /** The original IR node */
   sourceIr: IrSchema["types"][number];
+};
+
+/**
+ * Supported RPC operation kinds exposed by the explorer.
+ */
+export type RichIrSchemaRpcOperationKind = "procedure" | "stream";
+
+/**
+ * Enriched RPC operation entry derived from a field inside an `@rpc` type.
+ */
+export type RichIrSchemaRpcOperation = Field & {
+  id: string;
+  routeId: string;
+  urlPath: string;
+  rpcId: string;
+  rpcRouteId: string;
+  rpcUrlPath: string;
+  rpcName: string;
+  kind: RichIrSchemaRpcOperationKind;
+  /** The operation field doc converted from markdown to HTML. */
+  htmlDoc?: string;
+  /** Highlighted VDL snippet for the operation input when present. */
+  inputSourceCode?: RichIrSchemaSourceCode;
+  /** Highlighted VDL snippet for the operation output when present. */
+  outputSourceCode?: RichIrSchemaSourceCode;
+  /** The original IR node */
+  sourceIr: Field;
+};
+
+/**
+ * Enriched RPC service entry derived from a type annotated with `@rpc`.
+ */
+export type RichIrSchemaRpc = {
+  id: string;
+  routeId: string;
+  name: string;
+  urlPath: string;
+  /** The top-level RPC doc converted from markdown to HTML. */
+  htmlDoc?: string;
+  /** The canonical source code for this RPC without the top-level docstring. */
+  sourceCode: RichIrSchemaSourceCode;
+  /** The original IR node */
+  sourceIr: IrSchema["types"][number];
+  operations: RichIrSchemaRpcOperation[];
 };
 
 /**
@@ -102,6 +147,7 @@ export type RichIrSchemaDoc = IrSchema["docs"][number] & {
  */
 export type RichIrSchema = {
   entryPoint: string;
+  rpcs: RichIrSchemaRpc[];
   types: RichIrSchemaType[];
   enums: RichIrSchemaEnum[];
   constants: RichIrSchemaConstant[];
