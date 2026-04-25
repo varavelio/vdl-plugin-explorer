@@ -9,6 +9,7 @@ import { escapeScriptTag } from "@varavel/vdl-plugin-sdk/utils/strings";
 import template from "../../explorer/build/index.html?raw";
 
 const DEFAULT_OUTPUT_FILE = "index.html";
+const DEFAULT_RPC_BASE_URL = "<baseURL>";
 
 /**
  * Resolves the output filename for the generated HTML file.
@@ -40,10 +41,33 @@ function resolveOutFile(input: PluginInput): string {
 }
 
 /**
+ * Resolves the base URL used to render RPC operation endpoints in the explorer.
+ *
+ * The plugin reads `rpcBaseUrl` from options and falls back to `<baseURL>`
+ * when the option is missing or blank.
+ *
+ * @param input - Plugin invocation payload received from VDL.
+ * @returns A non-empty RPC base URL value.
+ */
+function resolveRpcBaseUrl(input: PluginInput): string {
+  const rpcBaseUrl = options.getOptionString(
+    input.options,
+    "rpcBaseUrl",
+    DEFAULT_RPC_BASE_URL,
+  );
+  const trimmedRpcBaseUrl = rpcBaseUrl.trim();
+
+  return trimmedRpcBaseUrl.length > 0
+    ? trimmedRpcBaseUrl
+    : DEFAULT_RPC_BASE_URL;
+}
+
+/**
  * Generates an HTML file embedding the VDL IR for the explorer application.
  *
  * Supported plugin options:
  * - `outFile`: output filename (default: `index.html`)
+ * - `rpcBaseUrl`: base URL used for RPC endpoint display (default: `<baseURL>`)
  *
  * @param input - Plugin invocation payload provided by VDL.
  * @returns One generated HTML file containing the explorer app and IR data.
@@ -54,9 +78,18 @@ export const generate = definePlugin((input) => {
 
   const outFile = resolveOutFile(input);
   const ir = escapeScriptTag(JSON.stringify(anonymizeIr(input.ir)));
-  const html = template.replace(
+
+  // The RPC base URL escaped and sanitized
+  let rpcBaseUrl = escapeScriptTag(JSON.stringify(resolveRpcBaseUrl(input)));
+  rpcBaseUrl = rpcBaseUrl.replace(/\/+$/, "");
+
+  let html = template.replace(
     "window.__vdl_ir = {};",
     `window.__vdl_ir = ${ir};`,
+  );
+  html = html.replace(
+    'window.__vdl_rpc_base_url = "<baseURL>";',
+    `window.__vdl_rpc_base_url = ${rpcBaseUrl};`,
   );
 
   return {
