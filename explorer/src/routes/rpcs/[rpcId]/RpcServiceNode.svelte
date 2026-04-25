@@ -1,7 +1,7 @@
 <script lang="ts">
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
+  import NodePage from "$lib/components/NodePage.svelte";
   import type { RichIrSchemaRpc } from "$lib/store/ir/index";
-  import NodePage from "../../[nodeType]/[nodeId]/NodePage.svelte";
 
   interface Props {
     rpc: RichIrSchemaRpc;
