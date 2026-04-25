@@ -9,7 +9,7 @@ import { escapeScriptTag } from "@varavel/vdl-plugin-sdk/utils/strings";
 import template from "../../explorer/build/index.html?raw";
 
 const DEFAULT_OUTPUT_FILE = "index.html";
-const DEFAULT_RPC_BASE_URL = "<baseURL>";
+const DEFAULT_RPC_BASE_URL = "https://<baseURL>";
 
 /**
  * Resolves the output filename for the generated HTML file.
@@ -43,7 +43,7 @@ function resolveOutFile(input: PluginInput): string {
 /**
  * Resolves the base URL used to render RPC operation endpoints in the explorer.
  *
- * The plugin reads `rpcBaseUrl` from options and falls back to `<baseURL>`
+ * The plugin reads `rpcBaseUrl` from options and falls back to `https://<baseURL>`
  * when the option is missing or blank.
  *
  * @param input - Plugin invocation payload received from VDL.
@@ -67,7 +67,7 @@ function resolveRpcBaseUrl(input: PluginInput): string {
  *
  * Supported plugin options:
  * - `outFile`: output filename (default: `index.html`)
- * - `rpcBaseUrl`: base URL used for RPC endpoint display (default: `<baseURL>`)
+ * - `rpcBaseUrl`: base URL used for RPC endpoint display (default: `https://<baseURL>`)
  *
  * @param input - Plugin invocation payload provided by VDL.
  * @returns One generated HTML file containing the explorer app and IR data.
@@ -88,7 +88,7 @@ export const generate = definePlugin((input) => {
     `window.__vdl_ir = ${ir};`,
   );
   html = html.replace(
-    'window.__vdl_rpc_base_url = "<baseURL>";',
+    'window.__vdl_rpc_base_url = "https://<baseURL>";',
     `window.__vdl_rpc_base_url = ${rpcBaseUrl};`,
   );
 

@@ -10,7 +10,7 @@
 
   let { rpcOperation }: Props = $props();
 
-  const DEFAULT_RPC_BASE_URL = "<baseURL>";
+  const DEFAULT_RPC_BASE_URL = "https://<baseURL>";
 
   let tags = $derived.by(() => {
     if (!rpcOperation) return [];
