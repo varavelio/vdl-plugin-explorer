@@ -22,7 +22,14 @@ const SUMMARY_LIMIT = 180;
 /**
  * Resource kinds exposed by the explorer search index.
  */
-export type SearchResultKind = "doc" | "type" | "enum" | "constant";
+export type SearchResultKind =
+  | "doc"
+  | "rpc"
+  | "procedure"
+  | "stream"
+  | "type"
+  | "enum"
+  | "constant";
 
 /**
  * Search hit shape consumed by the command palette UI.
@@ -185,12 +192,16 @@ function createSearchDocuments(): SearchDocument[] {
   }));
 
   const types = store.ir.types.map((typeDef) => createTypeDocument(typeDef));
+  const rpcs = store.ir.rpcs.map((rpc) => createRpcDocument(rpc));
+  const rpcOperations = store.ir.rpcs.flatMap((rpc) =>
+    rpc.operations.map((operation) => createRpcOperationDocument(operation)),
+  );
   const enums = store.ir.enums.map((enumDef) => createEnumDocument(enumDef));
   const constants = store.ir.constants.map((constantDef) =>
     createConstantDocument(constantDef),
   );
 
-  return [...docs, ...types, ...enums, ...constants];
+  return [...docs, ...types, ...rpcs, ...rpcOperations, ...enums, ...constants];
 }
 
 /**
@@ -236,6 +247,75 @@ function createEnumDocument(
       enumDef.doc,
       enumDef.enumType,
       ...enumDef.members.map(enumMemberToSearchText),
+    ]),
+  };
+}
+
+/**
+ * Creates a search document for an RPC service page.
+ *
+ * @param rpc - RPC service enriched with routing metadata.
+ * @returns Search document representing the RPC service.
+ */
+function createRpcDocument(rpc: {
+  id: string;
+  urlPath: string;
+  name: string;
+  sourceIr: { doc?: string };
+  sourceCode: { raw: string };
+  operations: Array<{ name: string; kind: "procedure" | "stream" }>;
+}): SearchDocument {
+  return {
+    id: rpc.id,
+    kind: "rpc",
+    urlPath: rpc.urlPath,
+    name: rpc.name,
+    summary:
+      summarizeText(rpc.sourceIr.doc) ||
+      `RPC with ${rpc.operations.length} operations`,
+    body: joinSearchParts([
+      rpc.name,
+      rpc.sourceIr.doc,
+      rpc.sourceCode.raw,
+      ...rpc.operations.map(
+        (operation) => `${operation.kind} ${operation.name}`,
+      ),
+    ]),
+  };
+}
+
+/**
+ * Creates a search document for an RPC operation page.
+ *
+ * @param operation - RPC procedure or stream enriched with routing metadata.
+ * @returns Search document representing the operation.
+ */
+function createRpcOperationDocument(operation: {
+  id: string;
+  kind: "procedure" | "stream";
+  urlPath: string;
+  name: string;
+  doc?: string;
+  rpcName: string;
+  inputSourceCode?: { raw: string };
+  outputSourceCode?: { raw: string };
+}): SearchDocument {
+  return {
+    id: operation.id,
+    kind: operation.kind,
+    urlPath: operation.urlPath,
+    name: operation.name,
+    title: `${operation.rpcName}.${operation.name}`,
+    summary:
+      summarizeText(operation.doc) ||
+      `${operation.kind} in ${operation.rpcName}`,
+    body: joinSearchParts([
+      operation.rpcName,
+      operation.name,
+      operation.kind,
+      operation.doc,
+      operation.inputSourceCode?.raw,
+      operation.outputSourceCode?.raw,
     ]),
   };
 }
