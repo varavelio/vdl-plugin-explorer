@@ -3,6 +3,7 @@ import {
   definePlugin,
   type PluginInput,
 } from "@varavel/vdl-plugin-sdk";
+import { anonymizeIr } from "@varavel/vdl-plugin-sdk/utils/ir";
 import * as options from "@varavel/vdl-plugin-sdk/utils/options";
 import { escapeScriptTag } from "@varavel/vdl-plugin-sdk/utils/strings";
 import template from "../../explorer/build/index.html?raw";
@@ -52,7 +53,7 @@ export const generate = definePlugin((input) => {
   input.ir.entryPoint = "";
 
   const outFile = resolveOutFile(input);
-  const ir = escapeScriptTag(JSON.stringify(input.ir));
+  const ir = escapeScriptTag(JSON.stringify(anonymizeIr(input.ir)));
   const html = template.replace(
     "window.__vdl_ir = {};",
     `window.__vdl_ir = ${ir};`,
