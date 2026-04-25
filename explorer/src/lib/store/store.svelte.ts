@@ -3,6 +3,7 @@ import {
   EMPTY_RICH_IR,
   loadIrSchema,
   type RichIrSchema,
+  type RichIrSchemaSourceCode,
 } from "$lib/store/ir/index";
 
 /**
@@ -19,6 +20,15 @@ export class Store {
    */
   ir: RichIrSchema = $state(EMPTY_RICH_IR);
 
+  /**
+   * The full source code of the IR schema in different formats (raw, HTML light, HTML dark).
+   */
+  irSourceCode: RichIrSchemaSourceCode = $state({
+    raw: "",
+    htmlLight: "",
+    htmlDark: "",
+  });
+
   constructor() {
     if (!browser || this.initialized) return;
     this.init();
@@ -28,7 +38,10 @@ export class Store {
    * Initializes the store by loading the IR schema.
    */
   private async init() {
-    this.ir = await loadIrSchema();
+    const { richIrSchema, sourceCode } = await loadIrSchema();
+
+    this.ir = richIrSchema;
+    this.irSourceCode = sourceCode;
     this.initialized = true;
   }
 }

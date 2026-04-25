@@ -1,6 +1,8 @@
+import { generateVdl } from "@varavel/vdl-plugin-sdk/utils/codegen";
+import { highlighter } from "$lib/shiki";
 import { enrichIrSchema } from "./enricher";
 import { loadRawIrSchema } from "./raw-loader";
-import type { RichIrSchema } from "./types";
+import type { RichIrSchema, RichIrSchemaSourceCode } from "./types";
 
 export {
   EMPTY_IR,
@@ -28,6 +30,29 @@ export {
  *
  * @returns A rich IR schema containing stable `id` fields and parsed doc metadata.
  */
-export async function loadIrSchema(): Promise<RichIrSchema> {
-  return await enrichIrSchema(loadRawIrSchema());
+export async function loadIrSchema(): Promise<{
+  richIrSchema: RichIrSchema;
+  sourceCode: RichIrSchemaSourceCode;
+}> {
+  const rawIr = loadRawIrSchema();
+  const rawIrSource = generateVdl(rawIr, { docstrings: "strip-top-level" });
+
+  const richIrSchemaPromise = await enrichIrSchema(rawIr);
+  const htmlLightPromise = highlighter.highlight(rawIrSource, "vdl", "light");
+  const htmlDarkPromise = highlighter.highlight(rawIrSource, "vdl", "dark");
+
+  const [richIrSchema, htmlLight, htmlDark] = await Promise.all([
+    richIrSchemaPromise,
+    htmlLightPromise,
+    htmlDarkPromise,
+  ]);
+
+  return {
+    richIrSchema,
+    sourceCode: {
+      raw: rawIrSource,
+      htmlLight,
+      htmlDark,
+    },
+  };
 }
