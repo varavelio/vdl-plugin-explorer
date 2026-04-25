@@ -9,12 +9,15 @@
 
 const config = {
   version 1
-
+  cleanOutDir false
   plugins [
     {
       src "../dist/index.js"
       schema "./schema/main.vdl"
-      outDir "./dist"
+      outDir "../dist"
+      options {
+        outFile "demo.html"
+      }
     }
   ]
 }
