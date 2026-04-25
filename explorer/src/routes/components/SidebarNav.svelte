@@ -8,6 +8,7 @@
     NetworkIcon,
     Pin,
     Radio,
+    ServerCog,
     Zap,
   } from "@lucide/svelte";
   import { Nav } from "@varavel/ui";
@@ -68,7 +69,7 @@
     {#if store.ir.rpcs.length > 0}
       <Nav.Group label="RPCs" icon={NetworkIcon} open>
         {#each store.ir.rpcs as rpc (rpc.id)}
-          <Nav.Group label={rpc.name} open>
+          <Nav.Group label={rpc.name} icon={ServerCog} open>
             {#if rpc.htmlDoc}
               <Nav.Item
                 label={rpc.name}
