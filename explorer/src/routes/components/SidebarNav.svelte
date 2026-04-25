@@ -2,9 +2,13 @@
   import {
     BookOpenText,
     Braces,
+    FileText,
     LayoutDashboard,
     ListTree,
+    NetworkIcon,
     Pin,
+    Radio,
+    Zap,
   } from "@lucide/svelte";
   import { Nav } from "@varavel/ui";
   import { tick } from "svelte";
@@ -22,6 +26,7 @@
     // Access length properties just to make this effect
     // reactive to changes in the IR data.
     store.ir.docs.length;
+    store.ir.rpcs.length;
     store.ir.types.length;
     store.ir.enums.length;
     store.ir.constants.length;
@@ -56,6 +61,32 @@
             href={doc.urlPath}
             active={page.url.hash === doc.urlPath}
           />
+        {/each}
+      </Nav.Group>
+    {/if}
+
+    {#if store.ir.rpcs.length > 0}
+      <Nav.Group label="RPCs" icon={NetworkIcon} open>
+        {#each store.ir.rpcs as rpc (rpc.id)}
+          <Nav.Group label={rpc.name} open>
+            {#if rpc.htmlDoc}
+              <Nav.Item
+                label={rpc.name}
+                icon={FileText}
+                href={rpc.urlPath}
+                active={page.url.hash === rpc.urlPath}
+              />
+            {/if}
+
+            {#each rpc.operations as operation (operation.id)}
+              <Nav.Item
+                label={operation.name}
+                icon={operation.kind === "procedure" ? Zap : Radio}
+                href={operation.urlPath}
+                active={page.url.hash === operation.urlPath}
+              />
+            {/each}
+          </Nav.Group>
         {/each}
       </Nav.Group>
     {/if}
