@@ -28,7 +28,7 @@ jobs:
         uses: devcontainers/ci@v0.3
         with:
           push: never
-          runCmd: /bin/bash -c "task deps && task build && mv ./dist/demo.html ./dist/index.html"
+          runCmd: /bin/bash -c "task deps && task build"
 
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
@@ -36,4 +36,4 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          command: pages deploy ./dist --project-name=varavel-vdl-plugin-explorer-demo
+          command: pages deploy ./demo/dist --project-name=varavel-vdl-plugin-explorer-demo
