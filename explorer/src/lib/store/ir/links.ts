@@ -25,6 +25,43 @@ export function createIrNodeRoute(
 }
 
 /**
+ * Build route metadata for an RPC service page.
+ *
+ * @param name RPC service name.
+ * @param obj RPC service payload used to derive stable identifiers.
+ * @returns Fingerprint id and docs page URL.
+ */
+export function createRpcRoute(
+  name: string,
+  obj: unknown,
+): { id: string; urlPath: string } {
+  const id = createId(name, obj);
+  const urlPath = `#/rpcs/${id}`;
+  return { id, urlPath };
+}
+
+/**
+ * Build route metadata for an RPC operation page.
+ *
+ * @param rpcName RPC service name.
+ * @param rpcObj RPC service payload used to derive the parent route segment.
+ * @param operationName Operation name.
+ * @param operationObj Operation payload used to derive stable identifiers.
+ * @returns Fingerprint id, readable route segment, parent route segment, and URL.
+ */
+export function createRpcOperationRoute(
+  rpcName: string,
+  rpcObj: unknown,
+  operationName: string,
+  operationObj: unknown,
+): { id: string; urlPath: string } {
+  const id = createId(operationName, operationObj);
+  const rpcId = createId(rpcName, rpcObj);
+  const urlPath = `#/rpcs/${rpcId}/${id}`;
+  return { id, urlPath };
+}
+
+/**
  * Build a dictionary that maps IR node names to their internal explorer routes.
  *
  * @remarks
