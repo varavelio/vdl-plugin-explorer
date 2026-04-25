@@ -59,6 +59,9 @@ function removePositionReplacer(key: string, value: unknown): unknown {
  * @returns One generated HTML file containing the explorer app and IR data.
  */
 export const generate = definePlugin((input) => {
+  // Remove entrypoint information from IR
+  input.ir.entryPoint = "";
+
   const outFile = resolveOutFile(input);
   const ir = escapeScriptTag(JSON.stringify(input.ir, removePositionReplacer));
   const html = template.replace(
