@@ -6,11 +6,11 @@
   interface Props {
     title: string;
     sourceCode?: SourceCode;
-    inputSourceCode?: SourceCode;
-    outputSourceCode?: SourceCode;
+    rpcInputSourceCode?: SourceCode;
+    rpcOutputSourceCode?: SourceCode;
+    rpcOperationUrl?: string;
     tags?: string[];
     htmlDoc?: string;
-    rpcOperationUrl?: string;
   }
 
   let {
@@ -18,8 +18,8 @@
     tags = [],
     htmlDoc,
     sourceCode,
-    inputSourceCode,
-    outputSourceCode,
+    rpcInputSourceCode,
+    rpcOutputSourceCode,
     rpcOperationUrl,
   }: Props = $props();
 
@@ -31,9 +31,9 @@
     return code.htmlLight;
   }
 
-  let highlightedSourceCode = $derived(pickSourceCode(sourceCode));
-  let highlightedInputSourceCode = $derived(pickSourceCode(inputSourceCode));
-  let highlightedOutputSourceCode = $derived(pickSourceCode(outputSourceCode));
+  let hlSourceCode = $derived(pickSourceCode(sourceCode));
+  let hlRpcInputSourceCode = $derived(pickSourceCode(rpcInputSourceCode));
+  let hlRpcOutputSourceCode = $derived(pickSourceCode(rpcOutputSourceCode));
 </script>
 
 <div class="space-y-10.75">
@@ -69,7 +69,7 @@
       <Heading level="2" size="2xl">Source</Heading>
       <CodeBlock
         rawCode={sourceCode.raw}
-        highlightedHtml={highlightedSourceCode}
+        highlightedHtml={hlSourceCode}
         title="VDL"
         fileName="source.vdl"
         bordered
@@ -77,12 +77,12 @@
     </section>
   {/if}
 
-  {#if inputSourceCode}
+  {#if rpcInputSourceCode}
     <section class="space-y-6">
       <Heading level="2" size="2xl">Input</Heading>
       <CodeBlock
-        rawCode={inputSourceCode.raw}
-        highlightedHtml={highlightedInputSourceCode}
+        rawCode={rpcInputSourceCode.raw}
+        highlightedHtml={hlRpcInputSourceCode}
         title="VDL"
         fileName="input.vdl"
         bordered
@@ -90,12 +90,12 @@
     </section>
   {/if}
 
-  {#if outputSourceCode}
+  {#if rpcOutputSourceCode}
     <section class="space-y-6">
       <Heading level="2" size="2xl">Output</Heading>
       <CodeBlock
-        rawCode={outputSourceCode.raw}
-        highlightedHtml={highlightedOutputSourceCode}
+        rawCode={rpcOutputSourceCode.raw}
+        highlightedHtml={hlRpcOutputSourceCode}
         title="VDL"
         fileName="output.vdl"
         bordered
