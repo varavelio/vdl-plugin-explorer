@@ -3,7 +3,7 @@ import {
   EMPTY_RICH_IR,
   loadIrSchema,
   type RichIrSchema,
-  type RichIrSchemaSourceCode,
+  type SourceCode,
 } from "$lib/store/ir/index";
 
 /**
@@ -23,7 +23,7 @@ export class Store {
   /**
    * The full source code of the IR schema in different formats (raw, HTML light, HTML dark).
    */
-  irSourceCode: RichIrSchemaSourceCode = $state({
+  irSourceCode: SourceCode = $state({
     raw: "",
     htmlLight: "",
     htmlDark: "",

@@ -1,13 +1,13 @@
 <script lang="ts">
   import { Badge, CodeBlock, Heading, Prose } from "@varavel/ui";
   import { theme as runtimeTheme } from "@varavel/ui/runtime";
-  import type { RichIrSchemaSourceCode } from "$lib/store/ir/index";
+  import type { SourceCode } from "$lib/store/ir/index";
 
   interface Props {
     title: string;
-    sourceCode?: RichIrSchemaSourceCode;
-    inputSourceCode?: RichIrSchemaSourceCode;
-    outputSourceCode?: RichIrSchemaSourceCode;
+    sourceCode?: SourceCode;
+    inputSourceCode?: SourceCode;
+    outputSourceCode?: SourceCode;
     tags?: string[];
     htmlDoc?: string;
   }
@@ -21,7 +21,7 @@
     outputSourceCode,
   }: Props = $props();
 
-  function pickSourceCode(code?: RichIrSchemaSourceCode) {
+  function pickSourceCode(code?: SourceCode) {
     if (!code) return undefined;
     if (runtimeTheme.resolved === "dark") {
       return code.htmlDark;

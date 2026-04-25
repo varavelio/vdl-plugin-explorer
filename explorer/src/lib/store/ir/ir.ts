@@ -2,7 +2,7 @@ import { generateVdl } from "@varavel/vdl-plugin-sdk/utils/codegen";
 import { highlighter } from "$lib/shiki";
 import { enrichIrSchema } from "./enricher";
 import { loadRawIrSchema } from "./raw-loader";
-import type { RichIrSchema, RichIrSchemaSourceCode } from "./types";
+import type { RichIrSchema, SourceCode } from "./types";
 
 export {
   EMPTY_IR,
@@ -15,8 +15,8 @@ export {
   type RichIrSchemaRpc,
   type RichIrSchemaRpcOperation,
   type RichIrSchemaRpcOperationKind,
-  type RichIrSchemaSourceCode,
   type RichIrSchemaType,
+  type SourceCode,
 } from "./types";
 
 /**
@@ -32,7 +32,7 @@ export {
  */
 export async function loadIrSchema(): Promise<{
   richIrSchema: RichIrSchema;
-  sourceCode: RichIrSchemaSourceCode;
+  sourceCode: SourceCode;
 }> {
   const rawIr = loadRawIrSchema();
   const rawIrSource = generateVdl(rawIr, { docstrings: "strip-top-level" });

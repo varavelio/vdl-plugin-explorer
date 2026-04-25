@@ -1,6 +1,16 @@
 import type { Field, IrSchema } from "@varavel/vdl-plugin-sdk";
 
 /**
+ * Contains the raw code and highlighted light and dark HTML representation
+ * of a piece of source code
+ */
+export type SourceCode = {
+  raw: string;
+  htmlLight: string;
+  htmlDark: string;
+};
+
+/**
  * An empty IR schema.
  */
 export const EMPTY_IR: IrSchema = {
@@ -23,13 +33,6 @@ export const EMPTY_RICH_IR: RichIrSchema = {
   docs: [],
 };
 
-/** Contains the raw code and highlighted light and dark HTML representation of a source code */
-export type RichIrSchemaSourceCode = {
-  raw: string;
-  htmlLight: string;
-  htmlDark: string;
-};
-
 /**
  * Enriched IR type entry.
  *
@@ -41,7 +44,7 @@ export type RichIrSchemaType = IrSchema["types"][number] & {
   /** The top-level type doc converted from markdown to HTML. */
   htmlDoc?: string;
   /** The canonical source code for this type without the type docstring. */
-  sourceCode: RichIrSchemaSourceCode;
+  sourceCode: SourceCode;
   /** The original IR node */
   sourceIr: IrSchema["types"][number];
 };
@@ -64,9 +67,9 @@ export type RichIrSchemaRpcOperation = Field & {
   /** The operation field doc converted from markdown to HTML. */
   htmlDoc?: string;
   /** Highlighted VDL snippet for the operation input when present. */
-  inputSourceCode?: RichIrSchemaSourceCode;
+  inputSourceCode?: SourceCode;
   /** Highlighted VDL snippet for the operation output when present. */
-  outputSourceCode?: RichIrSchemaSourceCode;
+  outputSourceCode?: SourceCode;
   /** The original IR node */
   sourceIr: Field;
 };
@@ -81,7 +84,7 @@ export type RichIrSchemaRpc = {
   /** The top-level RPC doc converted from markdown to HTML. */
   htmlDoc?: string;
   /** The canonical source code for this RPC without the top-level docstring. */
-  sourceCode: RichIrSchemaSourceCode;
+  sourceCode: SourceCode;
   /** The original IR node */
   sourceIr: IrSchema["types"][number];
   operations: RichIrSchemaRpcOperation[];
@@ -98,7 +101,7 @@ export type RichIrSchemaEnum = IrSchema["enums"][number] & {
   /** The top-level enum doc converted from markdown to HTML. */
   htmlDoc?: string;
   /** The canonical source code for this enum without the enum docstring. */
-  sourceCode: RichIrSchemaSourceCode;
+  sourceCode: SourceCode;
   /** The original IR node */
   sourceIr: IrSchema["enums"][number];
 };
@@ -114,7 +117,7 @@ export type RichIrSchemaConstant = IrSchema["constants"][number] & {
   /** The top-level constant doc converted from markdown to HTML. */
   htmlDoc?: string;
   /** The canonical source code for this constant without the constant docstring. */
-  sourceCode: RichIrSchemaSourceCode;
+  sourceCode: SourceCode;
   /** The original IR node */
   sourceIr: IrSchema["constants"][number];
 };
@@ -131,7 +134,7 @@ export type RichIrSchemaDoc = IrSchema["docs"][number] & {
   title: string;
   firstParagraph: string;
   /** The original markdown and HTML of the doc */
-  sourceCode: RichIrSchemaSourceCode;
+  sourceCode: SourceCode;
   /** The original IR node */
   sourceIr: IrSchema["docs"][number];
 };

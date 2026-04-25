@@ -18,7 +18,7 @@ import { createIrNodeLinkTransformer } from "./shiki-links-transformer";
 import type {
   RichIrSchema,
   RichIrSchemaRpcOperationKind,
-  RichIrSchemaSourceCode,
+  SourceCode,
 } from "./types";
 
 /**
@@ -148,7 +148,7 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
    * @param raw
    * @returns
    */
-  const toSourceCode = async (raw: string): Promise<RichIrSchemaSourceCode> => {
+  const toSourceCode = async (raw: string): Promise<SourceCode> => {
     const htmlLightPromise = highlighter.highlight(
       raw,
       "vdl",
