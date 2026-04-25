@@ -226,7 +226,7 @@
 >
   <span class="bloc w-full flex items-center justify-between">
     <span>Search...</span>
-    <span>
+    <span class="not-desk:hidden">
       <Kbd class="ml-2">{ctrlOrCmd}</Kbd>
       <Kbd>K</Kbd>
     </span>
