@@ -24,6 +24,7 @@
     <AppLayout
       primaryRegion="header"
       maxWidth="md"
+      sidebarWidth="lg"
       showSidebarBottom={viewport.isMobile}
     >
       {#snippet headerLeft()}
