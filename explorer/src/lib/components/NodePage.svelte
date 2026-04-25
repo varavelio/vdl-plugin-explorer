@@ -54,6 +54,7 @@
           rawCode={rpcOperationUrl}
           title="Endpoint"
           showDownload={false}
+          showLoc={false}
           bordered
         />
       {/if}
