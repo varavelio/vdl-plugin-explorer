@@ -56,10 +56,8 @@ export type RichIrSchemaRpcOperationKind = "procedure" | "stream";
  */
 export type RichIrSchemaRpcOperation = Field & {
   id: string;
-  routeId: string;
   urlPath: string;
   rpcId: string;
-  rpcRouteId: string;
   rpcUrlPath: string;
   rpcName: string;
   kind: RichIrSchemaRpcOperationKind;
