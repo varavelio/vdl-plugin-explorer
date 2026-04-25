@@ -20,6 +20,7 @@
 
 <Dialog
   bind:open
+  size="lg"
   title="VDL Schema"
   description="Full VDL Schema used to build this site"
 >
