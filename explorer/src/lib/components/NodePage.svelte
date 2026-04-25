@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Badge, CodeBlock, Copy, Heading, Prose } from "@varavel/ui";
+  import { Badge, CodeBlock, Heading, Prose } from "@varavel/ui";
   import { theme as runtimeTheme } from "@varavel/ui/runtime";
   import type { SourceCode } from "$lib/store/ir/index";
 
