@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { BookOpenText, Braces, ListTree, Pin } from "@lucide/svelte";
+  import {
+    BookOpenText,
+    Braces,
+    ListTree,
+    NetworkIcon,
+    Pin,
+  } from "@lucide/svelte";
   import { Badge, Card, GithubButton, Heading } from "@varavel/ui";
   import { viewport } from "@varavel/ui/runtime";
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
@@ -13,32 +19,56 @@
     icon: Component;
   };
 
-  let cards = $derived<OverviewCard[]>([
-    {
-      title: "Docs",
-      count: store.ir.docs.length,
-      description: "Documentation pages included in the schema.",
-      icon: BookOpenText,
-    },
-    {
-      title: "Types",
-      count: store.ir.types.length,
-      description: "Type definitions available in the schema.",
-      icon: Braces,
-    },
-    {
-      title: "Enums",
-      count: store.ir.enums.length,
-      description: "Enum definitions available in the schema.",
-      icon: ListTree,
-    },
-    {
-      title: "Constants",
-      count: store.ir.constants.length,
-      description: "Constant values defined in the schema.",
-      icon: Pin,
-    },
-  ]);
+  let cards = ($derived<OverviewCard[]>).by(() => {
+    const cards: OverviewCard[] = [];
+
+    if (store.ir.docs.length > 0) {
+      cards.push({
+        title: "Docs",
+        count: store.ir.docs.length,
+        description: "Documentation pages included in the schema.",
+        icon: BookOpenText,
+      });
+    }
+
+    if (store.ir.rpcs.length > 0) {
+      cards.push({
+        title: "RPCs",
+        count: store.ir.rpcs.length,
+        description: "RPC services grouped into procedures and streams.",
+        icon: NetworkIcon,
+      });
+    }
+
+    if (store.ir.types.length > 0) {
+      cards.push({
+        title: "Types",
+        count: store.ir.types.length,
+        description: "Type definitions available in the schema.",
+        icon: Braces,
+      });
+    }
+
+    if (store.ir.enums.length > 0) {
+      cards.push({
+        title: "Enums",
+        count: store.ir.enums.length,
+        description: "Enum definitions available in the schema.",
+        icon: ListTree,
+      });
+    }
+
+    if (store.ir.constants.length > 0) {
+      cards.push({
+        title: "Constants",
+        count: store.ir.constants.length,
+        description: "Constant values defined in the schema.",
+        icon: Pin,
+      });
+    }
+
+    return cards;
+  });
 </script>
 
 <svelte:head>
@@ -50,8 +80,8 @@
     <div class="space-y-4">
       <Heading level="1" size="3xl">VDL Explorer</Heading>
       <p class="mx-auto text-sm text-content-muted desk:text-base">
-        Explore the VDL schema from the sidebar menu to inspect docs, types,
-        enums, and constants.
+        Explore the VDL schema from the sidebar menu to inspect its available
+        docs, RPCs, types, enums, and constants.
       </p>
     </div>
 
