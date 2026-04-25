@@ -12,7 +12,7 @@
     if (!enumDef) return [];
 
     const nextTags: string[] = [
-      `type ${enumDef.enumType}`,
+      `${enumDef.enumType} type`,
       pluralize("member", enumDef.members.length, true),
     ];
 

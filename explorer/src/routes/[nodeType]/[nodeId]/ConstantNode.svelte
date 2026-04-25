@@ -11,7 +11,7 @@
   let tags = $derived.by(() => {
     if (!constantDef) return [];
 
-    const nextTags: string[] = [constantDef.value.kind];
+    const nextTags: string[] = [`${constantDef.value.kind} type`];
 
     if (constantDef.value.kind === "object") {
       nextTags.push(

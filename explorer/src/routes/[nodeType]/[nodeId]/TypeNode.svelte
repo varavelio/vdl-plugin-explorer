@@ -11,7 +11,7 @@
   let tags = $derived.by(() => {
     if (!typeDef) return [];
 
-    const nextTags: string[] = [typeDef.typeRef.kind];
+    const nextTags: string[] = [`${typeDef.typeRef.kind} type`];
 
     if (typeDef.typeRef.kind === "object") {
       nextTags.push(
