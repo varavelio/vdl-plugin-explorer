@@ -76,7 +76,6 @@ export type RichIrSchemaRpcOperation = Field & {
  */
 export type RichIrSchemaRpc = {
   id: string;
-  routeId: string;
   name: string;
   urlPath: string;
   /** The top-level RPC doc converted from markdown to HTML. */
