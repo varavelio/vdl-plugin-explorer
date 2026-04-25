@@ -5,20 +5,33 @@
 
   interface Props {
     title: string;
-    sourceCode: RichIrSchemaSourceCode;
+    sourceCode?: RichIrSchemaSourceCode;
+    inputSourceCode?: RichIrSchemaSourceCode;
+    outputSourceCode?: RichIrSchemaSourceCode;
     tags?: string[];
     htmlDoc?: string;
   }
 
-  let { title, tags = [], htmlDoc, sourceCode }: Props = $props();
+  let {
+    title,
+    tags = [],
+    htmlDoc,
+    sourceCode,
+    inputSourceCode,
+    outputSourceCode,
+  }: Props = $props();
 
-  let highlightedHtml = $derived.by(() => {
-    if (!sourceCode) return undefined;
+  function pickSourceCode(code?: RichIrSchemaSourceCode) {
+    if (!code) return undefined;
     if (runtimeTheme.resolved === "dark") {
-      return sourceCode.htmlDark;
+      return code.htmlDark;
     }
-    return sourceCode.htmlLight;
-  });
+    return code.htmlLight;
+  }
+
+  let highlightedSourceCode = $derived(pickSourceCode(sourceCode));
+  let highlightedInputSourceCode = $derived(pickSourceCode(inputSourceCode));
+  let highlightedOutputSourceCode = $derived(pickSourceCode(outputSourceCode));
 </script>
 
 <div class="space-y-10.75">
@@ -38,14 +51,42 @@
     {/if}
   </section>
 
-  <section class="space-y-6">
-    <Heading level="2" size="2xl">Source</Heading>
-    <CodeBlock
-      rawCode={sourceCode.raw}
-      {highlightedHtml}
-      title="VDL"
-      fileName="source.vdl"
-      bordered
-    />
-  </section>
+  {#if sourceCode}
+    <section class="space-y-6">
+      <Heading level="2" size="2xl">Source</Heading>
+      <CodeBlock
+        rawCode={sourceCode.raw}
+        highlightedHtml={highlightedSourceCode}
+        title="VDL"
+        fileName="source.vdl"
+        bordered
+      />
+    </section>
+  {/if}
+
+  {#if inputSourceCode}
+    <section class="space-y-6">
+      <Heading level="2" size="2xl">Input</Heading>
+      <CodeBlock
+        rawCode={inputSourceCode.raw}
+        highlightedHtml={highlightedInputSourceCode}
+        title="VDL"
+        fileName="input.vdl"
+        bordered
+      />
+    </section>
+  {/if}
+
+  {#if outputSourceCode}
+    <section class="space-y-6">
+      <Heading level="2" size="2xl">Output</Heading>
+      <CodeBlock
+        rawCode={outputSourceCode.raw}
+        highlightedHtml={highlightedOutputSourceCode}
+        title="VDL"
+        fileName="output.vdl"
+        bordered
+      />
+    </section>
+  {/if}
 </div>
