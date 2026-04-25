@@ -22,7 +22,7 @@
   </div>
 {:else}
   <UiProvider>
-    <AppLayout primaryRegion="header" maxWidth="md" sidebarWidth="lg">
+    <AppLayout primaryRegion="header" maxWidth="md">
       {#snippet headerLeft()}
         <header class="hidden desk:flex ml-2 items-center gap-4">
           <a href="#/"><Logo class="h-8" /></a>
