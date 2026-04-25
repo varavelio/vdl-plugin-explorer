@@ -1,13 +1,13 @@
 <script lang="ts">
   import "../app.css";
-  import { GithubButton, ThemePicker, UiProvider } from "@varavel/ui";
+  import { GithubButton, UiProvider } from "@varavel/ui";
   import { Loader } from "@varavel/ui/brand";
   import { AppLayout } from "@varavel/ui/layouts";
   import { viewport } from "@varavel/ui/runtime";
   import Logo from "$lib/components/Logo.svelte";
   import { highlighter } from "$lib/shiki";
   import { store } from "$lib/store";
-  import HeaderSchemaButton from "./components/HeaderSchemaButton.svelte";
+  import HeaderRigh from "./components/HeaderRigh.svelte";
   import SearchButton from "./components/SearchButton.svelte";
   import SidebarNav from "./components/SidebarNav.svelte";
 
@@ -22,12 +22,7 @@
   </div>
 {:else}
   <UiProvider>
-    <AppLayout
-      primaryRegion="header"
-      maxWidth="md"
-      sidebarWidth="lg"
-      showSidebarBottom={viewport.isMobile}
-    >
+    <AppLayout primaryRegion="header" maxWidth="md" sidebarWidth="lg">
       {#snippet headerLeft()}
         <header class="hidden desk:flex ml-2 items-center gap-4">
           <a href="#/"><Logo class="h-8" /></a>
@@ -50,18 +45,7 @@
       {/snippet}
 
       {#snippet headerRight()}
-        <div class="flex items-center gap-2">
-          {#if viewport.isDesktop}
-            <HeaderSchemaButton />
-          {/if}
-
-          <ThemePicker
-            class={{"[&_svg]:size-5": viewport.isMobile}}
-            variant={viewport.isMobile ? "ghost" : "outline"}
-            showLabel={viewport.isDesktop}
-            square={viewport.isMobile}
-          />
-        </div>
+        <HeaderRigh />
       {/snippet}
 
       {#snippet sidebarTop()}
@@ -70,20 +54,6 @@
 
       {#snippet sidebarCenter()}
         <SidebarNav />
-      {/snippet}
-
-      {#snippet sidebarBottom()}
-        <div class="w-full space-y-2">
-          <GithubButton
-            user="varavelio"
-            repo="vdl-plugin-explorer"
-            size="sm"
-            showStars={true}
-            showTag={false}
-            showForks={false}
-            wide={true}
-          />
-        </div>
       {/snippet}
 
       {#snippet main()}
