@@ -70,14 +70,12 @@
       <Nav.Group label="RPCs" icon={NetworkIcon} open>
         {#each store.ir.rpcs as rpc (rpc.id)}
           <Nav.Group label={rpc.name} icon={ServerCog} open>
-            {#if rpc.htmlDoc}
-              <Nav.Item
-                label={rpc.name}
-                icon={FileText}
-                href={rpc.urlPath}
-                active={page.url.hash === rpc.urlPath}
-              />
-            {/if}
+            <Nav.Item
+              label={rpc.name}
+              icon={FileText}
+              href={rpc.urlPath}
+              active={page.url.hash === rpc.urlPath}
+            />
 
             {#each rpc.operations as operation (operation.id)}
               <Nav.Item
