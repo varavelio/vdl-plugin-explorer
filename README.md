@@ -30,6 +30,12 @@ Use it when you want to:
 - inspect RPC services, procedures, and streams with input/output previews
 - ship a responsive schema reference as a single HTML file that can be hosted anywhere
 
+## Demo
+
+[Open the live demo](https://vdl-explorer-demo.varavel.com/) or explore [it's source code](https://github.com/varavelio/vdl-plugin-explorer/tree/main/demo).
+
+<img src="./screenshot.png" alt="VDL Plugin Explorer Demo" />
+
 ## Quick Start
 
 1. Add the plugin to your `vdl.config.vdl`:
