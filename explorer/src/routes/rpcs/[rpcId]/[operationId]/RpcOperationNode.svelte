@@ -1,5 +1,6 @@
 <script lang="ts">
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
+  import { browser } from "$app/environment";
   import NodePage from "$lib/components/NodePage.svelte";
   import type { RichIrSchemaRpcOperation } from "$lib/store/ir/index";
 
@@ -8,6 +9,8 @@
   }
 
   let { rpcOperation }: Props = $props();
+
+  const DEFAULT_RPC_BASE_URL = "<baseURL>";
 
   let tags = $derived.by(() => {
     if (!rpcOperation) return [];
@@ -23,9 +26,18 @@
     return nextTags;
   });
 
+  let rpcBaseUrl = $derived.by(() => {
+    if (!browser) return DEFAULT_RPC_BASE_URL;
+
+    const globalBaseUrl = window.__vdl_rpc_base_url?.trim();
+    if (!globalBaseUrl) return DEFAULT_RPC_BASE_URL;
+
+    return globalBaseUrl.replace(/\/+$/, "");
+  });
+
   let rpcOperationUrl = $derived.by(() => {
     if (!rpcOperation) return "";
-    return `https://<baseURL>/${rpcOperation.rpcName}/${rpcOperation.name}`;
+    return `${rpcBaseUrl}/${rpcOperation.rpcName}/${rpcOperation.name}`;
   });
 </script>
 
