@@ -39,17 +39,6 @@ function resolveOutFile(input: PluginInput): string {
 }
 
 /**
- * Removes `position` keys while JSON serializing IR data.
- *
- * @param key - Current JSON key being serialized.
- * @param value - Current JSON value being serialized.
- * @returns The value to keep in output, or `undefined` to omit it.
- */
-function removePositionReplacer(key: string, value: unknown): unknown {
-  return key === "position" ? undefined : value;
-}
-
-/**
  * Generates an HTML file embedding the VDL IR for the explorer application.
  *
  * Supported plugin options:
@@ -63,7 +52,7 @@ export const generate = definePlugin((input) => {
   input.ir.entryPoint = "";
 
   const outFile = resolveOutFile(input);
-  const ir = escapeScriptTag(JSON.stringify(input.ir, removePositionReplacer));
+  const ir = escapeScriptTag(JSON.stringify(input.ir));
   const html = template.replace(
     "window.__vdl_ir = {};",
     `window.__vdl_ir = ${ir};`,
