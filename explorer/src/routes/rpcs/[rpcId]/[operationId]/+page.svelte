@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { LayoutDashboard, NetworkIcon, ServerCog } from "@lucide/svelte";
+  import {
+    LayoutDashboard,
+    NetworkIcon,
+    Radio,
+    ServerCog,
+    Zap,
+  } from "@lucide/svelte";
   import { Breadcrumbs } from "@varavel/ui";
   import { tick } from "svelte";
   import { browser } from "$app/environment";
@@ -53,7 +59,7 @@
       { label: "Overview", icon: LayoutDashboard, href: "#/" },
       { label: "RPCs", icon: NetworkIcon },
       { label: rpc.name, icon: ServerCog, href: rpc.urlPath },
-      { label: operation.name }
+      { label: operation.name, icon: operation.kind === "procedure" ? Zap : Radio}
     ]}
   />
 

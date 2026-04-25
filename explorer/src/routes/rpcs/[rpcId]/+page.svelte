@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FileText, LayoutDashboard, NetworkIcon } from "@lucide/svelte";
+  import { LayoutDashboard, NetworkIcon, ServerCog } from "@lucide/svelte";
   import { Breadcrumbs } from "@varavel/ui";
   import { tick } from "svelte";
   import { browser } from "$app/environment";
@@ -46,7 +46,7 @@
     items={[
       { label: "Overview", icon: LayoutDashboard, href: "#/" },
       { label: "RPCs", icon: NetworkIcon },
-      { label: rpc.name, icon: FileText }
+      { label: rpc.name, icon: ServerCog }
     ]}
   />
 
