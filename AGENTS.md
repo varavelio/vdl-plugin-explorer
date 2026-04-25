@@ -22,6 +22,7 @@ When updating this document, do so with the context of the entire document in mi
 - Use the SDK utility functions when possible to avoid duplicating code.
 - The explorer UI favors small shared components for recurring IR presentation concerns (page chrome, markdown docs, recursive type rendering, recursive literal rendering) instead of duplicating that logic across routes.
 - RPC routes live under `explorer/src/routes/rpcs` as a dedicated special-case hierarchy instead of extending the generic `[nodeType]` explorer route.
+- RPC endpoint base URLs are configured via plugin option `rpcBaseUrl` and exposed in the explorer through `window.__vdl_rpc_base_url`.
 - IR route ids are slug-based; only docs can receive suffixes (`-1`, `-2`, ...) when duplicate titles exist.
 - For highlighted VDL source snippets, prefer Shiki HTML transformers for dynamic cross-references instead of post-processing generated HTML strings.
 - `e2e/` this directory contains end to end tests. Recommended structure: one fixture folder per test.
