@@ -45,7 +45,7 @@ const config = {
   version 1
   plugins [
     {
-      src "varavelio/vdl-plugin-explorer@v0.1.0"
+      src "varavelio/vdl-plugin-explorer@v0.1.1"
       schema "./schema.vdl"
       outDir "./docs"
     }
@@ -79,7 +79,7 @@ const config = {
   version 1
   plugins [
     {
-      src "varavelio/vdl-plugin-explorer@v0.1.0"
+      src "varavelio/vdl-plugin-explorer@v0.1.1"
       schema "./schema.vdl"
       outDir "./docs"
       options {
