@@ -121,7 +121,7 @@ function unwrapPreviewFieldSource(raw: string): string {
  */
 function generateFieldSource(field: Field): string {
   const raw = generateVdl(createFieldPreviewType(field), {
-    docstrings: "strip",
+    docstrings: "strip-top-level",
   });
   return unwrapPreviewFieldSource(raw);
 }
