@@ -22,7 +22,12 @@
   </div>
 {:else}
   <UiProvider>
-    <AppLayout primaryRegion="header" maxWidth="md">
+    <AppLayout
+      primaryRegion="header"
+      maxWidth="lg"
+      sidebarResizable
+      sidebarResizableId="vdl-plugin-explorer"
+    >
       {#snippet headerLeft()}
         <header class="hidden desk:flex ml-2 items-center gap-4">
           <a href="#/"><Logo class="h-8" /></a>
