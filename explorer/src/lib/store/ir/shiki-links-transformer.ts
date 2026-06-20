@@ -4,7 +4,7 @@ import type { ShikiHtmlNode, ShikiHtmlTransformer } from "$lib/shiki";
  * CSS class attached to internal schema reference links rendered by Shiki.
  * This class is styled in the app.css file.
  */
-const INTERNAL_IR_LINK_CLASS = "vdl-internal-link";
+export const INTERNAL_IR_LINK_CLASS = "vdl-internal-link";
 
 /**
  * Convert a Shiki class property value into an array of class names.

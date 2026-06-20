@@ -25,4 +25,5 @@ When updating this document, do so with the context of the entire document in mi
 - RPC endpoint base URLs are configured via plugin option `rpcBaseUrl` and exposed in the explorer through `window.__vdl_rpc_base_url`.
 - IR route ids are slug-based; only docs can receive suffixes (`-1`, `-2`, ...) when duplicate titles exist.
 - For highlighted VDL source snippets, prefer Shiki HTML transformers for dynamic cross-references instead of post-processing generated HTML strings.
+- Linkable source snippets are exposed through `RichIrSchema.sourceReferences`; `NodePage` intercepts Shiki `vdl-internal-link` anchors to open stacked source dialogs instead of navigating.
 - `e2e/` this directory contains end to end tests. Recommended structure: one fixture folder per test.

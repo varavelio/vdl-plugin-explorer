@@ -291,6 +291,27 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
     }),
   );
 
+  const sourceReferences: RichIrSchema["sourceReferences"] = [
+    ...types.map((type) => ({
+      kind: "type" as const,
+      href: type.urlPath,
+      title: type.name,
+      sourceCode: type.sourceCode,
+    })),
+    ...enums.map((en) => ({
+      kind: "enum" as const,
+      href: en.urlPath,
+      title: en.name,
+      sourceCode: en.sourceCode,
+    })),
+    ...constants.map((constant) => ({
+      kind: "constant" as const,
+      href: constant.urlPath,
+      title: constant.name,
+      sourceCode: constant.sourceCode,
+    })),
+  ];
+
   // Count the occurrences of each doc title to determine which ones
   // need duplicate suffixes
   const docTitleCounts = new Map<string, number>();
@@ -340,5 +361,6 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
     enums,
     constants,
     docs,
+    sourceReferences,
   };
 }

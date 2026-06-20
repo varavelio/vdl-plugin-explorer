@@ -17,6 +17,7 @@ export {
   type RichIrSchemaRpcOperationKind,
   type RichIrSchemaType,
   type SourceCode,
+  type SourceCodeReference,
 } from "./types";
 
 /**

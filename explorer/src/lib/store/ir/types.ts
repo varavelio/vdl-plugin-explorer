@@ -11,6 +11,16 @@ export type SourceCode = {
 };
 
 /**
+ * Linkable source snippet exposed by internal source-code references.
+ */
+export type SourceCodeReference = {
+  kind: "type" | "enum" | "constant";
+  href: string;
+  title: string;
+  sourceCode: SourceCode;
+};
+
+/**
  * An empty IR schema.
  */
 export const EMPTY_IR: IrSchema = {
@@ -31,6 +41,7 @@ export const EMPTY_RICH_IR: RichIrSchema = {
   enums: [],
   constants: [],
   docs: [],
+  sourceReferences: [],
 };
 
 /**
@@ -152,6 +163,7 @@ export type RichIrSchema = {
   enums: RichIrSchemaEnum[];
   constants: RichIrSchemaConstant[];
   docs: RichIrSchemaDoc[];
+  sourceReferences: SourceCodeReference[];
 };
 
 /**
