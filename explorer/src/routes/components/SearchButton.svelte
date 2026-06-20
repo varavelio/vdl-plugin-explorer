@@ -219,14 +219,14 @@
 <Button
   icon={Search}
   variant="outline"
-  class="cursor-text"
+  class="cursor-text overflow-hidden"
   alignContent="left"
   wide
   onclick={openSearch}
 >
   <span class="bloc w-full flex items-center justify-between">
     <span>Search...</span>
-    <span class="not-desk:hidden">
+    <span class="not-desk:hidden whitespace-nowrap">
       <Kbd class="ml-2">{ctrlOrCmd}</Kbd>
       <Kbd>K</Kbd>
     </span>
