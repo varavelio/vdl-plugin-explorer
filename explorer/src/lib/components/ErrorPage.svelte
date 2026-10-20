@@ -18,7 +18,7 @@
 <div
   class={[
     "size-full flex flex-col items-center justify-center space-y-2 text-center",
-    className
+    className,
   ]}
 >
   <Heading size="2xl">{title}</Heading>

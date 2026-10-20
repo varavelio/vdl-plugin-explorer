@@ -8,6 +8,6 @@
 {:else}
   <ErrorPage
     title={`${page.status} Error`}
-    message={page.error?.message?? "Something went wrong."}
+    message={page.error?.message ?? "Something went wrong."}
   />
 {/if}

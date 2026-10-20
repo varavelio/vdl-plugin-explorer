@@ -294,7 +294,10 @@
             <div class="min-w-0 flex-1 space-y-1.5">
               <div class="flex items-center gap-2">
                 <span class="truncate text-sm font-medium text-content">
-                  {#each highlightText(getLabel(result), result) as part, partIndex (`label-${partIndex}-${part.text}`)}
+                  {#each highlightText(
+                    getLabel(result),
+                    result,
+                  ) as part, partIndex (`label-${partIndex}-${part.text}`)}
                     {#if part.match}
                       <mark class="rounded-sm bg-yellow-300 px-0.5 text-black">
                         {part.text}
@@ -309,7 +312,10 @@
               <p
                 class="overflow-hidden text-sm text-content-muted [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]"
               >
-                {#each highlightText(result.summary || result.urlPath, result) as part, partIndex (`summary-${partIndex}-${part.text}`)}
+                {#each highlightText(
+                  result.summary || result.urlPath,
+                  result,
+                ) as part, partIndex (`summary-${partIndex}-${part.text}`)}
                   {#if part.match}
                     <mark class="rounded-sm bg-yellow-300 px-0.5 text-black">
                       {part.text}

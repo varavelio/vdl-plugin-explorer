@@ -46,7 +46,7 @@
     items={[
       { label: "Overview", icon: LayoutDashboard, href: "#/" },
       { label: "RPCs", icon: NetworkIcon },
-      { label: rpc.name, icon: ServerCog }
+      { label: rpc.name, icon: ServerCog },
     ]}
   />
 

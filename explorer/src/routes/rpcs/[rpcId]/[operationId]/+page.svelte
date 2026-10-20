@@ -59,7 +59,10 @@
       { label: "Overview", icon: LayoutDashboard, href: "#/" },
       { label: "RPCs", icon: NetworkIcon },
       { label: rpc.name, icon: ServerCog, href: rpc.urlPath },
-      { label: operation.name, icon: operation.kind === "procedure" ? Zap : Radio}
+      {
+        label: operation.name,
+        icon: operation.kind === "procedure" ? Zap : Radio,
+      },
     ]}
   />
 

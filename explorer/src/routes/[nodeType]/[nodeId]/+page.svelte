@@ -99,7 +99,7 @@
     items={[
       { label: "Overview", icon: LayoutDashboard, href: "#/" },
       { label: nodeGroupType, icon: nodeGroupIcon },
-      { label: title }
+      { label: title },
     ]}
   />
 
