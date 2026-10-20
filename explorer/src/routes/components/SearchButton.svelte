@@ -236,7 +236,7 @@
   bind:open
   size="md"
   title="Search"
-  description="Find docs, RPCs, types, enums, and constants instantly."
+  description="Find docs, HTTP RPC, types, enums, and constants instantly."
   padded={false}
 >
   <div class="border-t border-base-300">

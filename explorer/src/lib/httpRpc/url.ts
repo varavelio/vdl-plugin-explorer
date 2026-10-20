@@ -27,3 +27,20 @@ export function buildRpcProcUrl(
   const normalizedBase = baseUrl.trim().replace(/\/+$/, "");
   return `${normalizedBase}/${lowerFirst(rpcName)}/${procName}`;
 }
+
+/**
+ * Fallback base URL rendered before the plugin injects the configured one.
+ */
+export const DEFAULT_RPC_BASE_URL = "https://<baseURL>";
+
+/**
+ * Read the RPC base URL injected by the plugin.
+ *
+ * @param configured Value of `window.__vdl_rpc_base_url` when available.
+ * @returns The trimmed base URL without trailing slashes.
+ */
+export function readRpcBaseUrl(configured: string | undefined): string {
+  const trimmed = configured?.trim();
+  if (!trimmed) return DEFAULT_RPC_BASE_URL;
+  return trimmed.replace(/\/+$/, "");
+}

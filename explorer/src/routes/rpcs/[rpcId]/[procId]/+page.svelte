@@ -4,6 +4,7 @@
   import { tick } from "svelte";
   import { browser } from "$app/environment";
   import ErrorPage from "$lib/components/ErrorPage.svelte";
+  import ProcPlayground from "$lib/httpRpc/playground/ProcPlayground.svelte";
   import { store } from "$lib/store";
   import type { PageProps } from "./$types";
   import RpcProcNode from "./RpcProcNode.svelte";
@@ -22,7 +23,7 @@
 
   let pageTitle = $derived.by(() => {
     if (!rpc || !proc) return "Not Found";
-    return `${proc.name} | ${rpc.name} | RPCs`;
+    return `${proc.name} | ${rpc.name} | HTTP RPC`;
   });
 
   $effect(() => {
@@ -51,7 +52,7 @@
     class="w-full p-4 bg-base-100 desk:sticky desk:top-0 desk:z-20"
     items={[
       { label: "Overview", icon: LayoutDashboard, href: "#/" },
-      { label: "RPCs", icon: NetworkIcon },
+      { label: "HTTP RPC", icon: NetworkIcon },
       { label: rpc.name, icon: ServerCog, href: rpc.urlPath },
       {
         label: proc.name,
@@ -60,5 +61,8 @@
     ]}
   />
 
-  <div class="p-4 pt-0"><RpcProcNode rpcProc={proc} /></div>
+  <div class="space-y-8 p-4 pt-0">
+    <RpcProcNode rpcProc={proc} />
+    <ProcPlayground {proc} />
+  </div>
 {/if}

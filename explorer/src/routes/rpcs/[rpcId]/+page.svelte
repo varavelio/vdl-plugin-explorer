@@ -17,7 +17,7 @@
 
   let pageTitle = $derived.by(() => {
     if (!rpc) return "Not Found";
-    return `${rpc.name} | RPCs`;
+    return `${rpc.name} | HTTP RPC`;
   });
 
   $effect(() => {
@@ -45,7 +45,7 @@
     class="w-full p-4 bg-base-100 desk:sticky desk:top-0 desk:z-20"
     items={[
       { label: "Overview", icon: LayoutDashboard, href: "#/" },
-      { label: "RPCs", icon: NetworkIcon },
+      { label: "HTTP RPC", icon: NetworkIcon },
       { label: rpc.name, icon: ServerCog },
     ]}
   />

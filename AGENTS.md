@@ -30,4 +30,7 @@ When updating this document, do so with the context of the entire document in mi
 - Keep all npm versions pinned to exact versions, never use `^` ranges.
 - `explorer` stays on SvelteKit 2 with adapter-static 3 and TypeScript 6. Kit 3 moves config into the Vite plugin and breaks the single-file static setup plus the `@varavel/ui` peer range. TypeScript 7 breaks `svelte-check`. `plugin` can use TypeScript 7.
 - After bumping `dprint`, run `dprint config update` to migrate plugin URLs to the `npm:` spec. Keep `biome.json` `$schema` tracking the installed Biome version and run `biome migrate` when config keys deprecate.
-- `noAutofocus` stays off via override for `SearchButton.svelte`. The input lives inside the search Dialog modal where autofocus is intended, and Biome cannot recognize the custom Dialog as a modal context.
+- `noAutofocus` stays off via override for `SearchButton.svelte`.
+- Procedure playground state (input/output/history) persists per procedure in IndexedDB via `localforage` (`lib/httpRpc/playground/proc-state.svelte.ts`).
+- Monaco loads at runtime from the jsDelivr CDN via `@monaco-editor/loader` so the single-file build stays lean. `curlconverter` loads the same way through a dynamic `+esm` import and its tree-sitter WASM files resolve to jsDelivr through the `fetch` redirect patch in `app.html`.
+- The input lives inside the search Dialog modal where autofocus is intended, and Biome cannot recognize the custom Dialog as a modal context. The input lives inside the search Dialog modal where autofocus is intended, and Biome cannot recognize the custom Dialog as a modal context.

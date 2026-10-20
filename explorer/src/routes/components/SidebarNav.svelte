@@ -66,7 +66,7 @@
     {/if}
 
     {#if store.ir.rpcs.length > 0}
-      <Nav.Group label="RPCs" icon={NetworkIcon} open>
+      <Nav.Group label="HTTP RPC" icon={NetworkIcon} open>
         {#each store.ir.rpcs as rpc (rpc.id)}
           <Nav.Group label={rpc.name} icon={ServerCog} open>
             <Nav.Item

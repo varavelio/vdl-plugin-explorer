@@ -25,6 +25,32 @@
     window.__vdl_ir = {};
     </script>
 
+    <script>
+    // Redirect tree-sitter WASM requests to the CDN. curlconverter loads
+    // from the jsDelivr ESM bundle at runtime and fetches these files
+    // relative to the site root, which does not exist in the single-file
+    // build, so they are served from jsDelivr instead.
+    const __mpOriginalFetch = globalThis.fetch;
+    const __mpWasmCdn = {
+      "tree-sitter.wasm": "https://cdn.jsdelivr.net/npm/web-tree-sitter@0.24.7/tree-sitter.wasm",
+      "tree-sitter-bash.wasm": "https://cdn.jsdelivr.net/npm/curlconverter@4.12.0/dist/tree-sitter-bash.wasm",
+    };
+    function __mpResolveWasm(url) {
+      const file = url.split("?")[0].split("#")[0].split("/").pop();
+      return __mpWasmCdn[file] || null;
+    }
+    globalThis.fetch = function (resource, options) {
+      if (typeof resource === "string") {
+        const redirect = __mpResolveWasm(resource);
+        if (redirect) resource = redirect;
+      } else if (resource instanceof Request) {
+        const redirect = __mpResolveWasm(resource.url);
+        if (redirect) resource = new Request(redirect, resource);
+      }
+      return __mpOriginalFetch.call(this, resource, options);
+    };
+    </script>
+
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">

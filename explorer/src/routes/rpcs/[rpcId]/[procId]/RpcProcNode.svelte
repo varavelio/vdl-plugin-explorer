@@ -2,7 +2,11 @@
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
   import { browser } from "$app/environment";
   import NodePage from "$lib/components/NodePage.svelte";
-  import { buildRpcProcUrl } from "$lib/httpRpc/url";
+  import {
+    buildRpcProcUrl,
+    DEFAULT_RPC_BASE_URL,
+    readRpcBaseUrl,
+  } from "$lib/httpRpc/url";
   import type { RichIrSchemaRpcProc } from "$lib/store/ir/index";
 
   interface Props {
@@ -10,8 +14,6 @@
   }
 
   let { rpcProc }: Props = $props();
-
-  const DEFAULT_RPC_BASE_URL = "https://<baseURL>";
 
   let tags = $derived.by(() => {
     if (!rpcProc) return [];
@@ -27,11 +29,7 @@
 
   let rpcBaseUrl = $derived.by(() => {
     if (!browser) return DEFAULT_RPC_BASE_URL;
-
-    const globalBaseUrl = window.__vdl_rpc_base_url?.trim();
-    if (!globalBaseUrl) return DEFAULT_RPC_BASE_URL;
-
-    return globalBaseUrl.replace(/\/+$/, "");
+    return readRpcBaseUrl(window.__vdl_rpc_base_url);
   });
 
   let rpcProcUrl = $derived.by(() => {

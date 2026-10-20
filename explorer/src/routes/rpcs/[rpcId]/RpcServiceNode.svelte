@@ -12,7 +12,7 @@
   let tags = $derived.by(() => {
     if (!rpc) return [];
 
-    const nextTags = ["rpc"];
+    const nextTags = ["http rpc"];
 
     if (rpc.procs.length > 0) {
       nextTags.push(pluralize("procedure", rpc.procs.length, true));

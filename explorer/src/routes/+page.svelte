@@ -28,9 +28,9 @@
         icon: BookOpenText,
       },
       {
-        title: "RPCs",
+        title: "HTTP RPC",
         count: store.ir.rpcs.length,
-        description: "RPC services grouped into procedures.",
+        description: "HTTP RPC services grouped into procedures.",
         icon: NetworkIcon,
       },
       {
@@ -67,7 +67,7 @@
       <Heading level="1" size="3xl">VDL Explorer</Heading>
       <p class="mx-auto text-sm text-content-muted text-balance desk:text-base">
         Explore the VDL schema from the sidebar menu to inspect its available
-        docs, RPCs, types, enums, and constants.
+        docs, HTTP RPC, types, enums, and constants.
       </p>
     </div>
 
