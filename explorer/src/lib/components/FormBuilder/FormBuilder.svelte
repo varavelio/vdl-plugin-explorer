@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { BrushCleaning } from "@lucide/svelte";
-  import { Button, Heading, Tooltip } from "@varavel/ui";
+  import { Braces, BrushCleaning, SquarePen } from "@lucide/svelte";
+  import { Button, Heading } from "@varavel/ui";
   import type { EnumDef, Field, TypeDef } from "@varavel/vdl-plugin-sdk";
   import { untrack } from "svelte";
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
@@ -155,36 +155,43 @@
 
 <div class="space-y-4">
   <div class="flex items-center justify-between gap-2">
-    <div>
+    <div class="flex items-center gap-3">
       {#if title}
         <Heading level="2" size="lg">{title}</Heading>
       {/if}
-    </div>
-    <div class="flex gap-2">
-      <Button
-        size="sm"
-        variant={editorMode === "form" ? "solid" : "ghost"}
-        onclick={() => setMode("form")}
+      <div
+        class="flex divide-x divide-base-400 overflow-hidden rounded-md border border-base-400"
+        role="tablist"
+        aria-label="Editor mode"
       >
-        Form
-      </Button>
-      <Button
-        size="sm"
-        variant={editorMode === "form" ? "ghost" : "solid"}
-        onclick={() => setMode("json")}
-      >
-        JSON
-      </Button>
-      <Tooltip content="Clear all fields" side="left">
         <Button
           size="sm"
-          variant="ghost"
-          icon={BrushCleaning}
-          onclick={clearAll}
+          variant={editorMode === "form" ? "solid" : "ghost"}
+          onclick={() => setMode("form")}
+          icon={SquarePen}
+          class="rounded-none border-0"
+          role="tab"
+          aria-selected={editorMode === "form"}
         >
-          Clear
+          Form
         </Button>
-      </Tooltip>
+        <Button
+          size="sm"
+          variant={editorMode === "form" ? "ghost" : "solid"}
+          onclick={() => setMode("json")}
+          icon={Braces}
+          class="rounded-none border-0"
+          role="tab"
+          aria-selected={editorMode === "json"}
+        >
+          JSON
+        </Button>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <Button size="sm" variant="ghost" icon={BrushCleaning} onclick={clearAll}>
+        Clear
+      </Button>
     </div>
   </div>
 
