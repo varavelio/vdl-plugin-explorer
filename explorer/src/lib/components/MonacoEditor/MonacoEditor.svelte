@@ -76,6 +76,16 @@
         automaticLayout: true,
         minimap: { enabled: false },
         padding: { top: 12, bottom: 12 },
+        // Wheel events reach the page until the editor takes focus, so
+        // scrolling past the editor never traps the page inside it.
+        scrollbar: { handleMouseWheel: false },
+      });
+
+      editor.onDidFocusEditorText(() => {
+        editor?.updateOptions({ scrollbar: { handleMouseWheel: true } });
+      });
+      editor.onDidBlurEditorText(() => {
+        editor?.updateOptions({ scrollbar: { handleMouseWheel: false } });
       });
 
       editor.onDidChangeModelContent(() => {
@@ -111,7 +121,7 @@
 
 {#if loading}
   <div
-    class="flex w-full items-center justify-center border border-base-300"
+    class="flex w-full items-center justify-center rounded-md border border-base-400 bg-base-100"
     style:height={height}
   >
     <Loader class="size-8 animate-spin text-content-muted" />
@@ -120,8 +130,7 @@
 
 <div
   bind:this={container}
-  class:overflow-hidden={true}
   class:hidden={loading}
-  class="w-full border border-base-300"
+  class="w-full overflow-hidden rounded-md border border-base-400 bg-base-100"
   style:height={height}
 ></div>
