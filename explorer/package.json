@@ -6,6 +6,7 @@
     "-": "Run commands using the root's Taskfile.yml file"
   },
   "devDependencies": {
+    "@internationalized/date": "3.12.0",
     "@lucide/svelte": "1.59.0",
     "@monaco-editor/loader": "1.7.0",
     "@sveltejs/adapter-static": "3.0.10",
