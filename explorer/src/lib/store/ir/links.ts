@@ -43,7 +43,7 @@ export function createIrNodeRoute(
  */
 export function createRpcRoute(name: string): { id: string; urlPath: string } {
   const id = createId(name);
-  const urlPath = `#/rpcs/${id}`;
+  const urlPath = `#/http-rpcs/${id}`;
   return { id, urlPath };
 }
 
@@ -60,7 +60,7 @@ export function createRpcProcRoute(
 ): { id: string; urlPath: string } {
   const id = createId(procName);
   const rpcId = createId(rpcName);
-  const urlPath = `#/rpcs/${rpcId}/${id}`;
+  const urlPath = `#/http-rpcs/${rpcId}/${id}`;
   return { id, urlPath };
 }
 
