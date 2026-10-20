@@ -6,8 +6,8 @@
     "-": "Run commands using the root's Taskfile.yml file"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.12",
-    "@varavel/vdl": "0.5.0-alpha.5",
-    "dprint": "0.54.0"
+    "@biomejs/biome": "2.5.15",
+    "@varavel/vdl": "0.5.0",
+    "dprint": "0.64.0"
   }
 }
