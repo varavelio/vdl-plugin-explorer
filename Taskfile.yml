@@ -15,9 +15,10 @@ tasks:
     cmd: task --list-all
 
   ci:
-    desc: "Run full CI pipeline (deps, lint, build)"
+    desc: "Run full CI pipeline (deps, format, lint, build)"
     cmds:
       - task: deps
+      - task: format
       - task: lint
       - task: build
 
