@@ -1,0 +1,115 @@
+<script lang="ts">
+  import { BrushCleaning, PackageOpen, Plus, Trash } from "@lucide/svelte";
+  import { Button, Card } from "@varavel/ui";
+  import type {
+    EnumDef,
+    Field,
+    TypeDef,
+    TypeRef,
+  } from "@varavel/vdl-plugin-sdk";
+  import FieldDoc from "./FieldDoc.svelte";
+  import FieldNode from "./FieldNode.svelte";
+  import FieldTitle from "./FieldTitle.svelte";
+  import { defaultValueForType, type FormSchema } from "./fields";
+
+  interface Props {
+    /** Array field definition. */
+    field: Field;
+    /** Reference describing each array item. */
+    itemRef: TypeRef;
+    /** Named types used to expand `type` references. */
+    types: TypeDef[];
+    /** Named enums used to render `enum` selects. */
+    enums: EnumDef[];
+    /** Type names expanded above this node, guarding recursive types. */
+    seen: string[];
+    /** Current slice of the form value for this field. */
+    value: unknown;
+    /** Reports an updated slice to the parent node. */
+    onChange: (next: unknown) => void;
+    /** Removes this field from the parent object, when allowed. */
+    onRemove?: () => void;
+  }
+
+  let { field, itemRef, types, enums, seen, value, onChange, onRemove }: Props =
+    $props();
+
+  const schema: FormSchema = $derived({ types, enums });
+
+  let items = $derived(Array.isArray(value) ? (value as unknown[]) : []);
+
+  function updateItem(index: number, next: unknown) {
+    onChange(items.map((item, i) => (i === index ? next : item)));
+  }
+
+  function removeItem(index: number) {
+    onChange(items.filter((_, i) => i !== index));
+  }
+
+  function addItem() {
+    onChange([...items, defaultValueForType(itemRef, schema, seen)]);
+  }
+
+  function clearArray() {
+    onChange([]);
+  }
+</script>
+
+<Card>
+  <div class="mb-1 flex items-center justify-between gap-2">
+    <FieldTitle name={field.name} optional={field.optional} />
+    <div class="flex items-center">
+      <Button
+        size="sm"
+        variant="ghost"
+        square
+        icon={BrushCleaning}
+        onclick={clearArray}
+        aria-label={`Clear ${field.name}`}
+      />
+      {#if onRemove}
+        <Button
+          size="sm"
+          variant="ghost"
+          square
+          icon={Trash}
+          onclick={onRemove}
+          aria-label={`Delete ${field.name}`}
+        />
+      {/if}
+      <Button
+        size="sm"
+        variant="ghost"
+        square
+        icon={Plus}
+        onclick={addItem}
+        aria-label={`Add item to ${field.name}`}
+      />
+    </div>
+  </div>
+
+  <FieldDoc doc={field.doc} />
+
+  {#if items.length === 0}
+    <div class="flex flex-col items-center gap-1 py-2">
+      <PackageOpen class="size-6 text-content-muted" />
+      <p class="text-sm text-content-muted italic">
+        No items, add one using the button above.
+      </p>
+    </div>
+  {/if}
+
+  <div class="mt-2 space-y-4">
+    {#each items as item, index (index)}
+      <FieldNode
+        field={{ ...field, doc: undefined, name: `${field.name}[${index}]` }}
+        {types}
+        {enums}
+        {seen}
+        value={item}
+        onChange={(next) => updateItem(index, next)}
+        onRemove={() => removeItem(index)}
+      />
+    {/each}
+  </div>
+</Card>
