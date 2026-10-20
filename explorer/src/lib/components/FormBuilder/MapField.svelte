@@ -44,6 +44,12 @@
 
   const schema: FormSchema = $derived({ types, enums });
 
+  /**
+   * Bumped on clear so entries remount from the emptied map instead of
+   * reconciling stale drafts.
+   */
+  let rev = $state(0);
+
   let entries = $derived(
     typeof value === "object" && value !== null && !Array.isArray(value)
       ? Object.entries(value as Record<string, unknown>)
@@ -93,6 +99,7 @@
 
   function clearMap() {
     onChange({});
+    rev += 1;
   }
 </script>
 
@@ -131,45 +138,52 @@
 
   <FieldDoc doc={field.doc} />
 
-  {#if entries.length === 0}
-    <div class="flex flex-col items-center gap-1 py-2">
-      <PackageOpen class="size-6 text-content-muted" />
-      <p class="text-sm text-content-muted italic">
-        No entries, add one using the button above.
-      </p>
-    </div>
-  {/if}
+  {#key rev}
+    {#if entries.length === 0}
+      <div class="flex flex-col items-center gap-1 py-2">
+        <PackageOpen class="size-6 text-content-muted" />
+        <p class="text-sm text-content-muted italic">
+          No entries, add one using the button above.
+        </p>
+      </div>
+    {/if}
 
-  <div class="mt-2 space-y-4">
-    {#each entries as [key, entryValue] (key)}
-      <div class="space-y-2">
-        <div class="flex items-center gap-2">
-          <div class="flex-1">
-            <Input
-              value={key}
-              oninput={(event) =>
-                renameEntry(key, (event.target as HTMLInputElement).value)}
-              placeholder="Entry key..."
+    <div class="mt-2 space-y-4">
+      {#each entries as [key, entryValue] (key)}
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <div class="flex-1">
+              <Input
+                value={key}
+                oninput={(event) =>
+                  renameEntry(key, (event.target as HTMLInputElement).value)}
+                placeholder="Entry key..."
+              />
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              square
+              icon={Trash}
+              onclick={() => removeEntry(key)}
+              aria-label={`Delete entry ${key}`}
             />
           </div>
-          <Button
-            size="sm"
-            variant="ghost"
-            square
-            icon={Trash}
-            onclick={() => removeEntry(key)}
-            aria-label={`Delete entry ${key}`}
+          <FieldNode
+            field={{
+              ...field,
+              doc: undefined,
+              name: `${field.name}.${key}`,
+              typeRef: valueRef,
+            }}
+            {types}
+            {enums}
+            {seen}
+            value={entryValue}
+            onChange={(next) => updateEntry(key, next)}
           />
         </div>
-        <FieldNode
-          field={{ ...field, doc: undefined, name: `${field.name}.${key}` }}
-          {types}
-          {enums}
-          {seen}
-          value={entryValue}
-          onChange={(next) => updateEntry(key, next)}
-        />
-      </div>
-    {/each}
-  </div>
+      {/each}
+    </div>
+  {/key}
 </Card>

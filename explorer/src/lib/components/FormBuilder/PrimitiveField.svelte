@@ -23,41 +23,19 @@
   const isBool = $derived(primitive === "bool");
   const isNumber = $derived(primitive === "int" || primitive === "float");
 
-  let text = $state("");
+  /**
+   * Local draft. Null means untouched since mount, in which case the
+   * rendered text always mirrors the parent value. External resets remount
+   * this component through keyed blocks, so the draft never needs syncing.
+   */
+  let text = $state<string | null>(null);
 
-  $effect(() => {
-    const current = text;
-    untrack(() => {
-      if (isBool) return;
-      if (current === "") {
-        if (value !== "" && value !== undefined) onChange("");
-        return;
-      }
-      if (isNumber) {
-        const parsed =
-          primitive === "int"
-            ? Number.parseInt(current, 10)
-            : Number.parseFloat(current);
-        if (!Number.isNaN(parsed) && value !== parsed) onChange(parsed);
-        return;
-      }
-      if (value !== current) onChange(current);
-    });
-  });
-
-  $effect(() => {
-    const external = value;
-    untrack(() => {
-      if (isBool) return;
-      const next =
-        typeof external === "string" || typeof external === "number"
-          ? String(external)
-          : "";
-      if (next !== text) text = next;
-    });
-  });
-
-  let checked = $state(false);
+  /**
+   * Local boolean state, initialized from the parent value on mount.
+   * Toggles commit immediately, so no text-style draft is needed.
+   */
+  // svelte-ignore state_referenced_locally: initialized once on mount; external resets remount through keyed blocks.
+  let checked = $state(value === true);
 
   $effect(() => {
     const current = checked;
@@ -66,23 +44,45 @@
     });
   });
 
-  $effect(() => {
-    const external = value === true;
-    untrack(() => {
-      if (external !== checked) checked = external;
-    });
-  });
+  /**
+   * Render the parent value as text.
+   */
+  function toText(external: unknown): string {
+    if (typeof external === "string" || typeof external === "number") {
+      return String(external);
+    }
+    return "";
+  }
+
+  /**
+   * Commit a draft to the parent, skipping invalid numbers.
+   */
+  function commitText(next: string) {
+    text = next;
+    if (isNumber) {
+      if (next.trim() === "") return;
+      const parsed =
+        primitive === "int"
+          ? Number.parseInt(next, 10)
+          : Number.parseFloat(next);
+      if (Number.isNaN(parsed)) return;
+      onChange(parsed);
+      return;
+    }
+    onChange(next);
+  }
 
   function clearValue() {
+    text = null;
     if (isBool) {
+      checked = false;
       onChange(false);
       return;
     }
     if (isNumber) {
-      text = "0";
+      onChange(0);
       return;
     }
-    text = "";
     onChange("");
   }
 </script>
@@ -118,7 +118,8 @@
     <Input
       type={isNumber ? "number" : "text"}
       step={primitive === "float" ? 0.01 : undefined}
-      bind:value={text}
+      value={text ?? toText(value)}
+      oninput={(event) => commitText(event.currentTarget.value)}
       placeholder={`Enter ${field.name} here...`}
     />
   {/if}

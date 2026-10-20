@@ -32,6 +32,12 @@
       : seen,
   );
 
+  /**
+   * Bumped on clear so children remount from the emptied object instead of
+   * reconciling stale drafts.
+   */
+  let rev = $state(0);
+
   let object = $derived(
     typeof value === "object" && value !== null && !Array.isArray(value)
       ? (value as Record<string, unknown>)
@@ -50,6 +56,7 @@
 
   function clearObject() {
     onChange({});
+    rev += 1;
   }
 </script>
 
@@ -80,17 +87,19 @@
 
   <FieldDoc doc={field.doc} />
 
-  <div class="mt-2 space-y-4">
-    {#each field.typeRef.objectFields ?? [] as childField (childField.name)}
-      <FieldNode
-        field={childField}
-        {types}
-        {enums}
-        seen={childSeen}
-        value={object[childField.name]}
-        onChange={(next) => updateChild(childField.name, next)}
-        onRemove={() => removeChild(childField.name)}
-      />
-    {/each}
-  </div>
+  {#key rev}
+    <div class="mt-2 space-y-4">
+      {#each field.typeRef.objectFields ?? [] as childField (childField.name)}
+        <FieldNode
+          field={childField}
+          {types}
+          {enums}
+          seen={childSeen}
+          value={object[childField.name]}
+          onChange={(next) => updateChild(childField.name, next)}
+          onRemove={() => removeChild(childField.name)}
+        />
+      {/each}
+    </div>
+  {/key}
 </Card>

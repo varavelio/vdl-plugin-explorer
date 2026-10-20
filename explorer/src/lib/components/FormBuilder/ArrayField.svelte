@@ -36,6 +36,12 @@
 
   const schema: FormSchema = $derived({ types, enums });
 
+  /**
+   * Bumped on structural changes so index-keyed items remount from their
+   * new positions instead of reconciling stale drafts.
+   */
+  let rev = $state(0);
+
   let items = $derived(Array.isArray(value) ? (value as unknown[]) : []);
 
   function updateItem(index: number, next: unknown) {
@@ -44,6 +50,7 @@
 
   function removeItem(index: number) {
     onChange(items.filter((_, i) => i !== index));
+    rev += 1;
   }
 
   function addItem() {
@@ -52,6 +59,7 @@
 
   function clearArray() {
     onChange([]);
+    rev += 1;
   }
 </script>
 
@@ -90,26 +98,33 @@
 
   <FieldDoc doc={field.doc} />
 
-  {#if items.length === 0}
-    <div class="flex flex-col items-center gap-1 py-2">
-      <PackageOpen class="size-6 text-content-muted" />
-      <p class="text-sm text-content-muted italic">
-        No items, add one using the button above.
-      </p>
-    </div>
-  {/if}
+  {#key rev}
+    {#if items.length === 0}
+      <div class="flex flex-col items-center gap-1 py-2">
+        <PackageOpen class="size-6 text-content-muted" />
+        <p class="text-sm text-content-muted italic">
+          No items, add one using the button above.
+        </p>
+      </div>
+    {/if}
 
-  <div class="mt-2 space-y-4">
-    {#each items as item, index (index)}
-      <FieldNode
-        field={{ ...field, doc: undefined, name: `${field.name}[${index}]` }}
-        {types}
-        {enums}
-        {seen}
-        value={item}
-        onChange={(next) => updateItem(index, next)}
-        onRemove={() => removeItem(index)}
-      />
-    {/each}
-  </div>
+    <div class="mt-2 space-y-4">
+      {#each items as item, index (index)}
+        <FieldNode
+          field={{
+            ...field,
+            doc: undefined,
+            name: `${field.name}[${index}]`,
+            typeRef: itemRef,
+          }}
+          {types}
+          {enums}
+          {seen}
+          value={item}
+          onChange={(next) => updateItem(index, next)}
+          onRemove={() => removeItem(index)}
+        />
+      {/each}
+    </div>
+  {/key}
 </Card>

@@ -8,9 +8,11 @@
     playground: ProcPlaygroundState;
     /** Dialog visibility bound to the parent component. */
     open?: boolean;
+    /** Runs after a history entry is restored into the playground. */
+    onRestored?: () => void;
   }
 
-  let { playground, open = $bindable(false) }: Props = $props();
+  let { playground, open = $bindable(false), onRestored }: Props = $props();
 
   let selected = $state(null as number | null);
 
@@ -95,6 +97,7 @@
             playground.setInput(
               JSON.parse(item.input) as Record<string, unknown>,
             );
+            onRestored?.();
             selected = null;
             open = false;
           }}

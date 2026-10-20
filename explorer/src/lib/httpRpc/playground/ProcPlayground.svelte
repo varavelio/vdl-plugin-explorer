@@ -37,6 +37,7 @@
 
   let tab = $state("input");
   let historyOpen = $state(false);
+  let formRev = $state(0);
   let isExecuting = $state(false);
   let cancelRequest = $state(() => {});
 
@@ -92,6 +93,7 @@
       fields={inputFields}
       types={store.ir.types}
       enums={store.ir.enums}
+      resetKey={formRev}
       bind:value={playground.input}
     />
   {:else}
@@ -186,4 +188,10 @@
   </aside>
 </div>
 
-<HistoryDialog {playground} bind:open={historyOpen} />
+<HistoryDialog
+  {playground}
+  bind:open={historyOpen}
+  onRestored={() => {
+    formRev += 1;
+  }}
+/>

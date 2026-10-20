@@ -28,7 +28,18 @@
       : undefined,
   );
   let options = $derived(definition ? enumOptions(definition) : []);
-  let selected = $state("");
+
+  /**
+   * Local selection initialized from the parent value on mount.
+   * Selections commit immediately, so no draft is needed. External resets
+   * remount this component through keyed blocks.
+   */
+  function toSelected(external: unknown): string {
+    return external === undefined || external === null ? "" : String(external);
+  }
+
+  // svelte-ignore state_referenced_locally: initialized once on mount; external resets remount through keyed blocks.
+  let selected = $state(toSelected(value));
 
   $effect(() => {
     const current = selected;
@@ -40,13 +51,6 @@
             ? Number(current)
             : current;
       if (!Object.is(value, next)) onChange(next);
-    });
-  });
-
-  $effect(() => {
-    const external = value === undefined || value === null ? "" : String(value);
-    untrack(() => {
-      if (external !== selected) selected = external;
     });
   });
 </script>
