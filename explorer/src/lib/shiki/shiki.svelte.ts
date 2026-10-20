@@ -133,3 +133,78 @@ class ShikiHighlighter {
  * throughout the application to apply syntax highlighting to code snippets.
  */
 export const highlighter = new ShikiHighlighter();
+
+/**
+ * Bundled Shiki languages needed by the playground code snippets, matching
+ * the `langCode` values offered in `SNIPPET_LANGS`.
+ */
+const SNIPPET_GRAMMAR_LANGS = [
+  "shellscript",
+  "c",
+  "clojure",
+  "csharp",
+  "dart",
+  "elixir",
+  "go",
+  "http",
+  "java",
+  "javascript",
+  "json",
+  "julia",
+  "kotlin",
+  "lua",
+  "matlab",
+  "objective-c",
+  "ocaml",
+  "perl",
+  "php",
+  "powershell",
+  "python",
+  "r",
+  "ruby",
+  "rust",
+  "swift",
+  "yaml",
+];
+
+// biome-ignore lint/suspicious/noExplicitAny: We are using the CDN so we don't have types
+let snippetHighlighter: any = null;
+let snippetInitPromise: Promise<void> | null = null;
+
+/**
+ * Highlight a playground snippet with the bundled Shiki grammars. The
+ * highlighter is created lazily on first use so visitors who never open
+ * the snippets never download the extra grammars.
+ *
+ * @param code Snippet source to highlight.
+ * @param lang Shiki language id, see `SNIPPET_GRAMMAR_LANGS`.
+ * @param theme Visual theme variant used to generate highlighted HTML.
+ * @returns Highlighted HTML, or undefined when highlighting is unavailable.
+ */
+export async function highlightSnippet(
+  code: string,
+  lang: string,
+  theme: "light" | "dark",
+): Promise<string | undefined> {
+  try {
+    if (!snippetInitPromise) {
+      snippetInitPromise = (async () => {
+        const [{ createHighlighter }] = await Promise.all([
+          // @ts-expect-error: We are using the CDN so we don't have types
+          import("https://esm.run/shiki@4.0.2"),
+        ]);
+        snippetHighlighter = await createHighlighter({
+          themes: ["github-dark", "github-light"],
+          langs: SNIPPET_GRAMMAR_LANGS,
+        });
+      })();
+    }
+    await snippetInitPromise;
+    return snippetHighlighter.codeToHtml(code, {
+      lang,
+      theme: theme === "dark" ? "github-dark" : "github-light",
+    });
+  } catch {
+    return undefined;
+  }
+}
