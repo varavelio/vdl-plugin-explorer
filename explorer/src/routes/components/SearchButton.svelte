@@ -6,7 +6,6 @@
     ListTree,
     NetworkIcon,
     Pin,
-    Radio,
     Search,
     Zap,
   } from "@lucide/svelte";
@@ -280,8 +279,6 @@
                 <NetworkIcon class="size-4" />
               {:else if result.kind === "procedure"}
                 <Zap class="size-4" />
-              {:else if result.kind === "stream"}
-                <Radio class="size-4" />
               {:else if result.kind === "type"}
                 <Braces class="size-4" />
               {:else if result.kind === "enum"}

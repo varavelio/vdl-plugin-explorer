@@ -17,7 +17,7 @@
     sourceCode?: SourceCode;
     rpcInputSourceCode?: SourceCode;
     rpcOutputSourceCode?: SourceCode;
-    rpcOperationUrl?: string;
+    rpcProcUrl?: string;
     tags?: string[];
     htmlDoc?: string;
   }
@@ -29,7 +29,7 @@
     sourceCode,
     rpcInputSourceCode,
     rpcOutputSourceCode,
-    rpcOperationUrl,
+    rpcProcUrl,
   }: Props = $props();
 
   function pickSourceCode(code?: SourceCode) {
@@ -113,9 +113,9 @@
         </div>
       </div>
 
-      {#if rpcOperationUrl}
+      {#if rpcProcUrl}
         <CodeBlock
-          rawCode={rpcOperationUrl}
+          rawCode={rpcProcUrl}
           title="Endpoint"
           showDownload={false}
           showLoc={false}

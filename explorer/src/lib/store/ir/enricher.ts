@@ -11,15 +11,11 @@ import { highlighter } from "$lib/shiki";
 import {
   createIrNodeLinkDictionary,
   createIrNodeRoute,
-  createRpcOperationRoute,
+  createRpcProcRoute,
   createRpcRoute,
 } from "./links";
 import { createIrNodeLinkTransformer } from "./shiki-links-transformer";
-import type {
-  RichIrSchema,
-  RichIrSchemaRpcOperationKind,
-  SourceCode,
-} from "./types";
+import type { RichIrSchema, SourceCode } from "./types";
 
 /**
  * Convert markdown docstrings to sanitized HTML for rendering in the UI.
@@ -37,43 +33,31 @@ function markdownToHtmlDoc(markdown: string | undefined): string | undefined {
 }
 
 /**
- * Determine if a field represents an RPC operation and return its kind ("procedure" or "stream") if so.
+ * Determine if a field represents an RPC procedure.
  *
- * @param field The field to check for RPC operation annotations.
- * @returns The RPC operation kind if the field is annotated as an RPC operation, or undefined if it is not an RPC operation.
+ * @param field The field to check for the procedure annotation.
+ * @returns True when the field carries `@proc`, otherwise false.
  */
-function findRpcOperationKind(
-  field: Field,
-): RichIrSchemaRpcOperationKind | undefined {
-  if (getAnnotation(field.annotations, "proc")) {
-    return "procedure";
-  }
-
-  if (getAnnotation(field.annotations, "stream")) {
-    return "stream";
-  }
-
-  return undefined;
+function isRpcProc(field: Field): boolean {
+  return getAnnotation(field.annotations, "proc") !== undefined;
 }
 
 /**
- * Find the "input" or "output" field of an RPC operation field, if it exists and is properly structured.
+ * Find the "input" or "output" field of an RPC procedure field, if it exists and is properly structured.
  *
- * @param operationField The field representing the RPC operation, which should be an object type containing "input" and/or "output" fields.
+ * @param procField The field representing the RPC procedure, which should be an object type containing "input" and/or "output" fields.
  * @param name The name of the field to find, either "input" or "output".
  * @returns The "input" or "output" field if it exists and is properly structured, or undefined if it does not exist or is not properly structured.
  */
 function findRpcInputOutputField(
-  operationField: Field,
+  procField: Field,
   name: "input" | "output",
 ): Field | undefined {
-  if (operationField.typeRef.kind !== "object") {
+  if (procField.typeRef.kind !== "object") {
     return undefined;
   }
 
-  return operationField.typeRef.objectFields?.find(
-    (field) => field.name === name,
-  );
+  return procField.typeRef.objectFields?.find((field) => field.name === name);
 }
 
 /**
@@ -186,8 +170,8 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
   const rpcs: RichIrSchema["rpcs"] = (
     await Promise.all(
       types
-        // Filter out types that are not annotated as RPCs
-        .filter((type) => getAnnotation(type.annotations, "rpc"))
+        // Filter out types that are not annotated as HTTP RPC services
+        .filter((type) => getAnnotation(type.annotations, "httpRpc"))
         // Transform RPC types into rich RPC schema entries
         .map(async (type) => {
           const rpcName = type.name;
@@ -199,20 +183,19 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
               ? (type.typeRef.objectFields ?? [])
               : [];
 
-          // Enrich each RPC operation in the RPC type's fields
-          const operations = (
+          // Enrich each RPC procedure in the RPC type's fields
+          const procs = (
             await Promise.all(
               objectFields.map(
                 async (
                   field,
                 ): Promise<
-                  RichIrSchema["rpcs"][number]["operations"][number] | undefined
+                  RichIrSchema["rpcs"][number]["procs"][number] | undefined
                 > => {
-                  const kind = findRpcOperationKind(field);
-                  if (!kind) return undefined;
+                  if (!isRpcProc(field)) return undefined;
 
-                  const { id: operationId, urlPath: operationUrlPath } =
-                    createRpcOperationRoute(rpcName, field.name);
+                  const { id: procId, urlPath: procUrlPath } =
+                    createRpcProcRoute(rpcName, field.name);
 
                   const inputField = findRpcInputOutputField(field, "input");
                   const outputField = findRpcInputOutputField(field, "output");
@@ -227,12 +210,11 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
                   const sourceIr = { ...field };
                   return {
                     ...field,
-                    id: operationId,
-                    urlPath: operationUrlPath,
+                    id: procId,
+                    urlPath: procUrlPath,
                     rpcId,
                     rpcUrlPath,
                     rpcName,
-                    kind,
                     htmlDoc: markdownToHtmlDoc(field.doc),
                     inputSourceCode,
                     outputSourceCode,
@@ -242,11 +224,10 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
               ),
             )
           )
-            // Filter out undefined results from operations that were not
-            // properly structured as RPC operations
+            // Filter out undefined results from fields that were not
+            // properly structured as RPC procedures
             .filter(
-              (operation): operation is NonNullable<typeof operation> =>
-                operation !== undefined,
+              (proc): proc is NonNullable<typeof proc> => proc !== undefined,
             );
 
           return {
@@ -256,14 +237,14 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
             htmlDoc: type.htmlDoc,
             sourceCode: type.sourceCode,
             sourceIr: type.sourceIr,
-            operations,
+            procs,
           };
         }),
     )
   )
-    // Filter out RPCs that have no valid operations after enrichment, as
+    // Filter out RPCs that have no valid procedures after enrichment, as
     // they won't have meaningful pages in the explorer
-    .filter((rpc) => rpc.operations.length > 0);
+    .filter((rpc) => rpc.procs.length > 0);
 
   const enums: RichIrSchema["enums"] = await Promise.all(
     ir.enums.map(async (en) => {

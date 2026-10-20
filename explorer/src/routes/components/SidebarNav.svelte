@@ -7,7 +7,6 @@
     ListTree,
     NetworkIcon,
     Pin,
-    Radio,
     ServerCog,
     Zap,
   } from "@lucide/svelte";
@@ -77,12 +76,12 @@
               active={page.url.hash === rpc.urlPath}
             />
 
-            {#each rpc.operations as operation (operation.id)}
+            {#each rpc.procs as proc (proc.id)}
               <Nav.Item
-                label={operation.name}
-                icon={operation.kind === "procedure" ? Zap : Radio}
-                href={operation.urlPath}
-                active={page.url.hash === operation.urlPath}
+                label={proc.name}
+                icon={Zap}
+                href={proc.urlPath}
+                active={page.url.hash === proc.urlPath}
               />
             {/each}
           </Nav.Group>

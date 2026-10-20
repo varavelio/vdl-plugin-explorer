@@ -48,17 +48,17 @@ export function createRpcRoute(name: string): { id: string; urlPath: string } {
 }
 
 /**
- * Build route metadata for an RPC operation page.
+ * Build route metadata for an RPC procedure page.
  *
  * @param rpcName RPC service name.
- * @param operationName Operation name.
+ * @param procName Procedure name.
  * @returns Stable id, readable route segment, parent route segment, and URL.
  */
-export function createRpcOperationRoute(
+export function createRpcProcRoute(
   rpcName: string,
-  operationName: string,
+  procName: string,
 ): { id: string; urlPath: string } {
-  const id = createId(operationName);
+  const id = createId(procName);
   const rpcId = createId(rpcName);
   const urlPath = `#/rpcs/${rpcId}/${id}`;
   return { id, urlPath };

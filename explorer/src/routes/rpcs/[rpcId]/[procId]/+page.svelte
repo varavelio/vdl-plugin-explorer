@@ -1,18 +1,12 @@
 <script lang="ts">
-  import {
-    LayoutDashboard,
-    NetworkIcon,
-    Radio,
-    ServerCog,
-    Zap,
-  } from "@lucide/svelte";
+  import { LayoutDashboard, NetworkIcon, ServerCog, Zap } from "@lucide/svelte";
   import { Breadcrumbs } from "@varavel/ui";
   import { tick } from "svelte";
   import { browser } from "$app/environment";
   import ErrorPage from "$lib/components/ErrorPage.svelte";
   import { store } from "$lib/store";
   import type { PageProps } from "./$types";
-  import RpcOperationNode from "./RpcOperationNode.svelte";
+  import RpcProcNode from "./RpcProcNode.svelte";
 
   let { params }: PageProps = $props();
 
@@ -21,19 +15,19 @@
     return store.ir.rpcs.find((entry) => entry.id === params.rpcId);
   });
 
-  let operation = $derived.by(() => {
-    if (!rpc || !params.operationId) return;
-    return rpc.operations.find((entry) => entry.id === params.operationId);
+  let proc = $derived.by(() => {
+    if (!rpc || !params.procId) return;
+    return rpc.procs.find((entry) => entry.id === params.procId);
   });
 
   let pageTitle = $derived.by(() => {
-    if (!rpc || !operation) return "Not Found";
-    return `${operation.name} | ${rpc.name} | RPCs`;
+    if (!rpc || !proc) return "Not Found";
+    return `${proc.name} | ${rpc.name} | RPCs`;
   });
 
   $effect(() => {
     params.rpcId;
-    params.operationId;
+    params.procId;
 
     if (!browser) return;
     void tick().then(() => {
@@ -48,11 +42,11 @@
   <title>{pageTitle} | VDL Explorer</title>
 </svelte:head>
 
-{#if !rpc || !operation}
+{#if !rpc || !proc}
   <ErrorPage />
 {/if}
 
-{#if rpc && operation}
+{#if rpc && proc}
   <Breadcrumbs
     class="w-full p-4 bg-base-100 desk:sticky desk:top-0 desk:z-20"
     items={[
@@ -60,11 +54,11 @@
       { label: "RPCs", icon: NetworkIcon },
       { label: rpc.name, icon: ServerCog, href: rpc.urlPath },
       {
-        label: operation.name,
-        icon: operation.kind === "procedure" ? Zap : Radio,
+        label: proc.name,
+        icon: Zap,
       },
     ]}
   />
 
-  <div class="p-4 pt-0"><RpcOperationNode rpcOperation={operation} /></div>
+  <div class="p-4 pt-0"><RpcProcNode rpcProc={proc} /></div>
 {/if}

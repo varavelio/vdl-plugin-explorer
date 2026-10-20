@@ -41,7 +41,7 @@ function resolveOutFile(input: PluginInput): string {
 }
 
 /**
- * Resolves the base URL used to render RPC operation endpoints in the explorer.
+ * Resolves the base URL used to render RPC procedure endpoints in the explorer.
  *
  * The plugin reads `rpcBaseUrl` from options and falls back to `https://<baseURL>`
  * when the option is missing or blank.
@@ -67,7 +67,7 @@ function resolveRpcBaseUrl(input: PluginInput): string {
  *
  * Supported plugin options:
  * - `outFile`: output filename (default: `index.html`)
- * - `rpcBaseUrl`: base URL used for RPC endpoint display (default: `https://<baseURL>`)
+ * - `rpcBaseUrl`: base URL used for RPC procedure endpoint display (default: `https://<baseURL>`)
  *
  * @param input - Plugin invocation payload provided by VDL.
  * @returns One generated HTML file containing the explorer app and IR data.

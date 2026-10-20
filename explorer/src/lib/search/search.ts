@@ -26,7 +26,6 @@ export type SearchResultKind =
   | "doc"
   | "rpc"
   | "procedure"
-  | "stream"
   | "type"
   | "enum"
   | "constant";
@@ -193,15 +192,15 @@ function createSearchDocuments(): SearchDocument[] {
 
   const types = store.ir.types.map((typeDef) => createTypeDocument(typeDef));
   const rpcs = store.ir.rpcs.map((rpc) => createRpcDocument(rpc));
-  const rpcOperations = store.ir.rpcs.flatMap((rpc) =>
-    rpc.operations.map((operation) => createRpcOperationDocument(operation)),
+  const rpcProcs = store.ir.rpcs.flatMap((rpc) =>
+    rpc.procs.map((proc) => createRpcProcDocument(proc)),
   );
   const enums = store.ir.enums.map((enumDef) => createEnumDocument(enumDef));
   const constants = store.ir.constants.map((constantDef) =>
     createConstantDocument(constantDef),
   );
 
-  return [...docs, ...types, ...rpcs, ...rpcOperations, ...enums, ...constants];
+  return [...docs, ...types, ...rpcs, ...rpcProcs, ...enums, ...constants];
 }
 
 /**
@@ -263,7 +262,7 @@ function createRpcDocument(rpc: {
   name: string;
   sourceIr: { doc?: string };
   sourceCode: { raw: string };
-  operations: Array<{ name: string; kind: "procedure" | "stream" }>;
+  procs: Array<{ name: string }>;
 }): SearchDocument {
   return {
     id: rpc.id,
@@ -272,27 +271,24 @@ function createRpcDocument(rpc: {
     name: rpc.name,
     summary:
       summarizeText(rpc.sourceIr.doc) ||
-      `RPC with ${rpc.operations.length} operations`,
+      `RPC with ${rpc.procs.length} procedures`,
     body: joinSearchParts([
       rpc.name,
       rpc.sourceIr.doc,
       rpc.sourceCode.raw,
-      ...rpc.operations.map(
-        (operation) => `${operation.kind} ${operation.name}`,
-      ),
+      ...rpc.procs.map((proc) => `procedure ${proc.name}`),
     ]),
   };
 }
 
 /**
- * Creates a search document for an RPC operation page.
+ * Creates a search document for an RPC procedure page.
  *
- * @param operation - RPC procedure or stream enriched with routing metadata.
- * @returns Search document representing the operation.
+ * @param proc - RPC procedure enriched with routing metadata.
+ * @returns Search document representing the procedure.
  */
-function createRpcOperationDocument(operation: {
+function createRpcProcDocument(proc: {
   id: string;
-  kind: "procedure" | "stream";
   urlPath: string;
   name: string;
   doc?: string;
@@ -301,21 +297,19 @@ function createRpcOperationDocument(operation: {
   outputSourceCode?: { raw: string };
 }): SearchDocument {
   return {
-    id: operation.id,
-    kind: operation.kind,
-    urlPath: operation.urlPath,
-    name: operation.name,
-    title: `${operation.rpcName}.${operation.name}`,
-    summary:
-      summarizeText(operation.doc) ||
-      `${operation.kind} in ${operation.rpcName}`,
+    id: proc.id,
+    kind: "procedure",
+    urlPath: proc.urlPath,
+    name: proc.name,
+    title: `${proc.rpcName}.${proc.name}`,
+    summary: summarizeText(proc.doc) || `procedure in ${proc.rpcName}`,
     body: joinSearchParts([
-      operation.rpcName,
-      operation.name,
-      operation.kind,
-      operation.doc,
-      operation.inputSourceCode?.raw,
-      operation.outputSourceCode?.raw,
+      proc.rpcName,
+      proc.name,
+      "procedure",
+      proc.doc,
+      proc.inputSourceCode?.raw,
+      proc.outputSourceCode?.raw,
     ]),
   };
 }

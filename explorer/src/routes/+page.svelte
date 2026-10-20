@@ -30,7 +30,7 @@
       {
         title: "RPCs",
         count: store.ir.rpcs.length,
-        description: "RPC services grouped into procedures and streams.",
+        description: "RPC services grouped into procedures.",
         icon: NetworkIcon,
       },
       {

@@ -61,32 +61,26 @@ export type RichIrSchemaType = IrSchema["types"][number] & {
 };
 
 /**
- * Supported RPC operation kinds exposed by the explorer.
+ * Enriched RPC procedure entry derived from a `@proc` field inside an `@httpRpc` type.
  */
-export type RichIrSchemaRpcOperationKind = "procedure" | "stream";
-
-/**
- * Enriched RPC operation entry derived from a field inside an `@rpc` type.
- */
-export type RichIrSchemaRpcOperation = Field & {
+export type RichIrSchemaRpcProc = Field & {
   id: string;
   urlPath: string;
   rpcId: string;
   rpcUrlPath: string;
   rpcName: string;
-  kind: RichIrSchemaRpcOperationKind;
-  /** The operation field doc converted from markdown to HTML. */
+  /** The procedure field doc converted from markdown to HTML. */
   htmlDoc?: string;
-  /** Highlighted VDL snippet for the operation input when present. */
+  /** Highlighted VDL snippet for the procedure input when present. */
   inputSourceCode?: SourceCode;
-  /** Highlighted VDL snippet for the operation output when present. */
+  /** Highlighted VDL snippet for the procedure output when present. */
   outputSourceCode?: SourceCode;
   /** The original IR node */
   sourceIr: Field;
 };
 
 /**
- * Enriched RPC service entry derived from a type annotated with `@rpc`.
+ * Enriched RPC service entry derived from a type annotated with `@httpRpc`.
  */
 export type RichIrSchemaRpc = {
   id: string;
@@ -98,7 +92,7 @@ export type RichIrSchemaRpc = {
   sourceCode: SourceCode;
   /** The original IR node */
   sourceIr: IrSchema["types"][number];
-  operations: RichIrSchemaRpcOperation[];
+  procs: RichIrSchemaRpcProc[];
 };
 
 /**

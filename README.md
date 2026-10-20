@@ -33,7 +33,7 @@ Use it when you want to:
 
 - share schema docs with teammates, clients, or external partners
 - browse docs, RPCs, types, enums, and constants in one place
-- inspect RPC services, procedures, and streams with input/output previews
+- inspect RPC services and procedures with input/output previews
 - ship a responsive schema reference as a single HTML file that can be hosted anywhere
 
 ## Demo
@@ -76,7 +76,7 @@ All options are optional.
 | Option       | Type     | Default               | What it changes                                                            |
 | ------------ | -------- | --------------------- | -------------------------------------------------------------------------- |
 | `outFile`    | `string` | `"index.html"`        | Sets the output filename inside `outDir`. The value must end with `.html`. |
-| `rpcBaseUrl` | `string` | `"https://<baseURL>"` | Sets the base URL used when displaying RPC operation endpoints.            |
+| `rpcBaseUrl` | `string` | `"https://<baseURL>"` | Sets the base URL used when displaying RPC procedure endpoints.            |
 
 Example with all options:
 
@@ -102,7 +102,7 @@ const config = {
 - One standalone HTML file with the full explorer UI embedded.
 - Overview dashboard with counts for docs, RPCs, types, enums, and constants.
 - Sidebar navigation grouped by resource kind.
-- Dedicated pages for docs, RPC services, RPC operations, types, enums, and constants.
+- Dedicated pages for docs, RPC services, RPC procedures, types, enums, and constants.
 - Full-text search across titles, names, docs, summaries, and VDL source snippets.
 - Syntax-highlighted VDL source rendering.
 - Internal cross-links between referenced schema nodes.
@@ -111,16 +111,15 @@ const config = {
 
 ## RPC Annotation Model
 
-This plugin recognizes RPC pages from the standard VDL RPC annotations:
+This plugin recognizes RPC pages from the VPP-2 HTTP-RPC annotations:
 
-- `@rpc` marks a top-level type as an RPC service.
-- `@proc` marks a field as a request-response operation.
-- `@stream` marks a field as a server-streaming operation.
+- `@httpRpc` marks a top-level type as an RPC service.
+- `@proc` marks a field as a request-response procedure.
 
 Example:
 
 ```vdl
-@rpc
+@httpRpc
 type Messages {
   @proc
   send {
@@ -133,26 +132,16 @@ type Messages {
       accepted bool
     }
   }
-
-  @stream
-  events {
-    input {
-      roomId string
-    }
-
-    output {
-      text string
-      createdAt datetime
-    }
-  }
 }
 ```
+
+Procedure endpoints are displayed as `<baseURL>/<lowerFirst(RPCName)>/<ProcName>`. For example, `send` inside `@httpRpc type Messages` renders as `https://api.example.com/rpc/messages/send`.
 
 When RPC services are present, the explorer includes:
 
 - one page per RPC service
-- one page per procedure or stream operation
-- input and output VDL source previews for each operation
+- one page per procedure
+- input and output VDL source previews for each procedure
 
 ## Output Behavior
 

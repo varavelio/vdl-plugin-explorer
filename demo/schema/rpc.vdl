@@ -17,7 +17,7 @@ type Order {
 }
 
 """ User management service. """
-@rpc
+@httpRpc
 type UserService {
   @proc
   getUser {
@@ -45,7 +45,7 @@ type UserService {
 }
 
 """ Product catalog service. """
-@rpc
+@httpRpc
 type ProductService {
   @proc
   getProduct {
@@ -72,7 +72,7 @@ type ProductService {
 }
 
 """ Order management service. """
-@rpc
+@httpRpc
 type OrderService {
   @proc
   createOrder {
@@ -94,6 +94,27 @@ type OrderService {
 
     output {
       orders Order[]
+    }
+  }
+}
+
+""" Maintenance procedures covering optional input and output. """
+@httpRpc
+type Maintenance {
+  @proc
+  ping {}
+
+  @proc
+  clearCache {
+    input {
+      namespace string
+    }
+  }
+
+  @proc
+  rotateKeys {
+    output {
+      rotatedAt datetime
     }
   }
 }
