@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BrushCleaning, PackageOpen, Plus, Trash } from "@lucide/svelte";
-  import { Button, Card } from "@varavel/ui";
+  import { Button, Card, Tooltip } from "@varavel/ui";
   import type {
     EnumDef,
     Field,
@@ -67,32 +67,38 @@
   <div class="mb-1 flex items-center justify-between gap-2">
     <FieldTitle name={field.name} optional={field.optional} />
     <div class="flex items-center">
-      <Button
-        size="sm"
-        variant="ghost"
-        square
-        icon={BrushCleaning}
-        onclick={clearArray}
-        aria-label={`Clear ${field.name}`}
-      />
-      {#if onRemove}
+      <Tooltip content={`Clear ${field.name}`} side="left">
         <Button
           size="sm"
           variant="ghost"
           square
-          icon={Trash}
-          onclick={onRemove}
-          aria-label={`Delete ${field.name}`}
+          icon={BrushCleaning}
+          onclick={clearArray}
+          aria-label={`Clear ${field.name}`}
         />
+      </Tooltip>
+      {#if onRemove}
+        <Tooltip content={`Delete ${field.name}`} side="left">
+          <Button
+            size="sm"
+            variant="ghost"
+            square
+            icon={Trash}
+            onclick={onRemove}
+            aria-label={`Delete ${field.name}`}
+          />
+        </Tooltip>
       {/if}
-      <Button
-        size="sm"
-        variant="ghost"
-        square
-        icon={Plus}
-        onclick={addItem}
-        aria-label={`Add item to ${field.name}`}
-      />
+      <Tooltip content={`Add item to ${field.name}`} side="left">
+        <Button
+          size="sm"
+          variant="ghost"
+          square
+          icon={Plus}
+          onclick={addItem}
+          aria-label={`Add item to ${field.name}`}
+        />
+      </Tooltip>
     </div>
   </div>
 

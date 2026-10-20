@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BrushCleaning, PackageOpen, Plus, Trash } from "@lucide/svelte";
-  import { Button, Card, Input } from "@varavel/ui";
+  import { Button, Card, Input, Tooltip } from "@varavel/ui";
   import type {
     EnumDef,
     Field,
@@ -107,32 +107,38 @@
   <div class="mb-1 flex items-center justify-between gap-2">
     <FieldTitle name={field.name} optional={field.optional} />
     <div class="flex items-center">
-      <Button
-        size="sm"
-        variant="ghost"
-        square
-        icon={BrushCleaning}
-        onclick={clearMap}
-        aria-label={`Clear ${field.name}`}
-      />
-      {#if onRemove}
+      <Tooltip content={`Clear ${field.name}`} side="left">
         <Button
           size="sm"
           variant="ghost"
           square
-          icon={Trash}
-          onclick={onRemove}
-          aria-label={`Delete ${field.name}`}
+          icon={BrushCleaning}
+          onclick={clearMap}
+          aria-label={`Clear ${field.name}`}
         />
+      </Tooltip>
+      {#if onRemove}
+        <Tooltip content={`Delete ${field.name}`} side="left">
+          <Button
+            size="sm"
+            variant="ghost"
+            square
+            icon={Trash}
+            onclick={onRemove}
+            aria-label={`Delete ${field.name}`}
+          />
+        </Tooltip>
       {/if}
-      <Button
-        size="sm"
-        variant="ghost"
-        square
-        icon={Plus}
-        onclick={addEntry}
-        aria-label={`Add entry to ${field.name}`}
-      />
+      <Tooltip content={`Add entry to ${field.name}`} side="left">
+        <Button
+          size="sm"
+          variant="ghost"
+          square
+          icon={Plus}
+          onclick={addEntry}
+          aria-label={`Add entry to ${field.name}`}
+        />
+      </Tooltip>
     </div>
   </div>
 
@@ -160,14 +166,16 @@
                 placeholder="Entry key..."
               />
             </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              square
-              icon={Trash}
-              onclick={() => removeEntry(key)}
-              aria-label={`Delete entry ${key}`}
-            />
+            <Tooltip content={`Delete entry ${key}`} side="left">
+              <Button
+                size="sm"
+                variant="ghost"
+                square
+                icon={Trash}
+                onclick={() => removeEntry(key)}
+                aria-label={`Delete entry ${key}`}
+              />
+            </Tooltip>
           </div>
           <FieldNode
             field={{

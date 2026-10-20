@@ -6,7 +6,7 @@
     ZonedDateTime,
   } from "@internationalized/date";
   import { BrushCleaning, Trash } from "@lucide/svelte";
-  import { Button, DateTimePicker, Input, Switch } from "@varavel/ui";
+  import { Button, DateTimePicker, Input, Switch, Tooltip } from "@varavel/ui";
   import type { Field } from "@varavel/vdl-plugin-sdk";
   import { untrack } from "svelte";
   import FieldDoc from "./FieldDoc.svelte";
@@ -31,32 +31,58 @@
   const isNumber = $derived(primitive === "int" || primitive === "float");
 
   /**
-   * Local text draft. Null means untouched since mount, in which case the
-   * rendered input always mirrors the parent value. External resets remount
-   * this component through keyed blocks, so the draft never needs syncing.
+   * Last parent value seen by the reset effect below. Commits only run
+   * while the parent value matches it, so external replacements (delete,
+   * clear, history restore) reset the local state instead of being
+   * overwritten back.
+   */
+  let lastSeen: unknown;
+
+  /**
+   * Text draft. Null means untouched, in which case the rendered input
+   * always mirrors the parent value.
    */
   let text = $state<string | null>(null);
 
   /**
-   * Local toggle/selection states, initialized from the parent value on
-   * mount. They commit immediately, so no draft is needed. External resets
-   * remount this component through keyed blocks.
+   * Local toggle/date states, initialized from the parent value on mount.
    */
-  // svelte-ignore state_referenced_locally: initialized once on mount; external resets remount through keyed blocks.
+  // svelte-ignore state_referenced_locally: initialized once on mount; external changes flow through the reset effect below.
   let checked = $state(value === true);
-  // svelte-ignore state_referenced_locally: initialized once on mount; external resets remount through keyed blocks.
+  // svelte-ignore state_referenced_locally: initialized once on mount; external changes flow through the reset effect below.
   let dateValue = $state(parseDateTime(value));
+
+  /**
+   * Mirror external value changes into the local state without writing
+   * back. Typing never reaches this branch because keystrokes update the
+   * parent through the commit paths first, keeping both sides aligned.
+   */
+  $effect(() => {
+    const external = value;
+    untrack(() => {
+      if (Object.is(external, lastSeen)) return;
+      lastSeen = external;
+      text = null;
+      checked = external === true;
+      dateValue = parseDateTime(external);
+    });
+  });
 
   $effect(() => {
     const current = checked;
     untrack(() => {
-      if ((value === true) !== current) onChange(current);
+      if (!Object.is(value, lastSeen)) return;
+      if ((value === true) !== current) {
+        lastSeen = current;
+        onChange(current);
+      }
     });
   });
 
   $effect(() => {
     const current = dateValue;
     untrack(() => {
+      if (!Object.is(value, lastSeen)) return;
       // Day picks flow through transient states (briefly empty, then a
       // zone-less calendar date). Committing those would publish stale
       // values one interaction late, so they are skipped and only a
@@ -67,7 +93,10 @@
           ? current
           : toZoned(current, getLocalTimeZone());
       const next = zoned.toAbsoluteString();
-      if (value !== next) onChange(next);
+      if (value !== next) {
+        lastSeen = next;
+        onChange(next);
+      }
     });
   });
 
@@ -108,9 +137,11 @@
           ? Number.parseInt(next, 10)
           : Number.parseFloat(next);
       if (Number.isNaN(parsed)) return;
+      lastSeen = parsed;
       onChange(parsed);
       return;
     }
+    lastSeen = next;
     onChange(next);
   }
 
@@ -118,19 +149,16 @@
     text = null;
     if (isBool) {
       checked = false;
+      lastSeen = false;
       onChange(false);
       return;
     }
-    if (isDatetime) {
-      const now = parseAbsoluteToLocal(new Date().toISOString());
-      dateValue = now;
-      onChange(now.toAbsoluteString());
-      return;
-    }
     if (isNumber) {
+      lastSeen = 0;
       onChange(0);
       return;
     }
+    lastSeen = "";
     onChange("");
   }
 </script>
@@ -139,23 +167,29 @@
   <div class="mb-1 flex items-center justify-between gap-2">
     <FieldTitle name={field.name} optional={field.optional} />
     <div class="flex items-center">
-      <Button
-        size="sm"
-        variant="ghost"
-        square
-        icon={BrushCleaning}
-        onclick={clearValue}
-        aria-label={`Clear ${field.name}`}
-      />
+      {#if !isDatetime}
+        <Tooltip content={`Clear ${field.name}`} side="left">
+          <Button
+            size="sm"
+            variant="ghost"
+            square
+            icon={BrushCleaning}
+            onclick={clearValue}
+            aria-label={`Clear ${field.name}`}
+          />
+        </Tooltip>
+      {/if}
       {#if onRemove}
-        <Button
-          size="sm"
-          variant="ghost"
-          square
-          icon={Trash}
-          onclick={onRemove}
-          aria-label={`Delete ${field.name}`}
-        />
+        <Tooltip content={`Delete ${field.name}`} side="left">
+          <Button
+            size="sm"
+            variant="ghost"
+            square
+            icon={Trash}
+            onclick={onRemove}
+            aria-label={`Delete ${field.name}`}
+          />
+        </Tooltip>
       {/if}
     </div>
   </div>
@@ -181,10 +215,10 @@
   /*
    * note: hides the Clear button in the @varavel/ui date picker popover.
    * The kit offers no prop for this and its own clear only empties the
-   * popup without reaching the form value, while the form-level Clear and
-   * Delete buttons already cover this. The selector targets the second
-   * button of the popover footer (Now is always first), so it degrades to
-   * a no-op if the kit markup ever changes.
+   * popup without reaching the form value, while the form-level Delete
+   * button already covers this. The selector targets the second button of
+   * the popover footer (Now is always first), so it degrades to a no-op
+   * if the kit markup ever changes.
    */
   :global(
     div.mt-3.flex.items-center.justify-between.gap-3.border-t.border-base-400.pt-3

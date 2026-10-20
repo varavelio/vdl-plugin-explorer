@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BrushCleaning } from "@lucide/svelte";
-  import { Button, Heading } from "@varavel/ui";
+  import { Button, Heading, Tooltip } from "@varavel/ui";
   import type { EnumDef, Field, TypeDef } from "@varavel/vdl-plugin-sdk";
   import { untrack } from "svelte";
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
@@ -175,9 +175,16 @@
       >
         JSON
       </Button>
-      <Button size="sm" variant="ghost" icon={BrushCleaning} onclick={clearAll}>
-        Clear
-      </Button>
+      <Tooltip content="Clear all fields" side="left">
+        <Button
+          size="sm"
+          variant="ghost"
+          icon={BrushCleaning}
+          onclick={clearAll}
+        >
+          Clear
+        </Button>
+      </Tooltip>
     </div>
   </div>
 
