@@ -1,5 +1,6 @@
 import localforage from "localforage";
 import { browser } from "$app/environment";
+import { SNIPPET_LANGS } from "$lib/httpRpc/playground/curl";
 import {
   DEFAULT_HTTP_RPC_BASE_URL,
   parseHttpRpcBaseUrls,
@@ -79,9 +80,19 @@ export type StoreSettings = {
 };
 
 /**
- * Reserved UI preferences, persisted for future settings.
+ * Editor mode preferred for the form generator.
  */
-export type StoreUi = Record<string, unknown>;
+export type FormEditorMode = "form" | "json";
+
+/**
+ * Typed UI preferences, persisted for future settings.
+ */
+export type StoreUi = {
+  /** Editor mode every form generator opens in. */
+  formEditorMode: FormEditorMode;
+  /** Code snippet language selected in the playground. */
+  snippetLang: string;
+};
 
 /**
  * Check for a plain JSON object.
@@ -131,6 +142,23 @@ function normalizeHeader(value: unknown, index: number): HttpRpcHeader {
 }
 
 /**
+ * Normalize a persisted UI payload, whitelisting known values.
+ */
+function validateUi(persisted: unknown, fallback: StoreUi): StoreUi {
+  const record = isRecord(persisted) ? persisted : {};
+  const snippetLang =
+    typeof record.snippetLang === "string" &&
+    SNIPPET_LANGS.some((lang) => lang.label === record.snippetLang)
+      ? record.snippetLang
+      : fallback.snippetLang;
+  return {
+    formEditorMode:
+      record.formEditorMode === "json" ? "json" : fallback.formEditorMode,
+    snippetLang,
+  };
+}
+
+/**
  * Normalize a persisted settings payload.
  */
 function validateSettings(
@@ -166,6 +194,8 @@ function persistStoreKeys(target: Store): void {
         if (persisted === null || persisted === undefined) return;
         if (key === "settings") {
           target.settings = validateSettings(persisted, target.settings);
+        } else if (key === "ui") {
+          target.ui = validateUi(persisted, target.ui);
         }
       })
       .catch(() => {
@@ -222,9 +252,9 @@ export class Store {
   });
 
   /**
-   * Reserved persisted UI state for future settings.
+   * Typed persisted UI preferences.
    */
-  ui: StoreUi = $state({});
+  ui: StoreUi = $state({ formEditorMode: "form", snippetLang: "Curl" });
 
   /**
    * Base URLs configured through the `httpRpcBaseUrl` plugin option.
@@ -272,6 +302,17 @@ export class Store {
       ...this.settings.httpRpc,
       selectedBaseUrl: next,
     };
+  }
+
+  /**
+   * Persist the form generator editor mode preference.
+   * Already-selected values are ignored so mirroring effects never loop.
+   *
+   * @param mode Editor mode to prefer.
+   */
+  setFormEditorMode(mode: FormEditorMode) {
+    if (this.ui.formEditorMode === mode) return;
+    this.ui = { ...this.ui, formEditorMode: mode };
   }
 
   /**

@@ -3,6 +3,7 @@
   import { theme as runtimeTheme } from "@varavel/ui/runtime";
   import { onMount } from "svelte";
   import { highlightSnippet } from "$lib/shiki/shiki.svelte";
+  import { store } from "$lib/store";
   import {
     buildCurl,
     type CurlConverter,
@@ -24,7 +25,7 @@
 
   let converter: CurlConverter | null = $state(null);
   let converterFailed = $state(false);
-  let selectedLabel = $state("Curl");
+
   let highlighted = $state<string | undefined>(undefined);
 
   let curl = $derived(buildCurl(endpoint, input, headers));
@@ -40,7 +41,7 @@
   });
 
   let selected = $derived(
-    SNIPPET_LANGS.find((lang) => lang.label === selectedLabel) ??
+    SNIPPET_LANGS.find((lang) => lang.label === store.ui.snippetLang) ??
       SNIPPET_LANGS[1],
   );
 
@@ -123,7 +124,7 @@
     <Label for="snippet-language">Language</Label>
     <select
       id="snippet-language"
-      bind:value={selectedLabel}
+      bind:value={store.ui.snippetLang}
       class="text-content mt-1 inline-flex h-10 w-full cursor-pointer items-center gap-3 rounded-md border border-base-400 bg-base-100 px-3 text-sm transition-colors duration-200 hover:border-content hover:bg-base-100 focus:border-content focus:outline-none focus-visible:border-content focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-content"
     >
       {#each pickerEntries as entry (entry.kind === "group"

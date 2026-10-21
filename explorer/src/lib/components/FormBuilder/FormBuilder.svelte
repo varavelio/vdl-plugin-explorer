@@ -4,6 +4,7 @@
   import type { EnumDef, Field, TypeDef } from "@varavel/vdl-plugin-sdk";
   import { untrack } from "svelte";
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
+  import { type FormEditorMode, store } from "$lib/store";
   import FieldNode from "./FieldNode.svelte";
 
   interface Props {
@@ -34,7 +35,6 @@
     resetKey = 0,
   }: Props = $props();
 
-  let editorMode: "form" | "json" = $state("form");
   let jsonText = $state("");
 
   /**
@@ -66,10 +66,10 @@
    *
    * @param next Editor mode to activate.
    */
-  function setMode(next: "form" | "json") {
+  function setMode(next: FormEditorMode) {
     if (next === "json") {
       pushText(JSON.stringify(value ?? {}, null, 2));
-    } else if (editorMode === "json") {
+    } else if (store.ui.formEditorMode === "json") {
       try {
         value = JSON.parse(jsonText) as Record<string, unknown>;
         pushedText = jsonText;
@@ -77,7 +77,7 @@
         // Invalid JSON stays in the text; the form keeps the last value.
       }
     }
-    editorMode = next;
+    store.setFormEditorMode(next);
   }
 
   $effect(() => {
@@ -102,7 +102,7 @@
   });
 
   $effect(() => {
-    if (editorMode !== "json") return;
+    if (store.ui.formEditorMode !== "json") return;
     // Read outside `untrack` so typing re-runs this effect.
     const text = jsonText;
     untrack(() => {
@@ -166,23 +166,23 @@
       >
         <Button
           size="sm"
-          variant={editorMode === "form" ? "solid" : "ghost"}
+          variant={store.ui.formEditorMode === "form" ? "solid" : "ghost"}
           onclick={() => setMode("form")}
           icon={SquarePen}
           class="rounded-none border-0"
           role="tab"
-          aria-selected={editorMode === "form"}
+          aria-selected={store.ui.formEditorMode === "form"}
         >
           Form
         </Button>
         <Button
           size="sm"
-          variant={editorMode === "form" ? "ghost" : "solid"}
+          variant={store.ui.formEditorMode === "form" ? "ghost" : "solid"}
           onclick={() => setMode("json")}
           icon={Braces}
           class="rounded-none border-0"
           role="tab"
-          aria-selected={editorMode === "json"}
+          aria-selected={store.ui.formEditorMode === "json"}
         >
           JSON
         </Button>
@@ -195,7 +195,7 @@
     </div>
   </div>
 
-  {#if editorMode === "form"}
+  {#if store.ui.formEditorMode === "form"}
     {#key resetKey}
       {#key innerRev}
         {#each fields as field (field.name)}
