@@ -1,11 +1,13 @@
 <script>
   import { EllipsisVertical } from "@lucide/svelte";
-  import { Button, GithubButton, Popover, ThemePicker } from "@varavel/ui";
+  import { Button, Popover, ThemePicker } from "@varavel/ui";
   import { viewport } from "@varavel/ui/runtime";
   import HeaderSchemaButton from "./HeaderSchemaButton.svelte";
+  import HeaderSettingsButton from "./HeaderSettingsButton.svelte";
 </script>
 
 <div class="not-desk:hidden flex items-center gap-2">
+  <HeaderSettingsButton />
   <HeaderSchemaButton />
   <ThemePicker />
 </div>
@@ -19,16 +21,9 @@
     {/snippet}
 
     <div class="w-full flex flex-col gap-2">
+      <HeaderSettingsButton alignContent="left" />
       <HeaderSchemaButton alignContent="left" />
       <ThemePicker alignContent="left" />
-      <GithubButton
-        user="varavelio"
-        repo="vdl-plugin-explorer"
-        showStars={true}
-        showTag={false}
-        showForks={false}
-        wide={true}
-      />
     </div>
   </Popover>
 {/if}

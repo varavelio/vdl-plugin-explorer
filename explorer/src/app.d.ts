@@ -6,7 +6,7 @@ declare global {
      * This variable is replaced by the plugin at build time to inject
      * the base URL for the RPC calls to the VDL plugin.
      */
-    __vdl_rpc_base_url?: string;
+    __vdl_http_rpc_base_url?: string;
   }
 
   namespace App {

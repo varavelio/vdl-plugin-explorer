@@ -73,10 +73,10 @@ By default, the plugin writes one self-contained HTML file inside your `outDir`.
 
 All options are optional.
 
-| Option       | Type     | Default               | What it changes                                                            |
-| ------------ | -------- | --------------------- | -------------------------------------------------------------------------- |
-| `outFile`    | `string` | `"index.html"`        | Sets the output filename inside `outDir`. The value must end with `.html`. |
-| `rpcBaseUrl` | `string` | `"https://<baseURL>"` | Sets the base URL used when displaying RPC procedure endpoints.            |
+| Option           | Type     | Default               | What it changes                                                                                                                  |
+| ---------------- | -------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `outFile`        | `string` | `"index.html"`        | Sets the output filename inside `outDir`. The value must end with `.html`.                                                       |
+| `httpRpcBaseUrl` | `string` | `"https://<baseURL>"` | Comma-separated base URLs for HTTP RPC procedure endpoints, snippets and executions. Switch between them in the settings dialog. |
 
 Example with all options:
 
@@ -90,7 +90,7 @@ const config = {
       outDir "./docs"
       options {
         outFile "schema-explorer.html"
-        rpcBaseUrl "https://api.example.com/rpc"
+        httpRpcBaseUrl "https://api.example.com/rpc, https://staging.example.com/rpc"
       }
     }
   ]

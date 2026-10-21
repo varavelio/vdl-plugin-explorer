@@ -1,9 +1,8 @@
 <script lang="ts">
   import "../app.css";
-  import { GithubButton, UiProvider } from "@varavel/ui";
+  import { UiProvider } from "@varavel/ui";
   import { Loader } from "@varavel/ui/brand";
   import { AppLayout } from "@varavel/ui/layouts";
-  import { viewport } from "@varavel/ui/runtime";
   import Logo from "$lib/components/Logo.svelte";
   import { highlighter } from "$lib/shiki";
   import { store } from "$lib/store";
@@ -31,15 +30,6 @@
       {#snippet headerLeft()}
         <header class="hidden desk:flex ml-2 items-center gap-4">
           <a href="#/"><Logo class="h-8" /></a>
-          {#if viewport.isDesktop}
-            <GithubButton
-              user="varavelio"
-              repo="vdl-plugin-explorer"
-              showStars={true}
-              showTag={false}
-              showForks={false}
-            />
-          {/if}
         </header>
       {/snippet}
 

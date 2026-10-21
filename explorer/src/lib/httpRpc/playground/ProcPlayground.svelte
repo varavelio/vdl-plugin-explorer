@@ -1,10 +1,10 @@
 <script lang="ts">
   import { History, Loader, Trash, Zap } from "@lucide/svelte";
   import { Button, Heading, Tabs } from "@varavel/ui";
-  import { browser } from "$app/environment";
   import FormBuilder from "$lib/components/FormBuilder/FormBuilder.svelte";
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
-  import { buildRpcProcUrl, readRpcBaseUrl } from "$lib/httpRpc/url";
+  import { httpRpcBaseUrl } from "$lib/httpRpc/base-url.svelte";
+  import { buildRpcProcUrl } from "$lib/httpRpc/url";
   import { store } from "$lib/store";
   import type { RichIrSchemaRpcProc } from "$lib/store/ir/index";
   import HistoryDialog from "./HistoryDialog.svelte";
@@ -21,10 +21,7 @@
   let playground = $derived(new ProcPlaygroundState(proc.rpcName, proc.name));
 
   let endpoint = $derived.by(() => {
-    const baseUrl = browser
-      ? readRpcBaseUrl(window.__vdl_rpc_base_url)
-      : readRpcBaseUrl(undefined);
-    return buildRpcProcUrl(baseUrl, proc.rpcName, proc.name);
+    return buildRpcProcUrl(httpRpcBaseUrl.selected, proc.rpcName, proc.name);
   });
 
   let inputFields = $derived(

@@ -9,7 +9,7 @@ import { escapeScriptTag } from "@varavel/vdl-plugin-sdk/utils/strings";
 import template from "../../explorer/build/index.html?raw";
 
 const DEFAULT_OUTPUT_FILE = "index.html";
-const DEFAULT_RPC_BASE_URL = "https://<baseURL>";
+const DEFAULT_HTTP_RPC_BASE_URL = "https://<baseURL>";
 
 /**
  * Resolves the output filename for the generated HTML file.
@@ -41,25 +41,26 @@ function resolveOutFile(input: PluginInput): string {
 }
 
 /**
- * Resolves the base URL used to render RPC procedure endpoints in the explorer.
+ * Resolves the base URLs used to render HTTP RPC procedure endpoints in the
+ * explorer.
  *
- * The plugin reads `rpcBaseUrl` from options and falls back to `https://<baseURL>`
- * when the option is missing or blank.
+ * The plugin reads `httpRpcBaseUrl` from options as a comma-separated list,
+ * following the same convention as the `baseUrl` option of the HTTP RPC
+ * OpenAPI plugin, and falls back to `https://<baseURL>` when the option is
+ * missing or blank.
  *
  * @param input - Plugin invocation payload received from VDL.
- * @returns A non-empty RPC base URL value.
+ * @returns A non-empty list of HTTP RPC base URLs.
  */
-function resolveRpcBaseUrl(input: PluginInput): string {
-  const rpcBaseUrl = options.getOptionString(
+function resolveHttpRpcBaseUrls(input: PluginInput): string[] {
+  const baseUrls = options.getOptionArray(
     input.options,
-    "rpcBaseUrl",
-    DEFAULT_RPC_BASE_URL,
+    "httpRpcBaseUrl",
+    [],
+    ",",
   );
-  const trimmedRpcBaseUrl = rpcBaseUrl.trim();
 
-  return trimmedRpcBaseUrl.length > 0
-    ? trimmedRpcBaseUrl
-    : DEFAULT_RPC_BASE_URL;
+  return baseUrls.length > 0 ? baseUrls : [DEFAULT_HTTP_RPC_BASE_URL];
 }
 
 /**
@@ -67,7 +68,8 @@ function resolveRpcBaseUrl(input: PluginInput): string {
  *
  * Supported plugin options:
  * - `outFile`: output filename (default: `index.html`)
- * - `rpcBaseUrl`: base URL used for RPC procedure endpoint display (default: `https://<baseURL>`)
+ * - `httpRpcBaseUrl`: comma-separated base URLs used for HTTP RPC procedure
+ *   endpoint display (default: `https://<baseURL>`)
  *
  * @param input - Plugin invocation payload provided by VDL.
  * @returns One generated HTML file containing the explorer app and IR data.
@@ -79,17 +81,18 @@ export const generate = definePlugin((input) => {
   const outFile = resolveOutFile(input);
   const ir = escapeScriptTag(JSON.stringify(anonymizeIr(input.ir)));
 
-  // The RPC base URL escaped and sanitized
-  let rpcBaseUrl = escapeScriptTag(JSON.stringify(resolveRpcBaseUrl(input)));
-  rpcBaseUrl = rpcBaseUrl.replace(/\/+$/, "");
+  // The HTTP RPC base URLs escaped and sanitized
+  const httpRpcBaseUrl = escapeScriptTag(
+    JSON.stringify(resolveHttpRpcBaseUrls(input).join(",")),
+  );
 
   let html = template.replace(
     "window.__vdl_ir = {};",
     `window.__vdl_ir = ${ir};`,
   );
   html = html.replace(
-    'window.__vdl_rpc_base_url = "https://<baseURL>";',
-    `window.__vdl_rpc_base_url = ${rpcBaseUrl};`,
+    'window.__vdl_http_rpc_base_url = "https://<baseURL>";',
+    `window.__vdl_http_rpc_base_url = ${httpRpcBaseUrl};`,
   );
 
   return {

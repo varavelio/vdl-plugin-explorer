@@ -31,16 +31,20 @@ export function buildRpcProcUrl(
 /**
  * Fallback base URL rendered before the plugin injects the configured one.
  */
-export const DEFAULT_RPC_BASE_URL = "https://<baseURL>";
+export const DEFAULT_HTTP_RPC_BASE_URL = "https://<baseURL>";
 
 /**
- * Read the RPC base URL injected by the plugin.
+ * Parse the comma-separated HTTP RPC base URL list injected by the plugin,
+ * following the same convention as the `baseUrl` option of the HTTP RPC
+ * OpenAPI plugin.
  *
- * @param configured Value of `window.__vdl_rpc_base_url` when available.
- * @returns The trimmed base URL without trailing slashes.
+ * @param configured Value of `window.__vdl_http_rpc_base_url` when available.
+ * @returns The configured URLs without trailing slashes, or the fallback.
  */
-export function readRpcBaseUrl(configured: string | undefined): string {
-  const trimmed = configured?.trim();
-  if (!trimmed) return DEFAULT_RPC_BASE_URL;
-  return trimmed.replace(/\/+$/, "");
+export function parseHttpRpcBaseUrls(configured: string | undefined): string[] {
+  const urls = (configured ?? "")
+    .split(",")
+    .map((url) => url.trim().replace(/\/+$/, ""))
+    .filter((url) => url.length > 0);
+  return urls.length > 0 ? urls : [DEFAULT_HTTP_RPC_BASE_URL];
 }
