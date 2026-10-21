@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { Plus, Settings, Trash } from "@lucide/svelte";
+  import { Plus, RefreshCcw, Settings, Trash } from "@lucide/svelte";
   import {
     Button,
     Checkbox,
+    Combobox,
     Dialog,
     Input,
     Kbd,
-    Select,
     Tooltip,
   } from "@varavel/ui";
   import { viewport } from "@varavel/ui/runtime";
@@ -36,17 +36,30 @@
    * flow outward through `selectHttpRpcBaseUrl`, while late arrivals (loaded
    * persistence) are adopted locally without being written back.
    */
-  let selected = $state(store.selectedHttpRpcBaseUrl);
+  let selected: string | undefined = $state(store.selectedHttpRpcBaseUrl);
   let synced = $state(store.selectedHttpRpcBaseUrl);
 
+  /**
+   * Remount token forcing the combobox to drop its internal draft (for
+   * example after restoring the default while a draft is present).
+   */
+  let comboKey = $state(0);
+
+  /**
+   * Two-way sync tolerating combobox drafts: an undefined selection means
+   * the visitor is still typing, so nothing is pushed or adopted until the
+   * value commits. On simultaneous changes the typed value wins over a
+   * stale loaded one.
+   */
   $effect(() => {
     const fromStore = store.selectedHttpRpcBaseUrl;
-    if (fromStore !== synced) {
-      synced = fromStore;
-      selected = fromStore;
-    } else if (selected !== synced) {
+    if (selected === undefined) return;
+    if (selected !== synced) {
       synced = selected;
       store.selectHttpRpcBaseUrl(selected);
+    } else if (fromStore !== synced) {
+      synced = fromStore;
+      selected = fromStore;
     }
   });
 
@@ -94,41 +107,67 @@
 {/if}
 
 <Dialog bind:open size="lg" title="Explorer preferences">
-  <div class="space-y-4">
-    <section class="space-y-3">
+  <div class="space-y-6">
+    <section class="space-y-4">
       <h3 class="text-sm font-semibold">HTTP RPC settings</h3>
 
-      {#if store.httpRpcUrls.length > 1}
-        <Select
-          label="Base URL"
-          description="Used for procedure URLs, code snippets and executions."
-          items={store.httpRpcUrls.map((url) => ({ value: url, label: url }))}
-          bind:value={selected}
-        />
-      {/if}
+      <div>
+        <p class="text-sm font-medium">Base URL</p>
+        <div class="mt-2 flex items-start gap-2">
+          <div class="min-w-0 flex-1">
+            {#key comboKey}
+              <Combobox
+                placeholder="Select or type a base URL…"
+                items={store.httpRpcUrls.map((url) => ({
+                  value: url,
+                  label: url,
+                }))}
+                bind:value={selected}
+                allowCustomValue
+              />
+            {/key}
+          </div>
+          <Tooltip content="Restore default base URL" side="left">
+            <Button
+              variant="ghost"
+              square
+              icon={RefreshCcw}
+              onclick={() => {
+                selected = store.httpRpcUrls[0];
+                comboKey += 1;
+              }}
+              aria-label="Restore default base URL"
+            />
+          </Tooltip>
+        </div>
+        <p class="mt-1.5 text-xs text-content-muted">
+          Used for URLs, code snippets and procedure executions.
+        </p>
+      </div>
 
       <div>
         <p class="text-sm font-medium">Headers</p>
-        <p class="text-xs text-content-muted">
-          Sent with every procedure execution on top of the JSON defaults.
+        <p class="mt-1 text-xs text-content-muted">
+          Sent with every procedure execution on top of the JSON defaults and in
+          the code snippets.
         </p>
 
         {#if store.settings.httpRpc.headers.length > 0}
-          <div class="mt-2 overflow-x-auto">
+          <div class="mt-4 overflow-x-auto">
             <table class="w-full min-w-135 text-sm">
               <thead>
                 <tr class="text-left text-xs text-content-muted">
-                  <th class="w-0 pr-2 pb-1"></th>
-                  <th class="pr-2 pb-1 font-medium">Name</th>
-                  <th class="pr-2 pb-1 font-medium">Value</th>
-                  <th class="pr-2 pb-1 font-medium">Description</th>
-                  <th class="w-0 pb-1"></th>
+                  <th class="w-0 pr-3 pb-2"></th>
+                  <th class="pr-3 pb-2 font-medium">Name</th>
+                  <th class="pr-3 pb-2 font-medium">Value</th>
+                  <th class="pr-3 pb-2 font-medium">Description</th>
+                  <th class="w-0 pb-2"></th>
                 </tr>
               </thead>
               <tbody>
                 {#each store.settings.httpRpc.headers as header (header.id)}
                   <tr class="border-t border-base-300">
-                    <td class="py-2 pr-2">
+                    <td class="py-2.5 pr-3">
                       <Tooltip
                         content={header.enabled
                           ? "Disable header"
@@ -138,7 +177,7 @@
                         <Checkbox bind:checked={header.enabled} />
                       </Tooltip>
                     </td>
-                    <td class="py-2 pr-2">
+                    <td class="py-2.5 pr-3">
                       <Input
                         size="sm"
                         placeholder="Name"
@@ -146,7 +185,7 @@
                         bind:value={header.name}
                       />
                     </td>
-                    <td class="py-2 pr-2">
+                    <td class="py-2.5 pr-3">
                       <Input
                         size="sm"
                         placeholder="Value"
@@ -154,7 +193,7 @@
                         bind:value={header.value}
                       />
                     </td>
-                    <td class="py-2 pr-2">
+                    <td class="py-2.5 pr-3">
                       <Input
                         size="sm"
                         placeholder="Description (optional)"
@@ -162,7 +201,7 @@
                         bind:value={header.description}
                       />
                     </td>
-                    <td class="py-2">
+                    <td class="py-2.5">
                       <Tooltip content="Remove header" side="left">
                         <Button
                           size="sm"
@@ -180,10 +219,10 @@
             </table>
           </div>
         {:else}
-          <p class="mt-2 text-sm text-content-muted">No custom headers yet.</p>
+          <p class="mt-3 text-sm text-content-muted">No custom headers yet.</p>
         {/if}
 
-        <div class="mt-2 flex justify-end">
+        <div class="mt-3 flex justify-end">
           <Button
             size="sm"
             variant="ghost"

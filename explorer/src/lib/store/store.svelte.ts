@@ -249,26 +249,28 @@ export class Store {
   }
 
   /**
-   * Currently selected HTTP RPC base URL.
+   * Currently selected HTTP RPC base URL: the persisted value, whether it is
+   * a configured URL or a manual override.
    */
   get selectedHttpRpcBaseUrl(): string {
     const selected = this.settings.httpRpc.selectedBaseUrl;
-    return this.httpRpcUrls.includes(selected) ? selected : this.httpRpcUrls[0];
+    return selected ? selected : this.httpRpcUrls[0];
   }
 
   /**
-   * Select a configured HTTP RPC base URL and persist the choice.
-   * Already-selected and unknown values are ignored so mirroring effects
-   * never loop.
+   * Select an HTTP RPC base URL, configured or custom, and persist it.
+   * Blank and already-selected values are ignored so mirroring effects never
+   * loop.
    *
    * @param url Base URL to select.
    */
   selectHttpRpcBaseUrl(url: string) {
-    if (!this.httpRpcUrls.includes(url)) return;
-    if (this.settings.httpRpc.selectedBaseUrl === url) return;
+    const next = url.trim().replace(/\/+$/, "");
+    if (!next) return;
+    if (this.settings.httpRpc.selectedBaseUrl === next) return;
     this.settings.httpRpc = {
       ...this.settings.httpRpc,
-      selectedBaseUrl: url,
+      selectedBaseUrl: next,
     };
   }
 
