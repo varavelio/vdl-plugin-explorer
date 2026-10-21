@@ -359,18 +359,32 @@ export const SNIPPET_LANGS: SnippetLang[] = [
  *
  * @param endpoint Procedure URL.
  * @param input Request payload, defaults to an empty object.
+ * @param headers Extra headers merged over the JSON defaults, later entries
+ * winning on case-insensitive name matches.
  * @returns A copy-pasteable curl command.
  */
-export function buildCurl(endpoint: string, input: unknown): string {
+export function buildCurl(
+  endpoint: string,
+  input: unknown,
+  headers: Record<string, string> = {},
+): string {
   // The endpoint travels single-quoted: the default base URL holds the
   // `<baseURL>` placeholder and bare angle brackets parse as shell
   // redirections, which silently truncates the URL for curlconverter.
   const quotedEndpoint = `'${endpoint.replace(/'/g, "'\\''")}'`;
   const payload = JSON.stringify(input ?? {}, null, 2).replace(/'/g, "'\\''");
-  return [
-    `curl -X POST ${quotedEndpoint} \\`,
-    `-H ${JSON.stringify("Content-Type: application/json")} \\`,
-    `-H ${JSON.stringify("Accept: application/json")} \\`,
-    `-d '${payload}'`,
-  ].join("\n");
+  const merged = new Map<string, { name: string; value: string }>();
+  for (const [name, value] of Object.entries({
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    ...headers,
+  })) {
+    merged.set(name.toLowerCase(), { name, value });
+  }
+  const lines = [`curl -X POST ${quotedEndpoint} \\`];
+  for (const { name, value } of merged.values()) {
+    lines.push(`-H ${JSON.stringify(`${name}: ${value}`)} \\`);
+  }
+  lines.push(`-d '${payload}'`);
+  return lines.join("\n");
 }

@@ -16,16 +16,18 @@
     endpoint: string;
     /** Current request payload rendered into the snippets. */
     input: unknown;
+    /** Extra headers merged over the JSON defaults. */
+    headers?: Record<string, string>;
   }
 
-  let { endpoint, input }: Props = $props();
+  let { endpoint, input, headers = {} }: Props = $props();
 
   let converter: CurlConverter | null = $state(null);
   let converterFailed = $state(false);
   let selectedLabel = $state("Curl");
   let highlighted = $state<string | undefined>(undefined);
 
-  let curl = $derived(buildCurl(endpoint, input));
+  let curl = $derived(buildCurl(endpoint, input, headers));
 
   onMount(() => {
     loadCurlConverter()

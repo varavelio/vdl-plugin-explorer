@@ -1,10 +1,175 @@
+import localforage from "localforage";
 import { browser } from "$app/environment";
+import {
+  DEFAULT_HTTP_RPC_BASE_URL,
+  parseHttpRpcBaseUrls,
+} from "$lib/httpRpc/url";
 import {
   EMPTY_RICH_IR,
   loadIrSchema,
   type RichIrSchema,
   type SourceCode,
 } from "$lib/store/ir/index";
+
+/**
+ * Isolated IndexedDB database for persisted UI preferences.
+ */
+const settingsDb = localforage.createInstance({
+  name: "vdl-explorer-settings",
+  storeName: "settings",
+});
+
+/** Delay collapsing rapid edits into a single write. */
+const SAVE_DELAY_MS = 300;
+
+/** Top-level store keys persisted across visits. */
+const PERSISTED_KEYS = ["settings", "ui"] as const;
+
+/**
+ * Custom header sent with procedure executions.
+ */
+export type HttpRpcHeader = {
+  /** Stable identifier for list rendering. */
+  id: string;
+  /** Header name sent on the wire. */
+  name: string;
+  /** Header value sent on the wire. */
+  value: string;
+  /** Whether the header applies to executions. */
+  enabled: boolean;
+  /** Optional note describing the header. */
+  description: string;
+};
+
+/**
+ * Persisted HTTP RPC UI settings.
+ */
+export type HttpRpcSettingsData = {
+  /** Selected base URL; validated against the configured list on read. */
+  selectedBaseUrl: string;
+  /** Custom headers sent with procedure executions. */
+  headers: HttpRpcHeader[];
+};
+
+/**
+ * Persisted explorer settings.
+ */
+export type StoreSettings = {
+  httpRpc: HttpRpcSettingsData;
+};
+
+/**
+ * Reserved UI preferences, persisted for future settings.
+ */
+export type StoreUi = Record<string, unknown>;
+
+/**
+ * Check for a plain JSON object.
+ */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Delay a function until calls stop for the given milliseconds.
+ */
+function debounce<Args extends unknown[]>(
+  fn: (...args: Args) => void,
+  delayMs: number,
+): (...args: Args) => void {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return (...args: Args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delayMs);
+  };
+}
+
+/**
+ * Read the base URLs configured through the `httpRpcBaseUrl` plugin option.
+ *
+ * @returns The configured URLs, or the fallback when none is configured.
+ */
+function readConfiguredUrls(): string[] {
+  if (!browser) return [DEFAULT_HTTP_RPC_BASE_URL];
+  return parseHttpRpcBaseUrls(window.__vdl_http_rpc_base_url);
+}
+
+/**
+ * Normalize a persisted header, defaulting to enabled like the old
+ * playground did.
+ */
+function normalizeHeader(value: unknown, index: number): HttpRpcHeader {
+  const record = isRecord(value) ? value : {};
+  return {
+    id: typeof record.id === "string" ? record.id : `header-${index}`,
+    name: typeof record.name === "string" ? record.name : "",
+    value: typeof record.value === "string" ? record.value : "",
+    enabled: typeof record.enabled === "boolean" ? record.enabled : true,
+    description:
+      typeof record.description === "string" ? record.description : "",
+  };
+}
+
+/**
+ * Normalize a persisted settings payload.
+ */
+function validateSettings(
+  persisted: unknown,
+  fallback: StoreSettings,
+): StoreSettings {
+  const record = isRecord(persisted) ? persisted : {};
+  const httpRpc = isRecord(record.httpRpc) ? record.httpRpc : {};
+  const headers = Array.isArray(httpRpc.headers)
+    ? httpRpc.headers.map(normalizeHeader)
+    : [];
+  const selected =
+    typeof httpRpc.selectedBaseUrl === "string" &&
+    httpRpc.selectedBaseUrl.length > 0
+      ? httpRpc.selectedBaseUrl
+      : fallback.httpRpc.selectedBaseUrl;
+  return { httpRpc: { selectedBaseUrl: selected, headers } };
+}
+
+/**
+ * Persist selected top-level keys of the store, following the old playground
+ * convention of saving only part of it. Nested mutations (for example through
+ * `bind:value`) are detected by snapshotting and saved debounced per key, so
+ * editors never call save explicitly.
+ *
+ * @param target Store holding the keys.
+ */
+function persistStoreKeys(target: Store): void {
+  for (const key of PERSISTED_KEYS) {
+    settingsDb
+      .getItem(key)
+      .then((persisted) => {
+        if (persisted === null || persisted === undefined) return;
+        if (key === "settings") {
+          target.settings = validateSettings(persisted, target.settings);
+        }
+      })
+      .catch(() => {
+        // Unavailable storage keeps the initial value.
+      });
+  }
+
+  $effect.root(() => {
+    for (const key of PERSISTED_KEYS) {
+      const saveKey = debounce((snapshot: unknown) => {
+        if (snapshot === undefined) return;
+        settingsDb.setItem(key, snapshot).catch(() => {
+          // Private mode or quota errors keep the in-memory value.
+        });
+      }, SAVE_DELAY_MS);
+      $effect(() => {
+        const snapshot = JSON.parse(JSON.stringify(target[key])) as unknown;
+        saveKey(snapshot);
+      });
+    }
+  });
+}
+
+let headerCounter = 0;
 
 /**
  * Store class holds all the application shared state.
@@ -29,8 +194,26 @@ export class Store {
     htmlDark: "",
   });
 
+  /**
+   * Persisted UI preferences.
+   */
+  settings: StoreSettings = $state({
+    httpRpc: { selectedBaseUrl: readConfiguredUrls()[0], headers: [] },
+  });
+
+  /**
+   * Reserved persisted UI state for future settings.
+   */
+  ui: StoreUi = $state({});
+
+  /**
+   * Base URLs configured through the `httpRpcBaseUrl` plugin option.
+   */
+  readonly httpRpcUrls = readConfiguredUrls();
+
   constructor() {
     if (!browser || this.initialized) return;
+    persistStoreKeys(this);
     this.init();
   }
 
@@ -43,6 +226,71 @@ export class Store {
     this.ir = richIrSchema;
     this.irSourceCode = sourceCode;
     this.initialized = true;
+  }
+
+  /**
+   * Currently selected HTTP RPC base URL.
+   */
+  get selectedHttpRpcBaseUrl(): string {
+    const selected = this.settings.httpRpc.selectedBaseUrl;
+    return this.httpRpcUrls.includes(selected) ? selected : this.httpRpcUrls[0];
+  }
+
+  /**
+   * Select a configured HTTP RPC base URL and persist the choice.
+   * Already-selected and unknown values are ignored so mirroring effects
+   * never loop.
+   *
+   * @param url Base URL to select.
+   */
+  selectHttpRpcBaseUrl(url: string) {
+    if (!this.httpRpcUrls.includes(url)) return;
+    if (this.settings.httpRpc.selectedBaseUrl === url) return;
+    this.settings.httpRpc = {
+      ...this.settings.httpRpc,
+      selectedBaseUrl: url,
+    };
+  }
+
+  /**
+   * Enabled custom headers with a non-blank name, applied to executions.
+   */
+  get enabledHttpRpcHeaders(): HttpRpcHeader[] {
+    return this.settings.httpRpc.headers.filter(
+      (header) => header.enabled && header.name.trim().length > 0,
+    );
+  }
+
+  /** Append a blank enabled header. */
+  addHttpRpcHeader() {
+    headerCounter += 1;
+    this.settings.httpRpc = {
+      ...this.settings.httpRpc,
+      headers: [
+        ...this.settings.httpRpc.headers,
+        {
+          id: `header-${Date.now()}-${headerCounter}`,
+          name: "",
+          value: "",
+          enabled: true,
+          description: "",
+        },
+      ],
+    };
+  }
+
+  /**
+   * Remove a custom header by id.
+   *
+   * @param id Header identifier.
+   */
+  removeHttpRpcHeader(id: string) {
+    this.settings.httpRpc = {
+      ...this.settings.httpRpc,
+      headers: this.settings.httpRpc.headers.filter(
+        (header) => header.id !== id,
+      ),
+    };
   }
 }
 

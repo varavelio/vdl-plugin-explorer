@@ -3,7 +3,7 @@
   import { Button, Heading, Tabs } from "@varavel/ui";
   import FormBuilder from "$lib/components/FormBuilder/FormBuilder.svelte";
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
-  import { httpRpcBaseUrl } from "$lib/httpRpc/base-url.svelte";
+
   import { buildRpcProcUrl } from "$lib/httpRpc/url";
   import { store } from "$lib/store";
   import type { RichIrSchemaRpcProc } from "$lib/store/ir/index";
@@ -21,7 +21,26 @@
   let playground = $derived(new ProcPlaygroundState(proc.rpcName, proc.name));
 
   let endpoint = $derived.by(() => {
-    return buildRpcProcUrl(httpRpcBaseUrl.selected, proc.rpcName, proc.name);
+    return buildRpcProcUrl(
+      store.selectedHttpRpcBaseUrl,
+      proc.rpcName,
+      proc.name,
+    );
+  });
+
+  /**
+   * Request headers merging the JSON defaults with the enabled custom
+   * headers, which win on name matches like the old playground did.
+   */
+  let requestHeaders = $derived.by(() => {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+    for (const header of store.enabledHttpRpcHeaders) {
+      headers[header.name.trim()] = header.value;
+    }
+    return headers;
   });
 
   let inputFields = $derived(
@@ -50,10 +69,7 @@
 
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        headers: requestHeaders,
         body: JSON.stringify(playground.input ?? {}),
         signal: controller.signal,
       });
@@ -181,7 +197,11 @@
   </section>
 
   <aside class="desk:col-span-3">
-    <SnippetsPanel {endpoint} input={playground.input} />
+    <SnippetsPanel
+      {endpoint}
+      input={playground.input}
+      headers={requestHeaders}
+    />
   </aside>
 </div>
 

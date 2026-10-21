@@ -1,8 +1,8 @@
 <script lang="ts">
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
   import NodePage from "$lib/components/NodePage.svelte";
-  import { httpRpcBaseUrl } from "$lib/httpRpc/base-url.svelte";
   import { buildRpcProcUrl } from "$lib/httpRpc/url";
+  import { store } from "$lib/store";
   import type { RichIrSchemaRpcProc } from "$lib/store/ir/index";
 
   interface Props {
@@ -26,7 +26,7 @@
   let rpcProcUrl = $derived.by(() => {
     if (!rpcProc) return "";
     return buildRpcProcUrl(
-      httpRpcBaseUrl.selected,
+      store.selectedHttpRpcBaseUrl,
       rpcProc.rpcName,
       rpcProc.name,
     );
