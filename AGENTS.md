@@ -32,6 +32,7 @@ When updating this document, do so with the context of the entire document in mi
 - After bumping `dprint`, run `dprint config update` to migrate plugin URLs to the `npm:` spec. Keep `biome.json` `$schema` tracking the installed Biome version and run `biome migrate` when config keys deprecate.
 - `noAutofocus` stays off via override for `SearchButton.svelte`.
 - Procedure playground state (input/output/history) persists per procedure in IndexedDB via `localforage` (`lib/httpRpc/playground/proc-state.svelte.ts`).
+- Geist/Geist Mono load from Google Fonts through `@theme` block in `app.css` placed after the kit theme.
 - Monaco loads at runtime from the jsDelivr CDN via `@monaco-editor/loader` so the single-file build stays lean. `curlconverter` loads the same way through a dynamic `+esm` import and its tree-sitter WASM files resolve to jsDelivr through the `fetch` redirect patch in `app.html`.
 - Snippet code blocks highlight at runtime through a lazily created Shiki highlighter (`highlightSnippet` in `lib/shiki/shiki.svelte.ts`, bundled grammars only, `shellscript` as the `bash` id). `SnippetLang` carries both the Shiki `langCode` and the real download `extension`. `buildCurl` single-quotes the endpoint so the `<baseURL>` placeholder survives curlconverter parsing.
 - The input lives inside the search Dialog modal where autofocus is intended, and Biome cannot recognize the custom Dialog as a modal context. The input lives inside the search Dialog modal where autofocus is intended, and Biome cannot recognize the custom Dialog as a modal context.

@@ -1,6 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Geist:ital,wght@0,100..900;1,100..900&display=swap");
 @import "tailwindcss";
 @import "@varavel/ui/theme.css";
 @source "../node_modules/@varavel/ui";
+
+@theme {
+  --font-sans:
+    "Geist",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  --font-mono:
+    "Geist Mono",
+    ui-monospace,
+    "SFMono-Regular",
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    monospace;
+}
 
 /* Custom shiki code highlighting style */
 .shiki {
