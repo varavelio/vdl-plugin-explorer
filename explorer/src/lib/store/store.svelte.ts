@@ -12,10 +12,30 @@ import {
 } from "$lib/store/ir/index";
 
 /**
+ * Build a deployment-scoped IndexedDB database name, prefixing with
+ * the sanitized page path so several explorers under one domain
+ * (different deploy paths) keep isolated data.
+ *
+ * The domain root keeps the bare base name.
+ *
+ * @param base Base database name used at the domain root.
+ * @returns The base name prefixed with the deploy path, if any.
+ */
+export function deploymentDbName(base: string): string {
+  if (!browser) return base;
+  const pathPrefix = window.location.pathname
+    .replace(/(^|\/)index\.html$/i, "")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase();
+  return pathPrefix ? `${pathPrefix}-${base}` : base;
+}
+
+/**
  * Isolated IndexedDB database for persisted UI preferences.
  */
 const settingsDb = localforage.createInstance({
-  name: "vdl-explorer-settings",
+  name: deploymentDbName("vdl-explorer-settings"),
   storeName: "settings",
 });
 

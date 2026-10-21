@@ -1,5 +1,6 @@
 import localforage from "localforage";
 import { browser } from "$app/environment";
+import { deploymentDbName } from "$lib/store";
 
 /**
  * Single request/response pair stored in the procedure history.
@@ -32,7 +33,7 @@ const STORAGE_PREFIX = "proc-playground:";
 
 const snapshotStore = browser
   ? localforage.createInstance({
-      name: "vdl-explorer-playground",
+      name: deploymentDbName("vdl-explorer-playground"),
       storeName: "procedures",
     })
   : null;
