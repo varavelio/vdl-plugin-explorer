@@ -1,7 +1,7 @@
 <script lang="ts">
   import { History, Trash } from "@lucide/svelte";
   import { Button, CodeBlock, Dialog } from "@varavel/ui";
-  import type { ProcPlaygroundState } from "./proc-state.svelte";
+  import type { ProcPlaygroundState } from "$lib/store/httpRpcPlayground";
 
   interface Props {
     /** Playground owning the history entries. */

@@ -17,10 +17,12 @@ export type ProcHistoryItem = {
 /**
  * Persisted playground snapshot for one procedure.
  */
-type ProcPlaygroundSnapshot = {
+export type ProcPlaygroundSnapshot = {
   input: Record<string, unknown>;
   output: string;
   outputDate: string;
+  /** Duration of the latest execution in milliseconds, if any. */
+  durationMs: number | null;
   history: ProcHistoryItem[];
 };
 
@@ -29,20 +31,34 @@ type ProcPlaygroundSnapshot = {
  */
 const HISTORY_LIMIT = 150;
 
-const STORAGE_PREFIX = "proc-playground:";
+/** Delay collapsing rapid input edits into a single write. */
+export const INPUT_SAVE_DELAY_MS = 500;
 
 const snapshotStore = browser
   ? localforage.createInstance({
-      name: deploymentDbName("vdl-explorer-playground"),
+      name: deploymentDbName("vdl-explorer-http-rpc"),
       storeName: "procedures",
     })
   : null;
 
 /**
+ * Format a duration for the output header.
+ *
+ * @param durationMs Duration in milliseconds, if any.
+ * @returns Human-readable duration, or an empty string.
+ */
+export function formatDurationMs(durationMs: number | null): string {
+  if (durationMs === null) return "";
+  if (durationMs < 1000) return `${Math.round(durationMs)}ms`;
+  return `${(durationMs / 1000).toFixed(1)}s`;
+}
+
+/**
  * Reactive playground state for a single procedure.
  *
- * The input, output, and history are persisted to IndexedDB so executions
- * survive reloads. One instance is created per procedure page.
+ * The input, output, execution metadata and history persist to IndexedDB
+ * under a per-procedure key. Executions survive reloads. One instance is
+ * created per procedure page.
  */
 export class ProcPlaygroundState {
   /**
@@ -61,14 +77,14 @@ export class ProcPlaygroundState {
   outputDate = $state("");
 
   /**
+   * Duration of the latest execution in milliseconds, if any.
+   */
+  durationMs: number | null = $state(null);
+
+  /**
    * Past executions, newest first.
    */
   history: ProcHistoryItem[] = $state([]);
-
-  /**
-   * True once the persisted snapshot has been restored.
-   */
-  ready = $state(false);
 
   #key: string;
 
@@ -80,15 +96,14 @@ export class ProcPlaygroundState {
     readonly rpcName: string,
     readonly procName: string,
   ) {
-    this.#key = `${STORAGE_PREFIX}${rpcName}.${procName}`;
+    this.#key = `${this.rpcName}.${this.procName}`;
     if (browser) void this.restore();
-    else this.ready = true;
   }
 
   /**
-   * Restore the persisted snapshot when one exists.
+   * Load the persisted snapshot, if any.
    */
-  private async restore(): Promise<void> {
+  async restore(): Promise<void> {
     try {
       const snapshot = await snapshotStore?.getItem<ProcPlaygroundSnapshot>(
         this.#key,
@@ -97,24 +112,24 @@ export class ProcPlaygroundState {
         this.input = snapshot.input ?? {};
         this.output = snapshot.output ?? "";
         this.outputDate = snapshot.outputDate ?? "";
+        this.durationMs = snapshot.durationMs ?? null;
         this.history = snapshot.history ?? [];
       }
     } catch {
       // Corrupt snapshots are ignored in favor of a blank playground.
-    } finally {
-      this.ready = true;
     }
   }
 
   /**
    * Persist the current snapshot. Failures are ignored by design.
    */
-  private persist(): void {
+  persistNow(): void {
     snapshotStore
       ?.setItem(this.#key, {
         input: this.input,
         output: this.output,
         outputDate: this.outputDate,
+        durationMs: this.durationMs,
         history: this.history,
       } satisfies ProcPlaygroundSnapshot)
       .catch(() => {});
@@ -134,28 +149,30 @@ export class ProcPlaygroundState {
       this.history.pop();
     }
 
-    this.persist();
+    this.persistNow();
   }
 
   /**
-   * Replace the input and persist the change.
+   * Replace the request payload and persist the change.
    *
    * @param next Next request payload.
    */
-  setInput(next: Record<string, unknown>): void {
+  setInput(next: Record<string, unknown>) {
     this.input = next;
-    this.persist();
+    this.persistNow();
   }
 
   /**
-   * Replace the output and persist the change.
+   * Replace the response payload and persist the execution metadata.
    *
-   * @param next Pretty-printed response payload.
+   * @param next Pretty-printed response.
+   * @param durationMs Duration of the execution in milliseconds, if any.
    */
-  setOutput(next: string): void {
+  setOutput(next: string, durationMs: number | null = null) {
     this.output = next;
     this.outputDate = next ? new Date().toISOString() : "";
-    this.persist();
+    this.durationMs = next ? durationMs : null;
+    this.persistNow();
   }
 
   /**
@@ -163,34 +180,35 @@ export class ProcPlaygroundState {
    *
    * @param index Position of the entry, newest first.
    */
-  deleteHistoryItem(index: number): void {
+  deleteHistoryItem(index: number) {
     if (index < 0 || index >= this.history.length) return;
     this.history.splice(index, 1);
-    this.persist();
+    this.persistNow();
   }
 
   /**
    * Remove every history entry.
    */
-  clearHistory(): void {
+  clearHistory() {
     this.history = [];
-    this.persist();
+    this.persistNow();
   }
 
   /**
    * Reset the request payload to an empty object.
    */
-  clearInput(): void {
+  clearInput() {
     this.input = {};
-    this.persist();
+    this.persistNow();
   }
 
   /**
    * Reset the response payload.
    */
-  clearOutput(): void {
+  clearOutput() {
     this.output = "";
     this.outputDate = "";
-    this.persist();
+    this.durationMs = null;
+    this.persistNow();
   }
 }

@@ -1,14 +1,19 @@
 <script lang="ts">
   import { History, Loader, Trash, Zap } from "@lucide/svelte";
   import { Button, Heading, Tabs } from "@varavel/ui";
+  import { onDestroy, untrack } from "svelte";
   import FormBuilder from "$lib/components/FormBuilder/FormBuilder.svelte";
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
 
   import { buildRpcProcUrl } from "$lib/httpRpc/url";
   import { store } from "$lib/store";
+  import {
+    formatDurationMs,
+    INPUT_SAVE_DELAY_MS,
+    ProcPlaygroundState,
+  } from "$lib/store/httpRpcPlayground";
   import type { RichIrSchemaRpcProc } from "$lib/store/ir/index";
   import HistoryDialog from "./HistoryDialog.svelte";
-  import { ProcPlaygroundState } from "./proc-state.svelte";
   import SnippetsPanel from "./SnippetsPanel.svelte";
 
   interface Props {
@@ -51,6 +56,29 @@
       : [],
   );
 
+  let inputSaveTimer: ReturnType<typeof setTimeout> | undefined;
+
+  /**
+   * Persist the current input debounced, so even unexecuted edits survive
+   * reloads. The timer flushes when leaving the page.
+   */
+  $effect(() => {
+    // Track the input deeply; the snapshot is only the dependency.
+    JSON.stringify(playground.input ?? {});
+    untrack(() => {
+      clearTimeout(inputSaveTimer);
+      inputSaveTimer = setTimeout(
+        () => playground.persistNow(),
+        INPUT_SAVE_DELAY_MS,
+      );
+    });
+  });
+
+  onDestroy(() => {
+    clearTimeout(inputSaveTimer);
+    playground.persistNow();
+  });
+
   let tab = $state("input");
   let historyOpen = $state(false);
   let formRev = $state(0);
@@ -62,6 +90,7 @@
     isExecuting = true;
     playground.setOutput("");
 
+    const started = performance.now();
     try {
       tab = "output";
       const controller = new AbortController();
@@ -75,11 +104,15 @@
       });
 
       const data: unknown = await response.json();
-      playground.setOutput(JSON.stringify(data, null, 2));
+      const durationMs = Math.round(performance.now() - started);
+      playground.setOutput(JSON.stringify(data, null, 2), durationMs);
       playground.saveCurrentToHistory();
     } catch (error) {
       if (!(error instanceof Error && error.name === "AbortError")) {
-        playground.setOutput(JSON.stringify({ error: String(error) }, null, 2));
+        playground.setOutput(
+          JSON.stringify({ error: String(error) }, null, 2),
+          Math.round(performance.now() - started),
+        );
       }
     } finally {
       isExecuting = false;
@@ -153,7 +186,12 @@
   {:else}
     <MonacoEditor lang="json" value={playground.output} readOnly />
     <div class="mt-2 flex items-center justify-between gap-2">
-      <span class="text-xs text-content-muted">{playground.outputDate}</span>
+      <span class="text-xs text-content-muted">
+        {playground.outputDate}
+        {playground.durationMs !== null
+          ? ` · ${formatDurationMs(playground.durationMs)}`
+          : ""}
+      </span>
       <div class="flex gap-2">
         <Button size="sm" variant="ghost" onclick={() => void copyOutput()}>
           Copy output
