@@ -324,6 +324,49 @@ export class Store {
     );
   }
 
+  /**
+   * Add or update a custom header matched by name, like the old playground
+   * did. Names compare case-insensitively, so setting `Authorization` twice
+   * updates the value instead of duplicating the row. The header ends up
+   * enabled.
+   *
+   * @param name Header name sent on the wire.
+   * @param value Header value sent on the wire.
+   */
+  setHttpRpcHeader(name: string, value: string) {
+    const normalized = name.trim();
+    if (!normalized) return;
+    const target = normalized.toLowerCase();
+    const existing = this.settings.httpRpc.headers.find(
+      (header) => header.name.trim().toLowerCase() === target,
+    );
+    if (existing === undefined) {
+      headerCounter += 1;
+      this.settings.httpRpc = {
+        ...this.settings.httpRpc,
+        headers: [
+          ...this.settings.httpRpc.headers,
+          {
+            id: `header-${Date.now()}-${headerCounter}`,
+            name: normalized,
+            value,
+            enabled: true,
+            description: "",
+          },
+        ],
+      };
+      return;
+    }
+    this.settings.httpRpc = {
+      ...this.settings.httpRpc,
+      headers: this.settings.httpRpc.headers.map((header) =>
+        header === existing
+          ? { ...header, name: normalized, value, enabled: true }
+          : header,
+      ),
+    };
+  }
+
   /** Append a blank enabled header. */
   addHttpRpcHeader() {
     headerCounter += 1;

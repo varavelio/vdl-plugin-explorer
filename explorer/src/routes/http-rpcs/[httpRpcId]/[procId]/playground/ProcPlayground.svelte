@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { History, Loader, Trash, Zap } from "@lucide/svelte";
+  import { Copy, History, Loader, Trash, Zap } from "@lucide/svelte";
   import { Button, Heading, Tabs } from "@varavel/ui";
   import { untrack } from "svelte";
   import FormBuilder from "$lib/components/FormBuilder/FormBuilder.svelte";
@@ -13,6 +13,7 @@
   } from "$lib/store/httpRpcPlayground";
   import type { RichIrSchemaHttpRpcProc } from "$lib/store/ir/index";
   import HistoryDialog from "./HistoryDialog.svelte";
+  import OutputQuickActions from "./OutputQuickActions.svelte";
   import SnippetsPanel from "./SnippetsPanel.svelte";
 
   interface Props {
@@ -183,16 +184,20 @@
       Execute the procedure from the input tab to see the output.
     </p>
   {:else}
-    <MonacoEditor lang="json" value={playground.output} readOnly />
-    <div class="mt-2 flex items-center justify-between gap-2">
+    <div class="mb-2 flex items-center justify-between gap-2">
       <span class="text-xs text-content-muted">
         {playground.outputDate}
         {playground.durationMs !== null
-          ? ` · ${formatDurationMs(playground.durationMs)}`
+          ? ` • ${formatDurationMs(playground.durationMs)}`
           : ""}
       </span>
       <div class="flex gap-2">
-        <Button size="sm" variant="ghost" onclick={() => void copyOutput()}>
+        <Button
+          size="sm"
+          variant="ghost"
+          icon={Copy}
+          onclick={() => void copyOutput()}
+        >
           Copy output
         </Button>
         <Button
@@ -204,6 +209,10 @@
           Clear output
         </Button>
       </div>
+    </div>
+    <OutputQuickActions output={playground.output} />
+    <div class="mt-2">
+      <MonacoEditor lang="json" value={playground.output} readOnly />
     </div>
   {/if}
 {/snippet}
