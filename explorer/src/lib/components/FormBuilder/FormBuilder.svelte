@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { Braces, BrushCleaning, SquarePen } from "@lucide/svelte";
+  import { Braces, BrushCleaning, Copy, SquarePen } from "@lucide/svelte";
   import { Button, Heading } from "@varavel/ui";
+  import { clipboard } from "@varavel/ui/runtime";
   import type { EnumDef, Field, TypeDef } from "@varavel/vdl-plugin-sdk";
   import { untrack } from "svelte";
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
@@ -140,6 +141,18 @@
     innerRev += 1;
   }
 
+  /**
+   * Copy the current content with runtime toast feedback: the JSON text in
+   * JSON mode, or the pretty-printed value in form mode.
+   */
+  async function copyCurrent() {
+    await clipboard.copy(
+      store.ui.formEditorMode === "json"
+        ? jsonText
+        : JSON.stringify(value ?? {}, null, 2),
+    );
+  }
+
   let resetKeySnapshot = 0;
 
   $effect(() => {
@@ -189,6 +202,14 @@
       </div>
     </div>
     <div class="flex gap-2">
+      <Button
+        size="sm"
+        variant="ghost"
+        icon={Copy}
+        onclick={() => void copyCurrent()}
+      >
+        Copy
+      </Button>
       <Button size="sm" variant="ghost" icon={BrushCleaning} onclick={clearAll}>
         Clear
       </Button>

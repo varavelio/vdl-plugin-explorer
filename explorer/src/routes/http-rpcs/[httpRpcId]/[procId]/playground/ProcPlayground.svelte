@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { Copy, History, Loader, Trash, Zap } from "@lucide/svelte";
-  import { Button, Heading, Tabs } from "@varavel/ui";
-  import { clipboard } from "@varavel/ui/runtime";
+  import { BrushCleaning, Copy, History, Loader, Zap } from "@lucide/svelte";
+  import { Button, Heading, Kbd, Tabs } from "@varavel/ui";
+  import { clipboard, viewport } from "@varavel/ui/runtime";
   import { untrack } from "svelte";
+  import { browser } from "$app/environment";
   import FormBuilder from "$lib/components/FormBuilder/FormBuilder.svelte";
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
 
@@ -74,6 +75,11 @@
     });
   });
 
+  /**
+   * Show Cmd on Apple platforms and Ctrl elsewhere for the shortcut hint.
+   */
+  let isMac = $derived(browser && /mac/i.test(navigator.platform ?? ""));
+
   let tab = $state("input");
   let historyOpen = $state(false);
   let formRev = $state(0);
@@ -119,11 +125,24 @@
     }
   }
 
+  /**
+   * Execute from the input editors only. The output editors and the rest of
+   * the page keep their own keys, so a stray shortcut never fires a request.
+   *
+   * Runs on the capture phase because Monaco stops the keydown from bubbling
+   * out of its editors, which would otherwise swallow the shortcut.
+   */
   function handleKeydown(event: KeyboardEvent) {
-    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
-      event.preventDefault();
-      void executeProcedure();
+    if (event.key !== "Enter" || (!event.ctrlKey && !event.metaKey)) return;
+    const target = event.target;
+    if (
+      !(target instanceof HTMLElement) ||
+      target.closest("[data-playground-input]") === null
+    ) {
+      return;
     }
+    event.preventDefault();
+    void executeProcedure();
   }
 
   /**
@@ -136,41 +155,40 @@
 </script>
 
 {#snippet inputTab()}
-  {#if !playground.restored}
-    <p class="text-sm text-content-muted">Restoring the saved input…</p>
-  {:else if inputFields.length > 0}
-    <FormBuilder
-      fields={inputFields}
-      types={store.ir.types}
-      enums={store.ir.enums}
-      resetKey={formRev}
-      bind:value={playground.input}
-    />
-  {:else}
-    <p class="text-sm text-content-muted">
-      This procedure does not require any input.
-    </p>
-  {/if}
+  <div data-playground-input>
+    {#if !playground.restored}
+      <p class="text-sm text-content-muted">Restoring the saved input…</p>
+    {:else if inputFields.length > 0}
+      <FormBuilder
+        fields={inputFields}
+        types={store.ir.types}
+        enums={store.ir.enums}
+        resetKey={formRev}
+        bind:value={playground.input}
+      />
+    {:else}
+      <p class="text-sm text-content-muted">
+        This procedure does not require any input.
+      </p>
+    {/if}
 
-  <div class="mt-4 flex w-full justify-end gap-2">
-    <Button
-      size="sm"
-      variant="ghost"
-      icon={Trash}
-      disabled={isExecuting}
-      onclick={() => playground.clearInput()}
-    >
-      Clear input
-    </Button>
-    <Button
-      size="sm"
-      icon={isExecuting ? Loader : Zap}
-      loading={isExecuting}
-      disabled={isExecuting}
-      onclick={() => void executeProcedure()}
-    >
-      Execute procedure
-    </Button>
+    <div class="mt-4 flex w-full justify-end gap-2">
+      <Button
+        size="sm"
+        icon={isExecuting ? Loader : Zap}
+        loading={isExecuting}
+        disabled={isExecuting}
+        onclick={() => void executeProcedure()}
+      >
+        Execute procedure
+        {#if viewport.isDesktop}
+          <span class="ml-1 flex items-center gap-1">
+            <Kbd size="sm">{isMac ? "⌘" : "Ctrl"}</Kbd>
+            <Kbd size="sm">Enter</Kbd>
+          </span>
+        {/if}
+      </Button>
+    </div>
   </div>
 {/snippet}
 
@@ -202,15 +220,15 @@
           icon={Copy}
           onclick={() => void copyOutput()}
         >
-          Copy output
+          Copy
         </Button>
         <Button
           size="sm"
           variant="ghost"
-          icon={Trash}
+          icon={BrushCleaning}
           onclick={() => playground.clearOutput()}
         >
-          Clear output
+          Clear
         </Button>
       </div>
     </div>
@@ -221,7 +239,7 @@
   {/if}
 {/snippet}
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydowncapture={handleKeydown} />
 
 <div class="grid grid-cols-1 gap-6 desk:grid-cols-8">
   <section class="space-y-4 desk:col-span-5">
