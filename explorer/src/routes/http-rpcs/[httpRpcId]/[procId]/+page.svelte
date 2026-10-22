@@ -1,6 +1,13 @@
 <script lang="ts">
-  import { LayoutDashboard, NetworkIcon, ServerCog, Zap } from "@lucide/svelte";
-  import { Breadcrumbs } from "@varavel/ui";
+  import {
+    LayoutDashboard,
+    NetworkIcon,
+    PanelRightOpen,
+    ServerCog,
+    Zap,
+  } from "@lucide/svelte";
+  import { Breadcrumbs, Button, Tooltip } from "@varavel/ui";
+  import { viewport } from "@varavel/ui/runtime";
   import { tick } from "svelte";
   import { browser } from "$app/environment";
   import ErrorPage from "$lib/components/ErrorPage.svelte";
@@ -47,18 +54,42 @@
 {/if}
 
 {#if httpRpc && proc}
-  <Breadcrumbs
-    class="w-full p-4 bg-base-100 desk:sticky desk:top-0 desk:z-20"
-    items={[
-      { label: "Overview", icon: LayoutDashboard, href: "#/" },
-      { label: "HTTP RPC", icon: NetworkIcon },
-      { label: httpRpc.name, icon: ServerCog, href: httpRpc.urlPath },
-      {
-        label: proc.name,
-        icon: Zap,
-      },
-    ]}
-  />
+  <div class="w-full p-4 bg-base-100 gap-4 desk:sticky desk:top-0 desk:z-20">
+    <div
+      class={[
+        "w-full",
+        { "desk:pr-8": viewport.isDesktop && !store.ui.snippetsOpen },
+      ]}
+    >
+      <Breadcrumbs
+        class=""
+        items={[
+          { label: "Overview", icon: LayoutDashboard, href: "#/" },
+          { label: "HTTP RPC", icon: NetworkIcon },
+          { label: httpRpc.name, icon: ServerCog, href: httpRpc.urlPath },
+          {
+            label: proc.name,
+            icon: Zap,
+          },
+        ]}
+      />
+    </div>
+
+    {#if viewport.isDesktop && !store.ui.snippetsOpen}
+      <div class="absolute right-2 top-2">
+        <Tooltip content="Show code snippets" side="left">
+          <Button
+            size="sm"
+            variant="ghost"
+            square
+            icon={PanelRightOpen}
+            aria-label="Show code snippets"
+            onclick={() => store.setSnippetsOpen(true)}
+          />
+        </Tooltip>
+      </div>
+    {/if}
+  </div>
 
   <div class="p-4 pt-0">
     <HttpRpcProcNode httpRpcProc={proc} />

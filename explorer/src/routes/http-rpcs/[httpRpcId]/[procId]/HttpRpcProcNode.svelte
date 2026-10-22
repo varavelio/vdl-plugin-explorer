@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { PanelRightOpen } from "@lucide/svelte";
   import {
     Badge,
     Button,
@@ -7,10 +6,10 @@
     Dialog,
     Heading,
     Prose,
-    Tooltip,
   } from "@varavel/ui";
   import { theme as runtimeTheme, viewport } from "@varavel/ui/runtime";
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
+  import { fly } from "svelte/transition";
   import { buildHttpRpcProcUrl } from "$lib/helpers/http-rpc-url";
   import { interceptSourceCodeLinks } from "$lib/helpers/source-code-links";
   import { store } from "$lib/store";
@@ -211,6 +210,7 @@
   {#if viewport.isDesktop && snippetsOpen}
     <aside
       class="hidden desk:col-span-3 desk:block desk:sticky desk:top-15 desk:max-h-[calc(100dvh-10rem)] desk:overflow-y-auto"
+      in:fly={{ duration: 200 }}
     >
       <SnippetsPanel
         {endpoint}
@@ -221,22 +221,6 @@
     </aside>
   {/if}
 </div>
-
-{#if viewport.isDesktop && !snippetsOpen}
-  <div class="fixed top-16 right-6 z-30">
-    <Tooltip content="Show code snippets" side="left">
-      <Button
-        size="sm"
-        variant="ghost"
-        square
-        class="bg-base-100 shadow-md"
-        icon={PanelRightOpen}
-        aria-label="Show code snippets"
-        onclick={toggleSnippets}
-      />
-    </Tooltip>
-  </div>
-{/if}
 
 {#if !viewport.isDesktop}
   <Dialog bind:open={snippetsModalOpen}>
