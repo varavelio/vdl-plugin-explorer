@@ -1,7 +1,10 @@
 <script lang="ts">
   import { History, Trash } from "@lucide/svelte";
   import { Button, CodeBlock, Dialog } from "@varavel/ui";
-  import type { ProcPlaygroundState } from "$lib/store/httpRpcPlayground";
+  import {
+    formatDurationMs,
+    type ProcPlaygroundState,
+  } from "$lib/store/httpRpcPlayground";
 
   interface Props {
     /** Playground owning the history entries. */
@@ -61,8 +64,20 @@
               class="flex w-full items-center justify-between gap-2 rounded-lg border border-base-300 px-3 py-2 text-left hover:bg-base-200"
               onclick={() => (selected = index)}
             >
-              <span class="text-sm font-medium">{item.date}</span>
-              <span class="text-xs text-content-muted">View details</span>
+              <span class="min-w-0 flex-1">
+                <span class="block truncate font-mono text-xs">
+                  {item.url || "(unknown url)"}
+                </span>
+                <span class="mt-0.5 block text-xs text-content-muted">
+                  {item.date}
+                  {item.durationMs !== null
+                    ? ` · ${formatDurationMs(item.durationMs)}`
+                    : ""}
+                </span>
+              </span>
+              <span class="shrink-0 text-xs text-content-muted">
+                View details
+              </span>
             </button>
           </li>
         {/each}
@@ -71,6 +86,25 @@
   {:else if playground.history[selected]}
     {@const item = playground.history[selected]}
     <div class="space-y-4">
+      <div>
+        <p class="text-sm font-medium">URL</p>
+        <p class="mt-1 font-mono text-xs break-all">
+          {item.url || "(unknown url)"}
+        </p>
+        {#if item.durationMs !== null}
+          <p class="mt-1 text-xs text-content-muted">
+            Took{formatDurationMs(item.durationMs)}
+          </p>
+        {/if}
+      </div>
+      {#if Object.keys(item.headers).length > 0}
+        <CodeBlock
+          rawCode={JSON.stringify(item.headers, null, 2)}
+          title="Headers"
+          fileName="headers.json"
+          scrollY={true}
+        />
+      {/if}
       <CodeBlock
         rawCode={item.input}
         title="Input"

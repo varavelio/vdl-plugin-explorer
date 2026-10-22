@@ -106,7 +106,11 @@
       const data: unknown = await response.json();
       const durationMs = Math.round(performance.now() - started);
       playground.setOutput(JSON.stringify(data, null, 2), durationMs);
-      playground.saveCurrentToHistory();
+      playground.saveCurrentToHistory({
+        url: endpoint,
+        headers: requestHeaders,
+        durationMs,
+      });
     } catch (error) {
       if (!(error instanceof Error && error.name === "AbortError")) {
         playground.setOutput(

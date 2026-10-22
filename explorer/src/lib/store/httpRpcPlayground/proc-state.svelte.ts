@@ -12,6 +12,12 @@ export type ProcHistoryItem = {
   output: string;
   /** ISO timestamp of the execution. */
   date: string;
+  /** Procedure endpoint the request was sent to. */
+  url: string;
+  /** Request headers sent with the execution. */
+  headers: Record<string, string>;
+  /** Duration of the execution in milliseconds, if any. */
+  durationMs: number | null;
 };
 
 /**
@@ -40,6 +46,37 @@ const snapshotStore = browser
       storeName: "procedures",
     })
   : null;
+
+/**
+ * Check for a plain JSON object.
+ */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Normalize a persisted history entry, defaulting fields added after the
+ * entry was stored.
+ */
+function normalizeHistoryItem(value: unknown): ProcHistoryItem {
+  const record = isRecord(value) ? value : {};
+  const text = (field: unknown) => (typeof field === "string" ? field : "");
+  const headers: Record<string, string> = {};
+  if (isRecord(record.headers)) {
+    for (const [name, headerValue] of Object.entries(record.headers)) {
+      if (typeof headerValue === "string") headers[name] = headerValue;
+    }
+  }
+  return {
+    input: text(record.input),
+    output: text(record.output),
+    date: text(record.date),
+    url: text(record.url),
+    headers,
+    durationMs:
+      typeof record.durationMs === "number" ? record.durationMs : null,
+  };
+}
 
 /**
  * Format a duration for the output header.
@@ -113,7 +150,9 @@ export class ProcPlaygroundState {
         this.output = snapshot.output ?? "";
         this.outputDate = snapshot.outputDate ?? "";
         this.durationMs = snapshot.durationMs ?? null;
-        this.history = snapshot.history ?? [];
+        this.history = Array.isArray(snapshot.history)
+          ? snapshot.history.map(normalizeHistoryItem)
+          : [];
       }
     } catch {
       // Corrupt snapshots are ignored in favor of a blank playground.
@@ -137,12 +176,21 @@ export class ProcPlaygroundState {
 
   /**
    * Record the current input and output at the top of the history.
+   *
+   * @param meta Execution metadata stored with the entry.
    */
-  saveCurrentToHistory(): void {
+  saveCurrentToHistory(meta: {
+    url: string;
+    headers: Record<string, string>;
+    durationMs: number | null;
+  }): void {
     this.history.unshift({
       input: JSON.stringify(this.input ?? {}, null, 2),
       output: this.output,
       date: new Date().toISOString(),
+      url: meta.url,
+      headers: { ...meta.headers },
+      durationMs: meta.durationMs,
     });
 
     while (this.history.length > HISTORY_LIMIT) {
