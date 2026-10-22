@@ -6,14 +6,14 @@
     "-": "Run commands using the root's Taskfile.yml file"
   },
   "devDependencies": {
-    "@internationalized/date": "3.12.0",
+    "@internationalized/date": "3.12.4",
     "@lucide/svelte": "1.59.0",
     "@monaco-editor/loader": "1.7.0",
     "@sveltejs/adapter-static": "3.0.10",
     "@sveltejs/kit": "2.57.1",
     "@sveltejs/vite-plugin-svelte": "7.3.1",
     "@tailwindcss/vite": "4.3.3",
-    "@varavel/ui": "0.1.11",
+    "@varavel/ui": "0.2.1",
     "@varavel/vdl-plugin-sdk": "0.6.0",
     "dompurify": "3.4.17",
     "localforage": "1.10.0",
