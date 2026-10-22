@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { BrushCleaning, Copy, History, Loader, Zap } from "@lucide/svelte";
+  import {
+    BrushCleaning,
+    CodeXml,
+    Copy,
+    History,
+    Loader,
+    Zap,
+  } from "@lucide/svelte";
   import { Button, Heading, Kbd, Tabs, Tooltip } from "@varavel/ui";
   import { clipboard, viewport } from "@varavel/ui/runtime";
   import { untrack } from "svelte";
@@ -7,50 +14,30 @@
   import FormBuilder from "$lib/components/FormBuilder/FormBuilder.svelte";
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
 
-  import { buildHttpRpcProcUrl } from "$lib/helpers/http-rpc-url";
   import { store } from "$lib/store";
   import {
     formatDurationMs,
-    ProcPlaygroundState,
+    type ProcPlaygroundState,
   } from "$lib/store/httpRpcPlayground";
   import type { RichIrSchemaHttpRpcProc } from "$lib/store/ir/index";
   import HistoryDialog from "./HistoryDialog.svelte";
   import OutputQuickActions from "./OutputQuickActions.svelte";
-  import SnippetsPanel from "./SnippetsPanel.svelte";
 
   interface Props {
     /** Procedure executed by this playground. */
     proc: RichIrSchemaHttpRpcProc;
+    /** Shared state, also feeding the snippets aside. */
+    playground: ProcPlaygroundState;
+    /** Full procedure URL for requests and snippets. */
+    endpoint: string;
+    /** Headers sent with every request. */
+    requestHeaders: Record<string, string>;
+    /** Open the snippets modal on mobile. */
+    onSnippetsToggle: () => void;
   }
 
-  let { proc }: Props = $props();
-
-  let playground = $derived(
-    new ProcPlaygroundState(proc.httpRpcName, proc.name),
-  );
-
-  let endpoint = $derived.by(() => {
-    return buildHttpRpcProcUrl(
-      store.selectedHttpRpcBaseUrl,
-      proc.httpRpcName,
-      proc.name,
-    );
-  });
-
-  /**
-   * Request headers merging the JSON defaults with the enabled custom
-   * headers, which win on name matches like the old playground did.
-   */
-  let requestHeaders = $derived.by(() => {
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-    for (const header of store.enabledHttpRpcHeaders) {
-      headers[header.name.trim()] = header.value;
-    }
-    return headers;
-  });
+  let { proc, playground, endpoint, requestHeaders, onSnippetsToggle }: Props =
+    $props();
 
   let inputFields = $derived(
     proc.sourceIr.typeRef.kind === "object"
@@ -252,10 +239,20 @@
   </span>
 {/snippet}
 
-<div class="grid grid-cols-1 gap-6 desk:grid-cols-8">
-  <section class="space-y-4 desk:col-span-5">
-    <div class="flex items-center justify-between gap-2">
-      <Heading level="2" size="lg">Try it out</Heading>
+<section class="space-y-4">
+  <div class="flex items-center justify-between gap-2">
+    <Heading level="2" size="2xl">Try it out</Heading>
+    <div class="flex items-center gap-2">
+      {#if !viewport.isDesktop}
+        <Button
+          size="sm"
+          variant="outline"
+          icon={CodeXml}
+          onclick={onSnippetsToggle}
+        >
+          Snippets
+        </Button>
+      {/if}
       <Button
         size="sm"
         variant="outline"
@@ -265,24 +262,16 @@
         History
       </Button>
     </div>
+  </div>
 
-    <Tabs
-      items={[
-        { value: "input", label: "Input", content: inputTab },
-        { value: "output", label: "Output", content: outputTab },
-      ]}
-      bind:value={tab}
-    />
-  </section>
-
-  <aside class="desk:col-span-3">
-    <SnippetsPanel
-      {endpoint}
-      input={playground.input}
-      headers={requestHeaders}
-    />
-  </aside>
-</div>
+  <Tabs
+    items={[
+      { value: "input", label: "Input", content: inputTab },
+      { value: "output", label: "Output", content: outputTab },
+    ]}
+    bind:value={tab}
+  />
+</section>
 
 <HistoryDialog
   {playground}

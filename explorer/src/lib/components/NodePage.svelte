@@ -1,36 +1,23 @@
 <script lang="ts">
   import { Badge, CodeBlock, Dialog, Heading, Prose } from "@varavel/ui";
   import { theme as runtimeTheme } from "@varavel/ui/runtime";
+  import { interceptSourceCodeLinks } from "$lib/helpers/source-code-links";
   import { store } from "$lib/store";
   import type { SourceCode, SourceCodeReference } from "$lib/store/ir/index";
-  import { INTERNAL_IR_LINK_CLASS } from "$lib/store/ir/shiki-links-transformer";
 
   type SourceCodeDialog = SourceCodeReference & {
     key: string;
     open: boolean;
   };
 
-  const INTERNAL_SOURCE_LINK_SELECTOR = `a.${INTERNAL_IR_LINK_CLASS}[href]`;
-
   interface Props {
     title: string;
     sourceCode?: SourceCode;
-    httpRpcInputSourceCode?: SourceCode;
-    httpRpcOutputSourceCode?: SourceCode;
-    httpRpcProcUrl?: string;
     tags?: string[];
     htmlDoc?: string;
   }
 
-  let {
-    title,
-    tags = [],
-    htmlDoc,
-    sourceCode,
-    httpRpcInputSourceCode,
-    httpRpcOutputSourceCode,
-    httpRpcProcUrl,
-  }: Props = $props();
+  let { title, tags = [], htmlDoc, sourceCode }: Props = $props();
 
   function pickSourceCode(code?: SourceCode) {
     if (!code) return undefined;
@@ -41,12 +28,6 @@
   }
 
   let hlSourceCode = $derived(pickSourceCode(sourceCode));
-  let hlHttpRpcInputSourceCode = $derived(
-    pickSourceCode(httpRpcInputSourceCode),
-  );
-  let hlHttpRpcOutputSourceCode = $derived(
-    pickSourceCode(httpRpcOutputSourceCode),
-  );
 
   let sourceCodeDialogKey = 0;
   let sourceCodeDialogStack = $state<SourceCodeDialog[]>([]);
@@ -76,32 +57,10 @@
     ];
   }
 
-  function handleSourceCodeLinkClick(event: MouseEvent) {
-    if (!(event.target instanceof Element)) return;
-
-    const link = event.target.closest(INTERNAL_SOURCE_LINK_SELECTOR);
-    if (!(link instanceof HTMLAnchorElement)) return;
-
-    const href = link.getAttribute("href");
-    if (!href) return;
-
-    const reference = sourceReferencesByHref.get(href);
-    if (!reference) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    openSourceCodeDialog(reference);
-  }
-
-  function _interceptSourceCodeLinks(node: HTMLElement) {
-    node.addEventListener("click", handleSourceCodeLinkClick);
-
-    return {
-      destroy() {
-        node.removeEventListener("click", handleSourceCodeLinkClick);
-      },
-    };
-  }
+  let linkParams = $derived({
+    references: sourceReferencesByHref,
+    onOpen: openSourceCodeDialog,
+  });
 </script>
 
 <div class="space-y-10.75">
@@ -116,16 +75,6 @@
           {/each}
         </div>
       </div>
-
-      {#if httpRpcProcUrl}
-        <CodeBlock
-          rawCode={httpRpcProcUrl}
-          title="Endpoint"
-          showDownload={false}
-          showLoc={false}
-          bordered
-        />
-      {/if}
     </div>
 
     {#if htmlDoc}
@@ -136,42 +85,12 @@
   {#if sourceCode}
     <section class="space-y-6">
       <Heading level="2" size="2xl">Source</Heading>
-      <div use:_interceptSourceCodeLinks>
+      <div use:interceptSourceCodeLinks={linkParams}>
         <CodeBlock
           rawCode={sourceCode.raw}
           highlightedHtml={hlSourceCode}
           title="VDL"
           fileName="source.vdl"
-          bordered
-        />
-      </div>
-    </section>
-  {/if}
-
-  {#if httpRpcInputSourceCode}
-    <section class="space-y-6">
-      <Heading level="2" size="2xl">Input</Heading>
-      <div use:_interceptSourceCodeLinks>
-        <CodeBlock
-          rawCode={httpRpcInputSourceCode.raw}
-          highlightedHtml={hlHttpRpcInputSourceCode}
-          title="VDL"
-          fileName="input.vdl"
-          bordered
-        />
-      </div>
-    </section>
-  {/if}
-
-  {#if httpRpcOutputSourceCode}
-    <section class="space-y-6">
-      <Heading level="2" size="2xl">Output</Heading>
-      <div use:_interceptSourceCodeLinks>
-        <CodeBlock
-          rawCode={httpRpcOutputSourceCode.raw}
-          highlightedHtml={hlHttpRpcOutputSourceCode}
-          title="VDL"
-          fileName="output.vdl"
           bordered
         />
       </div>
@@ -186,7 +105,7 @@
     title={dialog.title}
     description={`Source for ${dialog.kind} reference`}
   >
-    <div use:_interceptSourceCodeLinks>
+    <div use:interceptSourceCodeLinks={linkParams}>
       <CodeBlock
         rawCode={dialog.sourceCode.raw}
         highlightedHtml={pickSourceCode(dialog.sourceCode)}

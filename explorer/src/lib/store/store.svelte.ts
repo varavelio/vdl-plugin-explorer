@@ -92,6 +92,8 @@ export type StoreUi = {
   formEditorMode: FormEditorMode;
   /** Code snippet language selected in the playground. */
   snippetLang: string;
+  /** Whether the desktop code snippets aside is visible. */
+  snippetsOpen: boolean;
 };
 
 /**
@@ -155,6 +157,10 @@ function validateUi(persisted: unknown, fallback: StoreUi): StoreUi {
     formEditorMode:
       record.formEditorMode === "json" ? "json" : fallback.formEditorMode,
     snippetLang,
+    snippetsOpen:
+      typeof record.snippetsOpen === "boolean"
+        ? record.snippetsOpen
+        : fallback.snippetsOpen,
   };
 }
 
@@ -254,7 +260,11 @@ export class Store {
   /**
    * Typed persisted UI preferences.
    */
-  ui: StoreUi = $state({ formEditorMode: "form", snippetLang: "Curl" });
+  ui: StoreUi = $state({
+    formEditorMode: "form",
+    snippetLang: "Curl",
+    snippetsOpen: true,
+  });
 
   /**
    * Base URLs configured through the `httpRpcBaseUrl` plugin option.
@@ -313,6 +323,16 @@ export class Store {
   setFormEditorMode(mode: FormEditorMode) {
     if (this.ui.formEditorMode === mode) return;
     this.ui = { ...this.ui, formEditorMode: mode };
+  }
+
+  /**
+   * Show or hide the desktop code snippets aside, shared by every proc page.
+   *
+   * @param open Whether the aside is visible.
+   */
+  setSnippetsOpen(open: boolean) {
+    if (this.ui.snippetsOpen === open) return;
+    this.ui = { ...this.ui, snippetsOpen: open };
   }
 
   /**

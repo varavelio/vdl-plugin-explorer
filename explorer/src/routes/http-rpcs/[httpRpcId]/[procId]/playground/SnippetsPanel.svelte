@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { CodeBlock, Heading, Select } from "@varavel/ui";
+  import { PanelRightClose } from "@lucide/svelte";
+  import { Button, CodeBlock, Heading, Select, Tooltip } from "@varavel/ui";
   import { theme as runtimeTheme } from "@varavel/ui/runtime";
   import { onMount } from "svelte";
   import { SNIPPET_LANGS } from "$lib/helpers/code-snippets";
@@ -14,9 +15,11 @@
     input: unknown;
     /** Extra headers merged over the JSON defaults. */
     headers?: Record<string, string>;
+    /** Close handler; when omitted no close button renders. */
+    onClose?: () => void;
   }
 
-  let { endpoint, input, headers = {} }: Props = $props();
+  let { endpoint, input, headers = {}, onClose }: Props = $props();
 
   let converter: CurlConverter | null = $state(null);
   let converterFailed = $state(false);
@@ -71,7 +74,21 @@
 </script>
 
 <div class="space-y-4">
-  <Heading level="2" size="lg">Code snippets</Heading>
+  <div class="flex items-center justify-between gap-2">
+    <Heading level="2" size="lg">Code snippets</Heading>
+    {#if onClose}
+      <Tooltip content="Hide code snippets" side="top">
+        <Button
+          size="sm"
+          variant="ghost"
+          square
+          icon={PanelRightClose}
+          aria-label="Hide code snippets"
+          onclick={onClose}
+        />
+      </Tooltip>
+    {/if}
+  </div>
 
   <Select
     label="Language"
@@ -94,5 +111,6 @@
     title={selected.label}
     fileName={`request.${selected.extension}`}
     scrollY={true}
+    wrapperClass="max-h-[60dvh]"
   />
 </div>

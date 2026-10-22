@@ -7,7 +7,6 @@
   import { store } from "$lib/store";
   import type { PageProps } from "./$types";
   import HttpRpcProcNode from "./HttpRpcProcNode.svelte";
-  import ProcPlayground from "./playground/ProcPlayground.svelte";
 
   let { params }: PageProps = $props();
 
@@ -61,8 +60,7 @@
     ]}
   />
 
-  <div class="space-y-8 p-4 pt-0">
+  <div class="p-4 pt-0">
     <HttpRpcProcNode httpRpcProc={proc} />
-    <ProcPlayground {proc} />
   </div>
 {/if}
