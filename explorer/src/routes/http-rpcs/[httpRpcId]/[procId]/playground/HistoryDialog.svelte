@@ -18,72 +18,92 @@
   let { playground, open = $bindable(false), onRestored }: Props = $props();
 
   let selected = $state(null as number | null);
+  let entryOpen = $state(false);
+
+  function openEntry(index: number) {
+    selected = index;
+    entryOpen = true;
+  }
 
   $effect(() => {
-    if (!open) selected = null;
+    if (!open) {
+      selected = null;
+      entryOpen = false;
+    }
+  });
+
+  $effect(() => {
+    if (!entryOpen) selected = null;
   });
 
   function removeSelected() {
     if (selected === null) return;
     playground.deleteHistoryItem(selected);
-    selected = null;
+    entryOpen = false;
   }
 </script>
 
 <Dialog
   bind:open
   size="md"
-  title={selected === null ? "Request history" : "History entry"}
-  description={selected === null
-    ? "Past executions of this procedure."
-    : (playground.history[selected]?.date ?? "")}
+  title="Request history"
+  description="Past executions of this procedure."
 >
-  {#if selected === null}
-    {#if playground.history.length === 0}
-      <div class="flex flex-col items-center gap-2 py-8 text-center">
-        <History class="size-8 text-content-muted" />
-        <p class="text-sm text-content-muted">No history available</p>
-      </div>
-    {:else}
-      <div class="mb-4">
-        <Button
-          size="sm"
-          variant="ghost"
-          icon={Trash}
-          onclick={() => playground.clearHistory()}
-        >
-          Clear all history ({playground.history.length})
-        </Button>
-      </div>
+  {#if playground.history.length === 0}
+    <div class="flex flex-col items-center gap-2 py-8 text-center">
+      <History class="size-8 text-content-muted" />
+      <p class="text-sm text-content-muted">No history available</p>
+    </div>
+  {:else}
+    <div class="mb-4">
+      <Button
+        size="sm"
+        variant="ghost"
+        icon={Trash}
+        onclick={() => playground.clearHistory()}
+      >
+        Clear all history ({playground.history.length})
+      </Button>
+    </div>
 
-      <ul class="max-h-[50dvh] space-y-2 overflow-y-auto">
-        {#each playground.history as item, index (item.date + index)}
-          <li>
-            <button
-              type="button"
-              class="flex w-full items-center justify-between gap-2 rounded-lg border border-base-300 px-3 py-2 text-left hover:bg-base-200"
-              onclick={() => (selected = index)}
-            >
-              <span class="min-w-0 flex-1">
-                <span class="block truncate font-mono text-xs">
-                  {item.url || "(unknown url)"}
-                </span>
-                <span class="mt-0.5 block text-xs text-content-muted">
-                  {item.date}
-                  {item.durationMs !== null
-                    ? ` · ${formatDurationMs(item.durationMs)}`
-                    : ""}
-                </span>
+    <ul class="max-h-[50dvh] space-y-2 overflow-y-auto">
+      {#each playground.history as item, index (item.date + index)}
+        <li>
+          <button
+            type="button"
+            class="flex w-full items-center justify-between gap-2 rounded-lg border border-base-300 px-3 py-2 text-left hover:bg-base-200"
+            onclick={() => openEntry(index)}
+          >
+            <span class="min-w-0 flex-1">
+              <span class="block truncate font-mono text-xs">
+                {item.url || "(unknown url)"}
               </span>
-              <span class="shrink-0 text-xs text-content-muted">
-                View details
+              <span class="mt-0.5 block text-xs text-content-muted">
+                {item.date}
+                {item.durationMs !== null
+                  ? ` · ${formatDurationMs(item.durationMs)}`
+                  : ""}
               </span>
-            </button>
-          </li>
-        {/each}
-      </ul>
-    {/if}
-  {:else if playground.history[selected]}
+            </span>
+            <span class="shrink-0 text-xs text-content-muted">
+              View details
+            </span>
+          </button>
+        </li>
+      {/each}
+    </ul>
+  {/if}
+</Dialog>
+
+<Dialog
+  bind:open={entryOpen}
+  size="md"
+  title="History entry"
+  description={selected !== null
+    ? (playground.history[selected]?.date ?? "")
+    : ""}
+>
+  {#if selected !== null && playground.history[selected]}
     {@const item = playground.history[selected]}
     <div class="space-y-4">
       <div>
@@ -132,13 +152,13 @@
               JSON.parse(item.input) as Record<string, unknown>,
             );
             onRestored?.();
-            selected = null;
+            entryOpen = false;
             open = false;
           }}
         >
           Restore input
         </Button>
-        <Button size="sm" variant="ghost" onclick={() => (selected = null)}>
+        <Button size="sm" variant="ghost" onclick={() => (entryOpen = false)}>
           Back
         </Button>
         <Button size="sm" variant="ghost" icon={Trash} onclick={removeSelected}>

@@ -113,11 +113,19 @@
         durationMs,
       });
     } catch (error) {
+      // Cancelled requests stay out of the history; every other failure is
+      // recorded like a success so the request can be inspected later.
       if (!(error instanceof Error && error.name === "AbortError")) {
+        const durationMs = Math.round(performance.now() - started);
         playground.setOutput(
           JSON.stringify({ error: String(error) }, null, 2),
-          Math.round(performance.now() - started),
+          durationMs,
         );
+        playground.saveCurrentToHistory({
+          url: endpoint,
+          headers: requestHeaders,
+          durationMs,
+        });
       }
     } finally {
       isExecuting = false;
