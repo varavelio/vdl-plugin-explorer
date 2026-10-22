@@ -188,7 +188,7 @@
       Execute the procedure from the input tab to see the output.
     </p>
   {:else}
-    <div class="mb-2 flex items-center justify-between gap-2">
+    <div class="flex items-center justify-between gap-2">
       <span class="text-xs text-content-muted">
         {playground.outputDate}
         {playground.durationMs !== null
@@ -215,7 +215,7 @@
       </div>
     </div>
     <OutputQuickActions output={playground.output} />
-    <div class="mt-2">
+    <div class="mt-4">
       <MonacoEditor lang="json" value={playground.output} readOnly />
     </div>
   {/if}

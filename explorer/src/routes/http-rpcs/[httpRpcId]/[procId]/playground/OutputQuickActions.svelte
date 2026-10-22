@@ -41,7 +41,7 @@
 
 {#if tokens.length > 0}
   <div
-    class="mt-2 flex items-center justify-between gap-3 border-t border-base-300 pt-2"
+    class="mt-4 flex items-center justify-between gap-3 border-t border-base-300 pt-4"
   >
     <span class="flex shrink-0 items-center gap-1 text-xs font-semibold">
       <Sparkles class="size-3" />
@@ -51,6 +51,24 @@
     <div class="min-w-0 flex-1 overflow-x-auto">
       <div class="flex w-max min-w-full items-center justify-end gap-1">
         {#each tokens as token (token.path)}
+          {#snippet bearerLabel()}
+            <span class="flex-1">
+              Set as header
+              <code class="rounded bg-base-300 px-1 py-px font-mono text-xs">
+                Authorization: Bearer &lt;token&gt;
+              </code>
+            </span>
+          {/snippet}
+
+          {#snippet rawLabel()}
+            <span class="flex-1">
+              Set as header
+              <code class="rounded bg-base-300 px-1 py-px font-mono text-xs">
+                Authorization: &lt;token&gt;
+              </code>
+            </span>
+          {/snippet}
+
           <Menu
             size="sm"
             variant="ghost"
@@ -66,12 +84,12 @@
                 onSelect: () => void copyToken(token.value),
               },
               {
-                label: "Set as Authorization: Bearer <token> header",
+                label: bearerLabel,
                 icon: authItemIcon,
                 onSelect: () => setAuthHeader(token.value, true),
               },
               {
-                label: "Set as Authorization: <token> header",
+                label: rawLabel,
                 icon: authItemIcon,
                 onSelect: () => setAuthHeader(token.value, false),
               },
