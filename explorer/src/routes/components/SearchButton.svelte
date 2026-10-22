@@ -275,7 +275,7 @@
             >
               {#if result.kind === "doc"}
                 <BookOpenText class="size-4" />
-              {:else if result.kind === "rpc"}
+              {:else if result.kind === "httpRpc"}
                 <NetworkIcon class="size-4" />
               {:else if result.kind === "procedure"}
                 <Zap class="size-4" />

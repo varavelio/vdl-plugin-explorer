@@ -36,7 +36,7 @@ export const EMPTY_IR: IrSchema = {
  */
 export const EMPTY_RICH_IR: RichIrSchema = {
   entryPoint: "",
-  rpcs: [],
+  httpRpcs: [],
   types: [],
   enums: [],
   constants: [],
@@ -61,14 +61,14 @@ export type RichIrSchemaType = IrSchema["types"][number] & {
 };
 
 /**
- * Enriched RPC procedure entry derived from a `@proc` field inside an `@httpRpc` type.
+ * Enriched HTTP RPC procedure entry derived from a `@proc` field inside an `@httpRpc` type.
  */
-export type RichIrSchemaRpcProc = Field & {
+export type RichIrSchemaHttpRpcProc = Field & {
   id: string;
   urlPath: string;
-  rpcId: string;
-  rpcUrlPath: string;
-  rpcName: string;
+  httpRpcId: string;
+  httpRpcUrlPath: string;
+  httpRpcName: string;
   /** The procedure field doc converted from markdown to HTML. */
   htmlDoc?: string;
   /** Highlighted VDL snippet for the procedure input when present. */
@@ -80,19 +80,19 @@ export type RichIrSchemaRpcProc = Field & {
 };
 
 /**
- * Enriched RPC service entry derived from a type annotated with `@httpRpc`.
+ * Enriched HTTP RPC service entry derived from a type annotated with `@httpRpc`.
  */
-export type RichIrSchemaRpc = {
+export type RichIrSchemaHttpRpc = {
   id: string;
   name: string;
   urlPath: string;
-  /** The top-level RPC doc converted from markdown to HTML. */
+  /** The top-level HTTP RPC doc converted from markdown to HTML. */
   htmlDoc?: string;
-  /** The canonical source code for this RPC without the top-level docstring. */
+  /** The canonical source code for this HTTP RPC without the top-level docstring. */
   sourceCode: SourceCode;
   /** The original IR node */
   sourceIr: IrSchema["types"][number];
-  procs: RichIrSchemaRpcProc[];
+  procs: RichIrSchemaHttpRpcProc[];
 };
 
 /**
@@ -152,7 +152,7 @@ export type RichIrSchemaDoc = IrSchema["docs"][number] & {
  */
 export type RichIrSchema = {
   entryPoint: string;
-  rpcs: RichIrSchemaRpc[];
+  httpRpcs: RichIrSchemaHttpRpc[];
   types: RichIrSchemaType[];
   enums: RichIrSchemaEnum[];
   constants: RichIrSchemaConstant[];

@@ -2,15 +2,10 @@
   import { CodeBlock, Heading, Label } from "@varavel/ui";
   import { theme as runtimeTheme } from "@varavel/ui/runtime";
   import { onMount } from "svelte";
+  import { SNIPPET_LANGS, type SnippetLang } from "$lib/helpers/code-snippets";
   import { highlightSnippet } from "$lib/shiki/shiki.svelte";
   import { store } from "$lib/store";
-  import {
-    buildCurl,
-    type CurlConverter,
-    loadCurlConverter,
-    SNIPPET_LANGS,
-    type SnippetLang,
-  } from "./curl";
+  import { buildCurl, type CurlConverter, loadCurlConverter } from "./curl";
 
   interface Props {
     /** Procedure URL the snippets target. */
@@ -88,10 +83,10 @@
   }
 
   let code = $derived.by(() => {
-    if (!selected.converter) return curl;
+    if (!selected.curlConverter) return curl;
     if (!converter) return curl;
     try {
-      const convert = converter[selected.converter];
+      const convert = converter[selected.curlConverter];
       if (typeof convert !== "function") return curl;
       return convert(curl);
     } catch {

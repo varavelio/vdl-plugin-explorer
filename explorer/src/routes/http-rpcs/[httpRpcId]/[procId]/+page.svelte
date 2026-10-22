@@ -4,30 +4,30 @@
   import { tick } from "svelte";
   import { browser } from "$app/environment";
   import ErrorPage from "$lib/components/ErrorPage.svelte";
-  import ProcPlayground from "$lib/httpRpc/playground/ProcPlayground.svelte";
   import { store } from "$lib/store";
   import type { PageProps } from "./$types";
-  import RpcProcNode from "./RpcProcNode.svelte";
+  import HttpRpcProcNode from "./HttpRpcProcNode.svelte";
+  import ProcPlayground from "./playground/ProcPlayground.svelte";
 
   let { params }: PageProps = $props();
 
-  let rpc = $derived.by(() => {
-    if (!params.rpcId) return;
-    return store.ir.rpcs.find((entry) => entry.id === params.rpcId);
+  let httpRpc = $derived.by(() => {
+    if (!params.httpRpcId) return;
+    return store.ir.httpRpcs.find((entry) => entry.id === params.httpRpcId);
   });
 
   let proc = $derived.by(() => {
-    if (!rpc || !params.procId) return;
-    return rpc.procs.find((entry) => entry.id === params.procId);
+    if (!httpRpc || !params.procId) return;
+    return httpRpc.procs.find((entry) => entry.id === params.procId);
   });
 
   let pageTitle = $derived.by(() => {
-    if (!rpc || !proc) return "Not Found";
-    return `${proc.name} | ${rpc.name} | HTTP RPC`;
+    if (!httpRpc || !proc) return "Not Found";
+    return `${proc.name} | ${httpRpc.name} | HTTP RPC`;
   });
 
   $effect(() => {
-    params.rpcId;
+    params.httpRpcId;
     params.procId;
 
     if (!browser) return;
@@ -43,17 +43,17 @@
   <title>{pageTitle} | VDL Explorer</title>
 </svelte:head>
 
-{#if !rpc || !proc}
+{#if !httpRpc || !proc}
   <ErrorPage />
 {/if}
 
-{#if rpc && proc}
+{#if httpRpc && proc}
   <Breadcrumbs
     class="w-full p-4 bg-base-100 desk:sticky desk:top-0 desk:z-20"
     items={[
       { label: "Overview", icon: LayoutDashboard, href: "#/" },
       { label: "HTTP RPC", icon: NetworkIcon },
-      { label: rpc.name, icon: ServerCog, href: rpc.urlPath },
+      { label: httpRpc.name, icon: ServerCog, href: httpRpc.urlPath },
       {
         label: proc.name,
         icon: Zap,
@@ -62,7 +62,7 @@
   />
 
   <div class="space-y-8 p-4 pt-0">
-    <RpcProcNode rpcProc={proc} />
+    <HttpRpcProcNode httpRpcProc={proc} />
     <ProcPlayground {proc} />
   </div>
 {/if}

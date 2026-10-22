@@ -24,7 +24,7 @@ const SUMMARY_LIMIT = 180;
  */
 export type SearchResultKind =
   | "doc"
-  | "rpc"
+  | "httpRpc"
   | "procedure"
   | "type"
   | "enum"
@@ -191,16 +191,25 @@ function createSearchDocuments(): SearchDocument[] {
   }));
 
   const types = store.ir.types.map((typeDef) => createTypeDocument(typeDef));
-  const rpcs = store.ir.rpcs.map((rpc) => createRpcDocument(rpc));
-  const rpcProcs = store.ir.rpcs.flatMap((rpc) =>
-    rpc.procs.map((proc) => createRpcProcDocument(proc)),
+  const httpRpcs = store.ir.httpRpcs.map((httpRpc) =>
+    createHttpRpcDocument(httpRpc),
+  );
+  const httpRpcProcs = store.ir.httpRpcs.flatMap((httpRpc) =>
+    httpRpc.procs.map((proc) => createHttpRpcProcDocument(proc)),
   );
   const enums = store.ir.enums.map((enumDef) => createEnumDocument(enumDef));
   const constants = store.ir.constants.map((constantDef) =>
     createConstantDocument(constantDef),
   );
 
-  return [...docs, ...types, ...rpcs, ...rpcProcs, ...enums, ...constants];
+  return [
+    ...docs,
+    ...types,
+    ...httpRpcs,
+    ...httpRpcProcs,
+    ...enums,
+    ...constants,
+  ];
 }
 
 /**
@@ -251,12 +260,12 @@ function createEnumDocument(
 }
 
 /**
- * Creates a search document for an RPC service page.
+ * Creates a search document for an HTTP RPC service page.
  *
- * @param rpc - RPC service enriched with routing metadata.
- * @returns Search document representing the RPC service.
+ * @param httpRpc - HTTP RPC service enriched with routing metadata.
+ * @returns Search document representing the HTTP RPC service.
  */
-function createRpcDocument(rpc: {
+function createHttpRpcDocument(httpRpc: {
   id: string;
   urlPath: string;
   name: string;
@@ -265,34 +274,34 @@ function createRpcDocument(rpc: {
   procs: Array<{ name: string }>;
 }): SearchDocument {
   return {
-    id: rpc.id,
-    kind: "rpc",
-    urlPath: rpc.urlPath,
-    name: rpc.name,
+    id: httpRpc.id,
+    kind: "httpRpc",
+    urlPath: httpRpc.urlPath,
+    name: httpRpc.name,
     summary:
-      summarizeText(rpc.sourceIr.doc) ||
-      `RPC with ${rpc.procs.length} procedures`,
+      summarizeText(httpRpc.sourceIr.doc) ||
+      `RPC with ${httpRpc.procs.length} procedures`,
     body: joinSearchParts([
-      rpc.name,
-      rpc.sourceIr.doc,
-      rpc.sourceCode.raw,
-      ...rpc.procs.map((proc) => `procedure ${proc.name}`),
+      httpRpc.name,
+      httpRpc.sourceIr.doc,
+      httpRpc.sourceCode.raw,
+      ...httpRpc.procs.map((proc) => `procedure ${proc.name}`),
     ]),
   };
 }
 
 /**
- * Creates a search document for an RPC procedure page.
+ * Creates a search document for an HTTP RPC procedure page.
  *
- * @param proc - RPC procedure enriched with routing metadata.
+ * @param proc - HTTP RPC procedure enriched with routing metadata.
  * @returns Search document representing the procedure.
  */
-function createRpcProcDocument(proc: {
+function createHttpRpcProcDocument(proc: {
   id: string;
   urlPath: string;
   name: string;
   doc?: string;
-  rpcName: string;
+  httpRpcName: string;
   inputSourceCode?: { raw: string };
   outputSourceCode?: { raw: string };
 }): SearchDocument {
@@ -301,10 +310,10 @@ function createRpcProcDocument(proc: {
     kind: "procedure",
     urlPath: proc.urlPath,
     name: proc.name,
-    title: `${proc.rpcName}.${proc.name}`,
-    summary: summarizeText(proc.doc) || `procedure in ${proc.rpcName}`,
+    title: `${proc.httpRpcName}.${proc.name}`,
+    summary: summarizeText(proc.doc) || `procedure in ${proc.httpRpcName}`,
     body: joinSearchParts([
-      proc.rpcName,
+      proc.httpRpcName,
       proc.name,
       "procedure",
       proc.doc,

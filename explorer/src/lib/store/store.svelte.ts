@@ -1,10 +1,10 @@
 import localforage from "localforage";
 import { browser } from "$app/environment";
-import { SNIPPET_LANGS } from "$lib/httpRpc/playground/curl";
+import { SNIPPET_LANGS } from "$lib/helpers/code-snippets";
 import {
   DEFAULT_HTTP_RPC_BASE_URL,
   parseHttpRpcBaseUrls,
-} from "$lib/httpRpc/url";
+} from "$lib/helpers/http-rpc-url";
 import {
   EMPTY_RICH_IR,
   loadIrSchema,

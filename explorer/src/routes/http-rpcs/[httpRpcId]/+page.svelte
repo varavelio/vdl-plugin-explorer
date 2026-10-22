@@ -6,22 +6,22 @@
   import ErrorPage from "$lib/components/ErrorPage.svelte";
   import { store } from "$lib/store";
   import type { PageProps } from "./$types";
-  import RpcServiceNode from "./RpcServiceNode.svelte";
+  import HttpRpcServiceNode from "./HttpRpcServiceNode.svelte";
 
   let { params }: PageProps = $props();
 
-  let rpc = $derived.by(() => {
-    if (!params.rpcId) return;
-    return store.ir.rpcs.find((entry) => entry.id === params.rpcId);
+  let httpRpc = $derived.by(() => {
+    if (!params.httpRpcId) return;
+    return store.ir.httpRpcs.find((entry) => entry.id === params.httpRpcId);
   });
 
   let pageTitle = $derived.by(() => {
-    if (!rpc) return "Not Found";
-    return `${rpc.name} | HTTP RPC`;
+    if (!httpRpc) return "Not Found";
+    return `${httpRpc.name} | HTTP RPC`;
   });
 
   $effect(() => {
-    params.rpcId;
+    params.httpRpcId;
 
     if (!browser) return;
     void tick().then(() => {
@@ -36,19 +36,19 @@
   <title>{pageTitle} | VDL Explorer</title>
 </svelte:head>
 
-{#if !rpc}
+{#if !httpRpc}
   <ErrorPage />
 {/if}
 
-{#if rpc}
+{#if httpRpc}
   <Breadcrumbs
     class="w-full p-4 bg-base-100 desk:sticky desk:top-0 desk:z-20"
     items={[
       { label: "Overview", icon: LayoutDashboard, href: "#/" },
       { label: "HTTP RPC", icon: NetworkIcon },
-      { label: rpc.name, icon: ServerCog },
+      { label: httpRpc.name, icon: ServerCog },
     ]}
   />
 
-  <div class="p-4 pt-0"><RpcServiceNode {rpc} /></div>
+  <div class="p-4 pt-0"><HttpRpcServiceNode {httpRpc} /></div>
 {/if}

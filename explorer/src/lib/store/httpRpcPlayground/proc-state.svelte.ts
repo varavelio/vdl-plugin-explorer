@@ -126,14 +126,14 @@ export class ProcPlaygroundState {
   #key: string;
 
   /**
-   * @param rpcName RPC service name owning the procedure.
+   * @param httpRpcName HTTP RPC service name owning the procedure.
    * @param procName Procedure name identifying the playground.
    */
   constructor(
-    readonly rpcName: string,
+    readonly httpRpcName: string,
     readonly procName: string,
   ) {
-    this.#key = `${this.rpcName}.${this.procName}`;
+    this.#key = `${this.httpRpcName}.${this.procName}`;
     if (browser) void this.restore();
   }
 

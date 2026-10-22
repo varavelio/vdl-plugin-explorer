@@ -36,31 +36,34 @@ export function createIrNodeRoute(
 }
 
 /**
- * Build route metadata for an RPC service page.
+ * Build route metadata for an HTTP RPC service page.
  *
- * @param name RPC service name.
- * @returns Stable RPC id and docs page URL.
+ * @param name HTTP RPC service name.
+ * @returns Stable HTTP RPC id and docs page URL.
  */
-export function createRpcRoute(name: string): { id: string; urlPath: string } {
+export function createHttpRpcRoute(name: string): {
+  id: string;
+  urlPath: string;
+} {
   const id = createId(name);
-  const urlPath = `#/http-rpcs/${id}`;
+  const urlPath = `#/http-httpRpcs/${id}`;
   return { id, urlPath };
 }
 
 /**
- * Build route metadata for an RPC procedure page.
+ * Build route metadata for an HTTP RPC procedure page.
  *
- * @param rpcName RPC service name.
+ * @param httpRpcName HTTP RPC service name.
  * @param procName Procedure name.
  * @returns Stable id, readable route segment, parent route segment, and URL.
  */
-export function createRpcProcRoute(
-  rpcName: string,
+export function createHttpRpcProcRoute(
+  httpRpcName: string,
   procName: string,
 ): { id: string; urlPath: string } {
   const id = createId(procName);
-  const rpcId = createId(rpcName);
-  const urlPath = `#/http-rpcs/${rpcId}/${id}`;
+  const httpRpcId = createId(httpRpcName);
+  const urlPath = `#/http-httpRpcs/${httpRpcId}/${id}`;
   return { id, urlPath };
 }
 

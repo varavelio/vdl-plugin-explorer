@@ -15,9 +15,9 @@
   interface Props {
     title: string;
     sourceCode?: SourceCode;
-    rpcInputSourceCode?: SourceCode;
-    rpcOutputSourceCode?: SourceCode;
-    rpcProcUrl?: string;
+    httpRpcInputSourceCode?: SourceCode;
+    httpRpcOutputSourceCode?: SourceCode;
+    httpRpcProcUrl?: string;
     tags?: string[];
     htmlDoc?: string;
   }
@@ -27,9 +27,9 @@
     tags = [],
     htmlDoc,
     sourceCode,
-    rpcInputSourceCode,
-    rpcOutputSourceCode,
-    rpcProcUrl,
+    httpRpcInputSourceCode,
+    httpRpcOutputSourceCode,
+    httpRpcProcUrl,
   }: Props = $props();
 
   function pickSourceCode(code?: SourceCode) {
@@ -41,8 +41,12 @@
   }
 
   let hlSourceCode = $derived(pickSourceCode(sourceCode));
-  let hlRpcInputSourceCode = $derived(pickSourceCode(rpcInputSourceCode));
-  let hlRpcOutputSourceCode = $derived(pickSourceCode(rpcOutputSourceCode));
+  let hlHttpRpcInputSourceCode = $derived(
+    pickSourceCode(httpRpcInputSourceCode),
+  );
+  let hlHttpRpcOutputSourceCode = $derived(
+    pickSourceCode(httpRpcOutputSourceCode),
+  );
 
   let sourceCodeDialogKey = 0;
   let sourceCodeDialogStack = $state<SourceCodeDialog[]>([]);
@@ -113,9 +117,9 @@
         </div>
       </div>
 
-      {#if rpcProcUrl}
+      {#if httpRpcProcUrl}
         <CodeBlock
-          rawCode={rpcProcUrl}
+          rawCode={httpRpcProcUrl}
           title="Endpoint"
           showDownload={false}
           showLoc={false}
@@ -144,13 +148,13 @@
     </section>
   {/if}
 
-  {#if rpcInputSourceCode}
+  {#if httpRpcInputSourceCode}
     <section class="space-y-6">
       <Heading level="2" size="2xl">Input</Heading>
       <div use:_interceptSourceCodeLinks>
         <CodeBlock
-          rawCode={rpcInputSourceCode.raw}
-          highlightedHtml={hlRpcInputSourceCode}
+          rawCode={httpRpcInputSourceCode.raw}
+          highlightedHtml={hlHttpRpcInputSourceCode}
           title="VDL"
           fileName="input.vdl"
           bordered
@@ -159,13 +163,13 @@
     </section>
   {/if}
 
-  {#if rpcOutputSourceCode}
+  {#if httpRpcOutputSourceCode}
     <section class="space-y-6">
       <Heading level="2" size="2xl">Output</Heading>
       <div use:_interceptSourceCodeLinks>
         <CodeBlock
-          rawCode={rpcOutputSourceCode.raw}
-          highlightedHtml={hlRpcOutputSourceCode}
+          rawCode={httpRpcOutputSourceCode.raw}
+          highlightedHtml={hlHttpRpcOutputSourceCode}
           title="VDL"
           fileName="output.vdl"
           bordered

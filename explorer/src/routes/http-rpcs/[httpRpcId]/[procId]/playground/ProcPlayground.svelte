@@ -5,30 +5,32 @@
   import FormBuilder from "$lib/components/FormBuilder/FormBuilder.svelte";
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
 
-  import { buildRpcProcUrl } from "$lib/httpRpc/url";
+  import { buildHttpRpcProcUrl } from "$lib/helpers/http-rpc-url";
   import { store } from "$lib/store";
   import {
     formatDurationMs,
     INPUT_SAVE_DELAY_MS,
     ProcPlaygroundState,
   } from "$lib/store/httpRpcPlayground";
-  import type { RichIrSchemaRpcProc } from "$lib/store/ir/index";
+  import type { RichIrSchemaHttpRpcProc } from "$lib/store/ir/index";
   import HistoryDialog from "./HistoryDialog.svelte";
   import SnippetsPanel from "./SnippetsPanel.svelte";
 
   interface Props {
     /** Procedure executed by this playground. */
-    proc: RichIrSchemaRpcProc;
+    proc: RichIrSchemaHttpRpcProc;
   }
 
   let { proc }: Props = $props();
 
-  let playground = $derived(new ProcPlaygroundState(proc.rpcName, proc.name));
+  let playground = $derived(
+    new ProcPlaygroundState(proc.httpRpcName, proc.name),
+  );
 
   let endpoint = $derived.by(() => {
-    return buildRpcProcUrl(
+    return buildHttpRpcProcUrl(
       store.selectedHttpRpcBaseUrl,
-      proc.rpcName,
+      proc.httpRpcName,
       proc.name,
     );
   });

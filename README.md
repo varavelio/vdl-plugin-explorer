@@ -9,7 +9,7 @@
 <h1 align="center">VDL Explorer Plugin</h1>
 
 <p align="center">
-  Generate a single-file HTML explorer for VDL <strong>docs</strong>, <strong>RPCs</strong>, <strong>types</strong>, <strong>enums</strong>, and <strong>constants</strong>.
+  Generate a single-file HTML explorer for VDL <strong>docs</strong>, <strong>HTTP RPCs</strong>, <strong>types</strong>, <strong>enums</strong>, and <strong>constants</strong>.
 </p>
 
 <p align="center">
@@ -32,8 +32,8 @@ This plugin turns your VDL schema into a standalone, shareable explorer UI.
 Use it when you want to:
 
 - share schema docs with teammates, clients, or external partners
-- browse docs, RPCs, types, enums, and constants in one place
-- inspect RPC services and procedures with input/output previews
+- browse docs, HTTP RPCs, types, enums, and constants in one place
+- inspect HTTP RPC services and procedures with input/output previews
 - ship a responsive schema reference as a single HTML file that can be hosted anywhere
 
 ## Demo
@@ -73,10 +73,10 @@ By default, the plugin writes one self-contained HTML file inside your `outDir`.
 
 All options are optional.
 
-| Option           | Type     | Default               | What it changes                                                                                                                  |
-| ---------------- | -------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `outFile`        | `string` | `"index.html"`        | Sets the output filename inside `outDir`. The value must end with `.html`.                                                       |
-| `httpRpcBaseUrl` | `string` | `"https://<baseURL>"` | Comma-separated base URLs for HTTP RPC procedure endpoints, snippets and executions. Switch between them in the settings dialog. |
+| Option           | Type     | Default               | What it changes                                                                                                                       |
+| ---------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `outFile`        | `string` | `"index.html"`        | Sets the output filename inside `outDir`. The value must end with `.html`.                                                            |
+| `httpRpcBaseUrl` | `string` | `"https://<baseURL>"` | Comma-separated base URLs for HTTP HTTP RPC procedure endpoints, snippets and executions. Switch between them in the settings dialog. |
 
 Example with all options:
 
@@ -100,20 +100,20 @@ const config = {
 ## What You Get
 
 - One standalone HTML file with the full explorer UI embedded.
-- Overview dashboard with counts for docs, RPCs, types, enums, and constants.
+- Overview dashboard with counts for docs, HTTP RPCs, types, enums, and constants.
 - Sidebar navigation grouped by resource kind.
-- Dedicated pages for docs, RPC services, RPC procedures, types, enums, and constants.
+- Dedicated pages for docs, HTTP RPC services, HTTP RPC procedures, types, enums, and constants.
 - Full-text search across titles, names, docs, summaries, and VDL source snippets.
 - Syntax-highlighted VDL source rendering.
 - Internal cross-links between referenced schema nodes.
 - Light and dark theme support.
 - Responsive layout that works well on desktop and mobile.
 
-## RPC Annotation Model
+## HTTP RPC Annotation Model
 
-This plugin recognizes RPC pages from the VPP-2 HTTP-RPC annotations:
+This plugin recognizes HTTP RPC pages from the VPP-2 HTTP-RPC annotations:
 
-- `@httpRpc` marks a top-level type as an RPC service.
+- `@httpRpc` marks a top-level type as an HTTP RPC service.
 - `@proc` marks a field as a request-response procedure.
 
 Example:
@@ -135,11 +135,11 @@ type Messages {
 }
 ```
 
-Procedure endpoints are displayed as `<baseURL>/<lowerFirst(RPCName)>/<ProcName>`. For example, `send` inside `@httpRpc type Messages` renders as `https://api.example.com/rpc/messages/send`.
+Procedure endpoints are displayed as `<baseURL>/<lowerFirst(HTTP RPC name)>/<ProcName>`. For example, `send` inside `@httpRpc type Messages` renders as `https://api.example.com/rpc/messages/send`.
 
-When RPC services are present, the explorer includes:
+When HTTP RPC services are present, the explorer includes:
 
-- one page per RPC service
+- one page per HTTP RPC service
 - one page per procedure
 - input and output VDL source previews for each procedure
 

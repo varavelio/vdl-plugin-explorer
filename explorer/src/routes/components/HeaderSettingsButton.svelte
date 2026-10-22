@@ -24,7 +24,7 @@
    * The dialog only configures HTTP RPC preferences for now, so the entry
    * point stays hidden when the schema declares no HTTP RPC.
    */
-  let hasHttpRpc = $derived(store.ir.rpcs.length > 0);
+  let hasHttpRpc = $derived(store.ir.httpRpcs.length > 0);
 
   /**
    * Show Cmd on Apple platforms and Ctrl elsewhere for the shortcut hint.

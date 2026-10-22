@@ -29,8 +29,8 @@
       },
       {
         title: "HTTP RPC",
-        count: store.ir.rpcs.length,
-        description: "HTTP RPC services grouped into procedures.",
+        count: store.ir.httpRpcs.length,
+        description: "HTTP HTTP RPC services grouped into procedures.",
         icon: NetworkIcon,
       },
       {

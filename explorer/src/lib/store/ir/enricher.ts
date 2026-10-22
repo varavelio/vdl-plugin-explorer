@@ -9,10 +9,10 @@ import DOMPurify from "dompurify";
 import { marked } from "marked";
 import { highlighter } from "$lib/shiki";
 import {
+  createHttpRpcProcRoute,
+  createHttpRpcRoute,
   createIrNodeLinkDictionary,
   createIrNodeRoute,
-  createRpcProcRoute,
-  createRpcRoute,
 } from "./links";
 import { createIrNodeLinkTransformer } from "./shiki-links-transformer";
 import type { RichIrSchema, SourceCode } from "./types";
@@ -33,23 +33,23 @@ function markdownToHtmlDoc(markdown: string | undefined): string | undefined {
 }
 
 /**
- * Determine if a field represents an RPC procedure.
+ * Determine if a field represents an HTTP RPC procedure.
  *
  * @param field The field to check for the procedure annotation.
  * @returns True when the field carries `@proc`, otherwise false.
  */
-function isRpcProc(field: Field): boolean {
+function isHttpRpcProc(field: Field): boolean {
   return getAnnotation(field.annotations, "proc") !== undefined;
 }
 
 /**
- * Find the "input" or "output" field of an RPC procedure field, if it exists and is properly structured.
+ * Find the "input" or "output" field of an HTTP RPC procedure field, if it exists and is properly structured.
  *
- * @param procField The field representing the RPC procedure, which should be an object type containing "input" and/or "output" fields.
+ * @param procField The field representing the HTTP RPC procedure, which should be an object type containing "input" and/or "output" fields.
  * @param name The name of the field to find, either "input" or "output".
  * @returns The "input" or "output" field if it exists and is properly structured, or undefined if it does not exist or is not properly structured.
  */
-function findRpcInputOutputField(
+function findHttpRpcInputOutputField(
   procField: Field,
   name: "input" | "output",
 ): Field | undefined {
@@ -167,15 +167,16 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
     }),
   );
 
-  const rpcs: RichIrSchema["rpcs"] = (
+  const httpRpcs: RichIrSchema["httpRpcs"] = (
     await Promise.all(
       types
-        // Filter out types that are not annotated as HTTP RPC services
+        // Filter out types that are not annotated as HTTP HTTP RPC services
         .filter((type) => getAnnotation(type.annotations, "httpRpc"))
-        // Transform RPC types into rich RPC schema entries
+        // Transform HTTP RPC types into rich HTTP RPC schema entries
         .map(async (type) => {
-          const rpcName = type.name;
-          const { id: rpcId, urlPath: rpcUrlPath } = createRpcRoute(rpcName);
+          const httpRpcName = type.name;
+          const { id: httpRpcId, urlPath: httpRpcUrlPath } =
+            createHttpRpcRoute(httpRpcName);
 
           // Extract all child fields of object kind
           const objectFields =
@@ -183,22 +184,28 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
               ? (type.typeRef.objectFields ?? [])
               : [];
 
-          // Enrich each RPC procedure in the RPC type's fields
+          // Enrich each HTTP RPC procedure in the RPC type's fields
           const procs = (
             await Promise.all(
               objectFields.map(
                 async (
                   field,
                 ): Promise<
-                  RichIrSchema["rpcs"][number]["procs"][number] | undefined
+                  RichIrSchema["httpRpcs"][number]["procs"][number] | undefined
                 > => {
-                  if (!isRpcProc(field)) return undefined;
+                  if (!isHttpRpcProc(field)) return undefined;
 
                   const { id: procId, urlPath: procUrlPath } =
-                    createRpcProcRoute(rpcName, field.name);
+                    createHttpRpcProcRoute(httpRpcName, field.name);
 
-                  const inputField = findRpcInputOutputField(field, "input");
-                  const outputField = findRpcInputOutputField(field, "output");
+                  const inputField = findHttpRpcInputOutputField(
+                    field,
+                    "input",
+                  );
+                  const outputField = findHttpRpcInputOutputField(
+                    field,
+                    "output",
+                  );
 
                   const inputSourceCode = inputField
                     ? await toSourceCode(generateFieldSource(inputField))
@@ -212,9 +219,9 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
                     ...field,
                     id: procId,
                     urlPath: procUrlPath,
-                    rpcId,
-                    rpcUrlPath,
-                    rpcName,
+                    httpRpcId,
+                    httpRpcUrlPath,
+                    httpRpcName,
                     htmlDoc: markdownToHtmlDoc(field.doc),
                     inputSourceCode,
                     outputSourceCode,
@@ -225,15 +232,15 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
             )
           )
             // Filter out undefined results from fields that were not
-            // properly structured as RPC procedures
+            // properly structured as HTTP RPC procedures
             .filter(
               (proc): proc is NonNullable<typeof proc> => proc !== undefined,
             );
 
           return {
-            id: rpcId,
-            name: rpcName,
-            urlPath: rpcUrlPath,
+            id: httpRpcId,
+            name: httpRpcName,
+            urlPath: httpRpcUrlPath,
             htmlDoc: type.htmlDoc,
             sourceCode: type.sourceCode,
             sourceIr: type.sourceIr,
@@ -242,9 +249,9 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
         }),
     )
   )
-    // Filter out RPCs that have no valid procedures after enrichment, as
+    // Filter out HTTP RPCs that have no valid procedures after enrichment, as
     // they won't have meaningful pages in the explorer
-    .filter((rpc) => rpc.procs.length > 0);
+    .filter((httpRpc) => httpRpc.procs.length > 0);
 
   const enums: RichIrSchema["enums"] = await Promise.all(
     ir.enums.map(async (en) => {
@@ -337,7 +344,7 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
 
   return {
     entryPoint: ir.entryPoint,
-    rpcs,
+    httpRpcs,
     types,
     enums,
     constants,

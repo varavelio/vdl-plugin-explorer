@@ -26,7 +26,7 @@
     // Access length properties just to make this effect
     // reactive to changes in the IR data.
     store.ir.docs.length;
-    store.ir.rpcs.length;
+    store.ir.httpRpcs.length;
     store.ir.types.length;
     store.ir.enums.length;
     store.ir.constants.length;
@@ -65,18 +65,18 @@
       </Nav.Group>
     {/if}
 
-    {#if store.ir.rpcs.length > 0}
+    {#if store.ir.httpRpcs.length > 0}
       <Nav.Group label="HTTP RPC" icon={NetworkIcon} open>
-        {#each store.ir.rpcs as rpc (rpc.id)}
-          <Nav.Group label={rpc.name} icon={ServerCog} open>
+        {#each store.ir.httpRpcs as httpRpc (httpRpc.id)}
+          <Nav.Group label={httpRpc.name} icon={ServerCog} open>
             <Nav.Item
-              label={rpc.name}
+              label={httpRpc.name}
               icon={FileText}
-              href={rpc.urlPath}
-              active={page.url.hash === rpc.urlPath}
+              href={httpRpc.urlPath}
+              active={page.url.hash === httpRpc.urlPath}
             />
 
-            {#each rpc.procs as proc (proc.id)}
+            {#each httpRpc.procs as proc (proc.id)}
               <Nav.Item
                 label={proc.name}
                 icon={Zap}
