@@ -42,9 +42,18 @@
     return nextTags;
   });
 
-  let playground = $derived(
-    new ProcPlaygroundState(httpRpcProc.httpRpcName, httpRpcProc.name),
+  // Created in `$effect.pre` so navigating between procedures (which
+  // reuses this component instance) swaps the state before rendering.
+  let playground = $state<ProcPlaygroundState>(
+    null as unknown as ProcPlaygroundState,
   );
+
+  $effect.pre(() => {
+    playground = new ProcPlaygroundState(
+      httpRpcProc.httpRpcName,
+      httpRpcProc.name,
+    );
+  });
 
   let endpoint = $derived.by(() => {
     return buildHttpRpcProcUrl(
@@ -170,7 +179,7 @@
 
     <ProcPlayground
       proc={httpRpcProc}
-      {playground}
+      bind:playground
       {endpoint}
       {requestHeaders}
       onSnippetsToggle={toggleSnippets}

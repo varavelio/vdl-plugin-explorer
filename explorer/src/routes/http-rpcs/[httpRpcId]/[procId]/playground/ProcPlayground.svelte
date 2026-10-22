@@ -36,8 +36,13 @@
     onSnippetsToggle: () => void;
   }
 
-  let { proc, playground, endpoint, requestHeaders, onSnippetsToggle }: Props =
-    $props();
+  let {
+    proc,
+    playground = $bindable(),
+    endpoint,
+    requestHeaders,
+    onSnippetsToggle,
+  }: Props = $props();
 
   let inputFields = $derived(
     proc.sourceIr.typeRef.kind === "object"
