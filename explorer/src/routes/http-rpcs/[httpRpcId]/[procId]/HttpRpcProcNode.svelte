@@ -208,9 +208,9 @@
     {/if}
   </div>
 
-  {#if snippetsOpen}
+  {#if viewport.isDesktop && snippetsOpen}
     <aside
-      class="hidden desk:col-span-3 desk:block desk:sticky desk:top-[4.5rem] desk:max-h-[calc(100dvh-5.5rem)] desk:overflow-y-auto"
+      class="hidden desk:col-span-3 desk:block desk:sticky desk:top-15 desk:max-h-[calc(100dvh-10rem)] desk:overflow-y-auto"
     >
       <SnippetsPanel
         {endpoint}
@@ -223,11 +223,11 @@
 </div>
 
 {#if viewport.isDesktop && !snippetsOpen}
-  <div class="fixed top-[4.5rem] right-4 z-30">
+  <div class="fixed top-16 right-6 z-30">
     <Tooltip content="Show code snippets" side="left">
       <Button
         size="sm"
-        variant="outline"
+        variant="ghost"
         square
         class="bg-base-100 shadow-md"
         icon={PanelRightOpen}

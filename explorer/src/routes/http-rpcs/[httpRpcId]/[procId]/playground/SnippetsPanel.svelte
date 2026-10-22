@@ -75,7 +75,7 @@
 
 <div class="space-y-4">
   <div class="flex items-center justify-between gap-2">
-    <Heading level="2" size="lg">Code snippets</Heading>
+    <Heading level="2" size="2xl">Code snippets</Heading>
     {#if onClose}
       <Tooltip content="Hide code snippets" side="top">
         <Button
