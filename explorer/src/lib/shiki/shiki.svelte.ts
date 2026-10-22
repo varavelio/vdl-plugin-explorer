@@ -42,7 +42,29 @@ export type ShikiHtmlNode = {
  */
 export type ShikiHtmlTransformer = {
   name: string;
+  pre?: (node: ShikiHtmlNode) => void;
   span?: (node: ShikiHtmlNode) => void;
+};
+
+/**
+ * Drops the background Shiki inlines on `<pre>` so the stylesheet owns the
+ * code background. Token colors stay inline; only the surface comes from CSS.
+ */
+const STRIP_PRE_BACKGROUND: ShikiHtmlTransformer = {
+  name: "vdl:strip-pre-background",
+  pre(node) {
+    const properties = node.properties;
+    if (typeof properties?.style !== "string") return;
+    const kept = properties.style
+      .split(";")
+      .map((rule) => rule.trim())
+      .filter((rule) => rule && !rule.startsWith("background"));
+    if (kept.length > 0) {
+      properties.style = kept.join("; ");
+    } else {
+      delete properties.style;
+    }
+  },
 };
 
 /**
@@ -123,7 +145,7 @@ class ShikiHighlighter {
     return this.#highlighter.codeToHtml(code, {
       lang,
       theme: shikiTheme,
-      transformers,
+      transformers: [...transformers, STRIP_PRE_BACKGROUND],
     });
   }
 }
@@ -203,6 +225,7 @@ export async function highlightSnippet(
     return snippetHighlighter.codeToHtml(code, {
       lang,
       theme: theme === "dark" ? "github-dark" : "github-light",
+      transformers: [STRIP_PRE_BACKGROUND],
     });
   } catch {
     return undefined;

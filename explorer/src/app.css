@@ -2,9 +2,17 @@
 @import "@varavel/ui/theme.css";
 @source "../node_modules/@varavel/ui";
 
-/* Custom shiki code highlighting style */
+/*
+  Custom shiki code highlighting style.
+  The code surface always matches bg-base-100
+*/
 .shiki {
   @apply p-4;
+  /* Tripled class beats the CodeBlock `pre` background (0,2,1) and any
+     typography `pre` background without resorting to `!important`. */
+  &.shiki.shiki {
+    background-color: var(--color-base-100);
+  }
 
   /* Add style to links */
   a.vdl-internal-link {
