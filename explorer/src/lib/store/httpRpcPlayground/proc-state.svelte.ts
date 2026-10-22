@@ -37,9 +37,6 @@ export type ProcPlaygroundSnapshot = {
  */
 const HISTORY_LIMIT = 150;
 
-/** Delay collapsing rapid input edits into a single write. */
-export const INPUT_SAVE_DELAY_MS = 500;
-
 const snapshotStore = browser
   ? localforage.createInstance({
       name: deploymentDbName("vdl-explorer-http-rpc"),
@@ -123,6 +120,14 @@ export class ProcPlaygroundState {
    */
   history: ProcHistoryItem[] = $state([]);
 
+  /**
+   * Whether the persisted snapshot finished loading.
+   *
+   * Playgrounds mount their form only once this flips, so fields start from
+   * the restored values instead of mounting empty and racing the load.
+   */
+  restored = $state(!browser);
+
   #key: string;
 
   /**
@@ -156,20 +161,30 @@ export class ProcPlaygroundState {
       }
     } catch {
       // Corrupt snapshots are ignored in favor of a blank playground.
+    } finally {
+      this.restored = true;
     }
   }
 
   /**
    * Persist the current snapshot. Failures are ignored by design.
+   *
+   * The payload is snapshotted into plain objects first: IndexedDB clones
+   * values with the structured clone algorithm, which rejects the proxies
+   * backing reactive state.
+   *
+   * Writes are dropped until the snapshot is restored, otherwise the empty
+   * initial state would overwrite the stored one.
    */
   persistNow(): void {
+    if (!this.restored) return;
     snapshotStore
       ?.setItem(this.#key, {
-        input: this.input,
+        input: $state.snapshot(this.input),
         output: this.output,
         outputDate: this.outputDate,
         durationMs: this.durationMs,
-        history: this.history,
+        history: $state.snapshot(this.history),
       } satisfies ProcPlaygroundSnapshot)
       .catch(() => {});
   }

@@ -46,7 +46,7 @@ export function createHttpRpcRoute(name: string): {
   urlPath: string;
 } {
   const id = createId(name);
-  const urlPath = `#/http-httpRpcs/${id}`;
+  const urlPath = `#/http-rpcs/${id}`;
   return { id, urlPath };
 }
 
@@ -63,7 +63,7 @@ export function createHttpRpcProcRoute(
 ): { id: string; urlPath: string } {
   const id = createId(procName);
   const httpRpcId = createId(httpRpcName);
-  const urlPath = `#/http-httpRpcs/${httpRpcId}/${id}`;
+  const urlPath = `#/http-rpcs/${httpRpcId}/${id}`;
   return { id, urlPath };
 }
 

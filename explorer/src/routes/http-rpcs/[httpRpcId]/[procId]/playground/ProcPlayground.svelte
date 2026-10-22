@@ -1,7 +1,7 @@
 <script lang="ts">
   import { History, Loader, Trash, Zap } from "@lucide/svelte";
   import { Button, Heading, Tabs } from "@varavel/ui";
-  import { onDestroy, untrack } from "svelte";
+  import { untrack } from "svelte";
   import FormBuilder from "$lib/components/FormBuilder/FormBuilder.svelte";
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
 
@@ -9,7 +9,6 @@
   import { store } from "$lib/store";
   import {
     formatDurationMs,
-    INPUT_SAVE_DELAY_MS,
     ProcPlaygroundState,
   } from "$lib/store/httpRpcPlayground";
   import type { RichIrSchemaHttpRpcProc } from "$lib/store/ir/index";
@@ -58,27 +57,19 @@
       : [],
   );
 
-  let inputSaveTimer: ReturnType<typeof setTimeout> | undefined;
-
-  /**
-   * Persist the current input debounced, so even unexecuted edits survive
-   * reloads. The timer flushes when leaving the page.
-   */
+  // Persist every input change so unexecuted edits survive reloads and
+  // navigation.
+  //
+  // note: writes stay immediate because a debounce window loses the edits made
+  // just before the page unloads, when pending timers never run. Each keystroke
+  // costs one IndexedDB write; coalesce per animation frame if the payload ever
+  // grows enough for that to matter.
   $effect(() => {
-    // Track the input deeply; the snapshot is only the dependency.
+    // Track the input deeply; the persisted snapshot is the dependency.
     JSON.stringify(playground.input ?? {});
     untrack(() => {
-      clearTimeout(inputSaveTimer);
-      inputSaveTimer = setTimeout(
-        () => playground.persistNow(),
-        INPUT_SAVE_DELAY_MS,
-      );
+      playground.persistNow();
     });
-  });
-
-  onDestroy(() => {
-    clearTimeout(inputSaveTimer);
-    playground.persistNow();
   });
 
   let tab = $state("input");
@@ -140,7 +131,9 @@
 </script>
 
 {#snippet inputTab()}
-  {#if inputFields.length > 0}
+  {#if !playground.restored}
+    <p class="text-sm text-content-muted">Restoring the saved input…</p>
+  {:else if inputFields.length > 0}
     <FormBuilder
       fields={inputFields}
       types={store.ir.types}
