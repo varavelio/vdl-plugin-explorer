@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BrushCleaning, Copy, History, Loader, Zap } from "@lucide/svelte";
-  import { Button, Heading, Kbd, Tabs } from "@varavel/ui";
+  import { Button, Heading, Kbd, Tabs, Tooltip } from "@varavel/ui";
   import { clipboard, viewport } from "@varavel/ui/runtime";
   import { untrack } from "svelte";
   import { browser } from "$app/environment";
@@ -181,21 +181,17 @@
     {/if}
 
     <div class="mt-4 flex w-full justify-end gap-2">
-      <Button
-        size="sm"
-        icon={isExecuting ? Loader : Zap}
-        loading={isExecuting}
-        disabled={isExecuting}
-        onclick={() => void executeProcedure()}
-      >
-        Execute procedure
-        {#if viewport.isDesktop}
-          <span class="ml-1 flex items-center gap-1">
-            <Kbd size="sm">{isMac ? "⌘" : "Ctrl"}</Kbd>
-            <Kbd size="sm">Enter</Kbd>
-          </span>
-        {/if}
-      </Button>
+      <Tooltip content={shortcutTip} side="top" disabled={!viewport.isDesktop}>
+        <Button
+          size="sm"
+          icon={isExecuting ? Loader : Zap}
+          loading={isExecuting}
+          disabled={isExecuting}
+          onclick={() => void executeProcedure()}
+        >
+          Execute procedure
+        </Button>
+      </Tooltip>
     </div>
   </div>
 {/snippet}
@@ -248,6 +244,13 @@
 {/snippet}
 
 <svelte:window onkeydowncapture={handleKeydown} />
+
+{#snippet shortcutTip()}
+  <span class="flex items-center gap-1">
+    <Kbd size="sm">{isMac ? "⌘" : "Ctrl"}</Kbd>
+    <Kbd size="sm">Enter</Kbd>
+  </span>
+{/snippet}
 
 <div class="grid grid-cols-1 gap-6 desk:grid-cols-8">
   <section class="space-y-4 desk:col-span-5">
