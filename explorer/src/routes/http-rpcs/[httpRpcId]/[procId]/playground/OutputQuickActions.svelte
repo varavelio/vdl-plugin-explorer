@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Copy, Key, ShieldCheck, Sparkles } from "@lucide/svelte";
   import { Menu } from "@varavel/ui";
+  import { clipboard } from "@varavel/ui/runtime";
   import { discoverAuthToken } from "$lib/helpers/discover-auth-token";
   import { store } from "$lib/store";
 
@@ -19,11 +20,14 @@
   let tokens = $derived(discoverAuthToken(output).slice(0, TOKEN_LIMIT));
 
   async function copyToken(value: string) {
-    await navigator.clipboard.writeText(value);
+    await clipboard.copy(value);
   }
 
-  function setAuthHeader(value: string) {
-    store.setHttpRpcHeader("Authorization", `Bearer ${value}`);
+  function setAuthHeader(value: string, withBearer: boolean) {
+    store.setHttpRpcHeader(
+      "Authorization",
+      withBearer ? `Bearer ${value}` : value,
+    );
   }
 </script>
 
@@ -36,33 +40,45 @@
 {/snippet}
 
 {#if tokens.length > 0}
-  <div class="mb-2 flex flex-wrap items-center gap-2">
-    <span class="flex items-center gap-1 text-xs font-semibold">
+  <div
+    class="mt-2 flex items-center justify-between gap-3 border-t border-base-300 pt-2"
+  >
+    <span class="flex shrink-0 items-center gap-1 text-xs font-semibold">
       <Sparkles class="size-3" />
       Token detected
     </span>
 
-    {#each tokens as token (token.path)}
-      <Menu
-        size="sm"
-        variant="outline"
-        icon={Key}
-        label={token.key}
-        side="top"
-        items={[
-          { type: "label", label: `Found at ${token.path}` },
-          {
-            label: "Copy token",
-            icon: copyItemIcon,
-            onSelect: () => void copyToken(token.value),
-          },
-          {
-            label: "Set as Authorization header",
-            icon: authItemIcon,
-            onSelect: () => setAuthHeader(token.value),
-          },
-        ]}
-      />
-    {/each}
+    <div class="min-w-0 flex-1 overflow-x-auto">
+      <div class="flex w-max min-w-full items-center justify-end gap-1">
+        {#each tokens as token (token.path)}
+          <Menu
+            size="sm"
+            variant="ghost"
+            triggerClass="shrink-0 font-normal"
+            icon={Key}
+            label={token.key}
+            side="top"
+            items={[
+              { type: "label", label: `Found at ${token.path}` },
+              {
+                label: "Copy token",
+                icon: copyItemIcon,
+                onSelect: () => void copyToken(token.value),
+              },
+              {
+                label: "Set as Authorization: Bearer <token> header",
+                icon: authItemIcon,
+                onSelect: () => setAuthHeader(token.value, true),
+              },
+              {
+                label: "Set as Authorization: <token> header",
+                icon: authItemIcon,
+                onSelect: () => setAuthHeader(token.value, false),
+              },
+            ]}
+          />
+        {/each}
+      </div>
+    </div>
   </div>
 {/if}

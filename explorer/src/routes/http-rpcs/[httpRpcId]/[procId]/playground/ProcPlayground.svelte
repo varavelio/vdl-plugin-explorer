@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Copy, History, Loader, Trash, Zap } from "@lucide/svelte";
   import { Button, Heading, Tabs } from "@varavel/ui";
+  import { clipboard } from "@varavel/ui/runtime";
   import { untrack } from "svelte";
   import FormBuilder from "$lib/components/FormBuilder/FormBuilder.svelte";
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
@@ -125,9 +126,12 @@
     }
   }
 
+  /**
+   * Copy the output with runtime toast feedback on success or failure.
+   */
   async function copyOutput() {
     if (!playground.output) return;
-    await navigator.clipboard.writeText(playground.output);
+    await clipboard.copy(playground.output);
   }
 </script>
 
