@@ -219,23 +219,26 @@
   {#if store.ui.formEditorMode === "form"}
     {#key resetKey}
       {#key innerRev}
-        {#each fields as field (field.name)}
-          <FieldNode
-            {field}
-            {types}
-            {enums}
-            seen={[]}
-            depth={0}
-            value={value[field.name]}
-            onChange={(next) => updateField(field.name, next)}
-            onRemove={() => removeField(field.name)}
-          />
-        {/each}
-
         {#if fields.length === 0}
           <p class="text-sm text-content-muted italic">
             This type defines no fields.
           </p>
+        {:else}
+          <div class="space-y-4 border-l-2 border-dashed border-base-400 pl-4">
+            {#each fields as field (field.name)}
+              <FieldNode
+                {field}
+                {types}
+                {enums}
+                seen={[]}
+                depth={0}
+                railed
+                value={value[field.name]}
+                onChange={(next) => updateField(field.name, next)}
+                onRemove={() => removeField(field.name)}
+              />
+            {/each}
+          </div>
         {/if}
       {/key}
     {/key}

@@ -107,13 +107,7 @@
 
 {#snippet body()}
   {#key rev}
-    <div
-      class="mt-2 space-y-4"
-      class:border-l-2={depth > 0}
-      class:border-dashed={depth > 0}
-      class:border-base-400={depth > 0}
-      class:pl-4={depth > 0}
-    >
+    <div class="mt-2 space-y-4 border-l-2 border-dashed border-base-400 pl-4">
       {#each field.typeRef.objectFields ?? [] as childField (childField.name)}
         <FieldNode
           field={childField}
@@ -121,7 +115,7 @@
           {enums}
           seen={childSeen}
           depth={depth + 1}
-          railed={depth > 0}
+          railed
           value={object[childField.name]}
           onChange={(next) => updateChild(childField.name, next)}
           onRemove={() => removeChild(childField.name)}
