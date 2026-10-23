@@ -321,7 +321,7 @@
     {/each}
   </div>
 
-  <div role="tabpanel" class="pt-4">
+  <div role="tabpanel">
     {#if tab === "input"}
       {@render inputTab()}
     {:else}
