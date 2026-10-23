@@ -99,6 +99,7 @@
     <MapField
       {field}
       {depth}
+      {railed}
       valueRef={field.typeRef.mapType}
       {types}
       {enums}

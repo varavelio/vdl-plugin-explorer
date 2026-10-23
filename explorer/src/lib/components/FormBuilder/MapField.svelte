@@ -25,6 +25,8 @@
     seen: string[];
     /** Nesting depth for styling only; nested maps render as guided groups. */
     depth?: number;
+    /** True when the parent list already indents this node with its own rail. */
+    railed?: boolean;
     /** Current slice of the form value for this field. */
     value: unknown;
     /** Reports an updated slice to the parent node. */
@@ -40,6 +42,7 @@
     enums,
     seen,
     depth = 0,
+    railed = false,
     value,
     onChange,
     onRemove,
@@ -160,7 +163,7 @@
     {/if}
 
     <div class="mt-2 space-y-4">
-      {#each entries as [key, entryValue] (key)}
+      {#each entries as [key, entryValue], index (index)}
         <div class="space-y-2">
           <div class="flex items-center gap-2">
             <div class="flex-1">
@@ -182,27 +185,30 @@
               />
             </Tooltip>
           </div>
-          <FieldNode
-            field={{
-              ...field,
-              doc: undefined,
-              name: `${field.name}.${key}`,
-              typeRef: valueRef,
-            }}
-            {types}
-            {enums}
-            {seen}
-            depth={depth + 1}
-            value={entryValue}
-            onChange={(next) => updateEntry(key, next)}
-          />
+          <div class="border-l-2 border-dashed border-base-400 pl-4">
+            <FieldNode
+              field={{
+                ...field,
+                doc: undefined,
+                name: `${field.name}.${key}`,
+                typeRef: valueRef,
+              }}
+              {types}
+              {enums}
+              {seen}
+              depth={depth + 1}
+              railed
+              value={entryValue}
+              onChange={(next) => updateEntry(key, next)}
+            />
+          </div>
         </div>
       {/each}
     </div>
   {/key}
 {/snippet}
 
-{#if depth === 0}
+{#if depth === 0 || railed}
   <div>
     {@render header()}
     {@render body()}
