@@ -2,7 +2,7 @@
  * The URL of the CDN pointing to the VDL grammar file for syntax highlighting.
  */
 const VDL_GRAMMAR_URL =
-  "https://cdn.jsdelivr.net/gh/varavelio/vdl@v0.5.0-alpha.5/editors/vscode/language/vdl.tmLanguage.json";
+  "https://cdn.jsdelivr.net/gh/varavelio/vdl@v0.5.0/integrations/syntax/textmate/vdl.tmLanguage.json";
 
 /**
  * The supported languages for the Shiki highlighter. Currently, only "vdl" is
