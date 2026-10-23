@@ -1,6 +1,16 @@
 <script lang="ts">
-  import { Badge, CodeBlock, Dialog, Heading, Prose } from "@varavel/ui";
+  import { SquarePen } from "@lucide/svelte";
+  import {
+    Badge,
+    Button,
+    CodeBlock,
+    Dialog,
+    Heading,
+    Prose,
+  } from "@varavel/ui";
   import { theme as runtimeTheme } from "@varavel/ui/runtime";
+  import type { EnumDef, Field, TypeDef } from "@varavel/vdl-plugin-sdk";
+  import FormBuilder from "$lib/components/FormBuilder/FormBuilder.svelte";
   import { interceptSourceCodeLinks } from "$lib/helpers/source-code-links";
   import { store } from "$lib/store";
   import type { SourceCode, SourceCodeReference } from "$lib/store/ir/index";
@@ -10,14 +20,43 @@
     open: boolean;
   };
 
+  /**
+   * Object shape previewed in the Form builder modal. Omitted for pages
+   * without a previewable object root.
+   */
+  type FormPreview = {
+    fields: Field[];
+    types: TypeDef[];
+    enums: EnumDef[];
+  };
+
   interface Props {
     title: string;
     sourceCode?: SourceCode;
     tags?: string[];
     htmlDoc?: string;
+    formPreview?: FormPreview | null;
   }
 
-  let { title, tags = [], htmlDoc, sourceCode }: Props = $props();
+  let {
+    title,
+    tags = [],
+    htmlDoc,
+    sourceCode,
+    formPreview = null,
+  }: Props = $props();
+
+  let formPreviewOpen = $state(false);
+  let formPreviewValue = $state<Record<string, unknown>>({});
+
+  /**
+   * Opens the preview modal with a fresh value, so each opening starts
+   * from a blank form. Nothing persists by design (YAGNI).
+   */
+  function openFormPreview() {
+    formPreviewValue = {};
+    formPreviewOpen = true;
+  }
 
   function pickSourceCode(code?: SourceCode) {
     if (!code) return undefined;
@@ -84,7 +123,19 @@
 
   {#if sourceCode}
     <section class="space-y-6">
-      <Heading level="2" size="2xl">Source</Heading>
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <Heading level="2" size="2xl">Source</Heading>
+        {#if formPreview}
+          <Button
+            size="sm"
+            variant="outline"
+            icon={SquarePen}
+            onclick={openFormPreview}
+          >
+            Form builder
+          </Button>
+        {/if}
+      </div>
       <div use:interceptSourceCodeLinks={linkParams}>
         <CodeBlock
           rawCode={sourceCode.raw}
@@ -97,6 +148,22 @@
     </section>
   {/if}
 </div>
+
+{#if formPreview}
+  <Dialog
+    bind:open={formPreviewOpen}
+    size="lg"
+    title={`Form builder: ${title}`}
+    description="Fill the form to preview a payload. Nothing is saved."
+  >
+    <FormBuilder
+      fields={formPreview.fields}
+      types={formPreview.types}
+      enums={formPreview.enums}
+      bind:value={formPreviewValue}
+    />
+  </Dialog>
+{/if}
 
 {#each visibleSourceCodeDialogs as dialog (dialog.key)}
   <Dialog

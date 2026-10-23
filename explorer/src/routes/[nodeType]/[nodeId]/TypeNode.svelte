@@ -1,6 +1,7 @@
 <script lang="ts">
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
   import NodePage from "$lib/components/NodePage.svelte";
+  import { store } from "$lib/store";
   import type { RichIrSchemaType } from "$lib/store/ir/index";
 
   interface Props {
@@ -38,4 +39,11 @@
   title={typeDef.name}
   htmlDoc={typeDef.htmlDoc}
   sourceCode={typeDef.sourceCode}
+  formPreview={typeDef.typeRef.kind === "object"
+    ? {
+        fields: typeDef.typeRef.objectFields ?? [],
+        types: store.ir.types,
+        enums: store.ir.enums,
+      }
+    : null}
 />
