@@ -134,13 +134,17 @@ export function describeFieldType(
     case "primitive":
       return ref.primitiveName ?? null;
     case "enum":
-      return ref.enumName ?? null;
+      return ref.enumName ? `${ref.enumName} (enum)` : null;
     case "array":
     case "map":
     case "object":
       return spellType(ref);
     case "type": {
       if (!ref.typeName) return null;
+      if (!findType(schema.types, ref.typeName)) {
+        const enm = findEnum(schema.enums, ref.typeName);
+        return enm ? `${ref.typeName} (enum)` : ref.typeName;
+      }
       let resolved = ref;
       const visited = [...seen];
       while (resolved.kind === "type" && resolved.typeName) {
@@ -155,6 +159,36 @@ export function describeFieldType(
     }
     default:
       return null;
+  }
+}
+
+/**
+ * Whether a reference renders as a container (array, map or object),
+ * following named type aliases. Used to draw tree rails only when some
+ * nesting exists below.
+ *
+ * @param ref Declared (pre-expansion) field reference.
+ * @param schema Named schema entries used to resolve aliases.
+ * @param seen Type names already expanded above this field.
+ */
+export function isContainerRef(
+  ref: TypeRef,
+  schema: FormSchema,
+  seen: string[],
+): boolean {
+  switch (ref.kind) {
+    case "array":
+    case "map":
+    case "object":
+      return true;
+    case "type": {
+      if (!ref.typeName || seen.includes(ref.typeName)) return false;
+      const target = findType(schema.types, ref.typeName);
+      if (!target) return false;
+      return isContainerRef(target.typeRef, schema, [...seen, ref.typeName]);
+    }
+    default:
+      return false;
   }
 }
 

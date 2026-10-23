@@ -153,6 +153,40 @@
     onChange(next);
   }
 
+  /**
+   * Keep number inputs numeric: digits, one decimal point for floats and a
+   * leading minus, plus navigation, editing and shortcut keys. The commit
+   * below still skips anything unparsable, this only stops stray keystrokes
+   * such as `e` from ever landing in the draft.
+   */
+  function handleNumberKeydown(event: KeyboardEvent) {
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (
+      [
+        "Backspace",
+        "Delete",
+        "Tab",
+        "Escape",
+        "Enter",
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown",
+        "Home",
+        "End",
+      ].includes(event.key)
+    ) {
+      return;
+    }
+    const target = event.currentTarget;
+    const text = target instanceof HTMLInputElement ? target.value : "";
+    if (/^[0-9]$/.test(event.key)) return;
+    if (event.key === "." && primitive === "float" && !text.includes("."))
+      return;
+    if (event.key === "-" && text === "") return;
+    event.preventDefault();
+  }
+
   function clearValue() {
     text = null;
     if (isBool) {
@@ -212,6 +246,7 @@
       step={primitive === "float" ? 0.01 : undefined}
       value={text ?? toText(value)}
       oninput={(event) => commitText(event.currentTarget.value)}
+      onkeydown={isNumber ? handleNumberKeydown : undefined}
       placeholder={`Enter ${field.name} here...`}
     />
   {/if}
