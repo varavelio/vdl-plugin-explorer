@@ -7,7 +7,6 @@
   import MonacoEditor from "$lib/components/MonacoEditor/MonacoEditor.svelte";
   import { type FormEditorMode, store } from "$lib/store";
   import FieldNode from "./FieldNode.svelte";
-  import { isContainerRef } from "./fields";
 
   interface Props {
     /** Top-level fields rendered by the form. */
@@ -131,14 +130,6 @@
   }
 
   /**
-   * Whether any top-level field nests below. The root tree rail only
-   * renders then, so flat forms stay flush with the panel.
-   */
-  let hasNesting = $derived(
-    fields.some((field) => isContainerRef(field.typeRef, { types, enums }, [])),
-  );
-
-  /**
    * Bumped on clear so fields remount from the emptied value instead of
    * reconciling stale drafts.
    */
@@ -232,22 +223,6 @@
           <p class="text-sm text-content-muted italic">
             This type defines no fields.
           </p>
-        {:else if hasNesting}
-          <div class="space-y-4 border-l-2 border-dashed border-base-400 pl-4">
-            {#each fields as field (field.name)}
-              <FieldNode
-                {field}
-                {types}
-                {enums}
-                seen={[]}
-                depth={0}
-                railed
-                value={value[field.name]}
-                onChange={(next) => updateField(field.name, next)}
-                onRemove={() => removeField(field.name)}
-              />
-            {/each}
-          </div>
         {:else}
           <div class="space-y-4">
             {#each fields as field (field.name)}
@@ -257,7 +232,6 @@
                 {enums}
                 seen={[]}
                 depth={0}
-                railed
                 value={value[field.name]}
                 onChange={(next) => updateField(field.name, next)}
                 onRemove={() => removeField(field.name)}

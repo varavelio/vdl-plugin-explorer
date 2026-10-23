@@ -163,36 +163,6 @@ export function describeFieldType(
 }
 
 /**
- * Whether a reference renders as a container (array, map or object),
- * following named type aliases. Used to draw tree rails only when some
- * nesting exists below.
- *
- * @param ref Declared (pre-expansion) field reference.
- * @param schema Named schema entries used to resolve aliases.
- * @param seen Type names already expanded above this field.
- */
-export function isContainerRef(
-  ref: TypeRef,
-  schema: FormSchema,
-  seen: string[],
-): boolean {
-  switch (ref.kind) {
-    case "array":
-    case "map":
-    case "object":
-      return true;
-    case "type": {
-      if (!ref.typeName || seen.includes(ref.typeName)) return false;
-      const target = findType(schema.types, ref.typeName);
-      if (!target) return false;
-      return isContainerRef(target.typeRef, schema, [...seen, ref.typeName]);
-    }
-    default:
-      return false;
-  }
-}
-
-/**
  * Compute the blank value used when adding an array item or map entry.
  *
  * Objects and maps start empty so nested fields can fill them in.
