@@ -182,7 +182,7 @@ function enumMemberToSearchText(member: EnumMember): string {
  */
 function createSearchDocuments(): SearchDocument[] {
   const docs = store.ir.docs.map((doc) => ({
-    id: doc.id,
+    id: `doc:${doc.id}`,
     kind: "doc" as const,
     urlPath: doc.urlPath,
     title: doc.title,
@@ -222,7 +222,7 @@ function createTypeDocument(
   typeDef: TypeDef & { id: string; urlPath: string },
 ): SearchDocument {
   return {
-    id: typeDef.id,
+    id: `type:${typeDef.id}`,
     kind: "type",
     urlPath: typeDef.urlPath,
     name: typeDef.name,
@@ -245,7 +245,7 @@ function createEnumDocument(
   enumDef: EnumDef & { id: string; urlPath: string },
 ): SearchDocument {
   return {
-    id: enumDef.id,
+    id: `enum:${enumDef.id}`,
     kind: "enum",
     urlPath: enumDef.urlPath,
     name: enumDef.name,
@@ -274,7 +274,7 @@ function createHttpRpcDocument(httpRpc: {
   procs: Array<{ name: string }>;
 }): SearchDocument {
   return {
-    id: httpRpc.id,
+    id: `httpRpc:${httpRpc.id}`,
     kind: "httpRpc",
     urlPath: httpRpc.urlPath,
     name: httpRpc.name,
@@ -293,6 +293,9 @@ function createHttpRpcDocument(httpRpc: {
 /**
  * Creates a search document for an HTTP RPC procedure page.
  *
+ * The document id scopes the bare proc slug with its parent RPC so procs
+ * sharing a name across services never collide in the index.
+ *
  * @param proc - HTTP RPC procedure enriched with routing metadata.
  * @returns Search document representing the procedure.
  */
@@ -301,17 +304,18 @@ function createHttpRpcProcDocument(proc: {
   urlPath: string;
   name: string;
   doc?: string;
+  httpRpcId: string;
   httpRpcName: string;
   inputSourceCode?: { raw: string };
   outputSourceCode?: { raw: string };
 }): SearchDocument {
   return {
-    id: proc.id,
+    id: `procedure:${proc.httpRpcId}/${proc.id}`,
     kind: "procedure",
     urlPath: proc.urlPath,
     name: proc.name,
     title: `${proc.httpRpcName}.${proc.name}`,
-    summary: summarizeText(proc.doc) || `procedure in ${proc.httpRpcName}`,
+    summary: summarizeText(proc.doc) || "HTTP RPC Procedure",
     body: joinSearchParts([
       proc.httpRpcName,
       proc.name,
@@ -333,7 +337,7 @@ function createConstantDocument(
   constantDef: ConstantDef & { id: string; urlPath: string },
 ): SearchDocument {
   return {
-    id: constantDef.id,
+    id: `constant:${constantDef.id}`,
     kind: "constant",
     urlPath: constantDef.urlPath,
     name: constantDef.name,
