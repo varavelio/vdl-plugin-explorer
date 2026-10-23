@@ -7,13 +7,23 @@
     name: string;
     /** True when the field may be omitted. */
     optional: boolean;
+    /** Source spelling shown next to the name, when this is a container. */
+    typeAnnotation?: string | null;
   }
 
-  let { name, optional }: Props = $props();
+  let { name, optional, typeAnnotation = null }: Props = $props();
 </script>
 
-<span class="flex items-center gap-1">
+<span class="flex min-w-0 items-center gap-1.5">
   <span class="truncate text-sm font-semibold">{name}</span>
+  {#if typeAnnotation}
+    <span
+      class="truncate font-mono text-xs text-content-muted"
+      title={typeAnnotation}
+    >
+      {typeAnnotation}
+    </span>
+  {/if}
   <Tooltip
     content={optional ? "This field is optional" : "This field is required"}
   >

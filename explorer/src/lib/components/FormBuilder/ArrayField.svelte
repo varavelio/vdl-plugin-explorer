@@ -27,6 +27,8 @@
     depth?: number;
     /** True when the parent list already indents this node with its own rail. */
     railed?: boolean;
+    /** Source spelling shown next to the name, when this is a container. */
+    typeAnnotation?: string | null;
     /** Current slice of the form value for this field. */
     value: unknown;
     /** Reports an updated slice to the parent node. */
@@ -43,6 +45,7 @@
     seen,
     depth = 0,
     railed = false,
+    typeAnnotation = null,
     value,
     onChange,
     onRemove,
@@ -79,7 +82,7 @@
 
 {#snippet header()}
   <div class="mb-1 flex items-center justify-between gap-2">
-    <FieldTitle name={field.name} optional={field.optional} />
+    <FieldTitle name={field.name} optional={field.optional} {typeAnnotation} />
     <div class="flex items-center">
       <Tooltip content={`Clear ${field.name}`} side="left">
         <Button

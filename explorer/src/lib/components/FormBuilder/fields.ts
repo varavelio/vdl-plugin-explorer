@@ -88,6 +88,77 @@ export function expandNamedField(
 }
 
 /**
+ * Spell a reference the way it reads in VDL source.
+ *
+ * @param ref Reference to spell.
+ * @returns Source spelling such as `string`, `Size`, `int[][]` or `unknown`.
+ */
+function spellType(ref: TypeRef): string {
+  switch (ref.kind) {
+    case "primitive":
+      return ref.primitiveName ?? "unknown";
+    case "type":
+      return ref.typeName ?? "unknown";
+    case "enum":
+      return ref.enumName ?? "unknown";
+    case "object":
+      return "object";
+    case "array": {
+      const inner = ref.arrayType ? spellType(ref.arrayType) : "unknown";
+      return `${inner}${"[]".repeat(ref.arrayDims ?? 1)}`;
+    }
+    case "map":
+      return `map[${ref.mapType ? spellType(ref.mapType) : "unknown"}]`;
+    default:
+      return "unknown";
+  }
+}
+
+/**
+ * Describe a field type for display next to its name, using the declared
+ * VDL spelling. Named references add their resolved shape in parentheses
+ * because the name alone hides whether it is an object, array, map or
+ * alias (for example `Scores (int[])`).
+ *
+ * @param ref Declared (pre-expansion) field reference.
+ * @param schema Named schema entries used to resolve aliases.
+ * @param seen Type names already expanded above this field.
+ * @returns Display spelling, or null when the reference is unknown.
+ */
+export function describeFieldType(
+  ref: TypeRef,
+  schema: FormSchema,
+  seen: string[],
+): string | null {
+  switch (ref.kind) {
+    case "primitive":
+      return ref.primitiveName ?? null;
+    case "enum":
+      return ref.enumName ?? null;
+    case "array":
+    case "map":
+    case "object":
+      return spellType(ref);
+    case "type": {
+      if (!ref.typeName) return null;
+      let resolved = ref;
+      const visited = [...seen];
+      while (resolved.kind === "type" && resolved.typeName) {
+        if (visited.includes(resolved.typeName)) return ref.typeName;
+        const target = findType(schema.types, resolved.typeName);
+        if (!target) return ref.typeName;
+        visited.push(resolved.typeName);
+        resolved = target.typeRef;
+      }
+      if (resolved === ref) return ref.typeName;
+      return `${ref.typeName} (${spellType(resolved)})`;
+    }
+    default:
+      return null;
+  }
+}
+
+/**
  * Compute the blank value used when adding an array item or map entry.
  *
  * Objects and maps start empty so nested fields can fill them in.

@@ -21,9 +21,17 @@
     onChange: (next: unknown) => void;
     /** Removes this field from the parent object, when allowed. */
     onRemove?: () => void;
+    /** Source spelling shown next to the name. */
+    typeAnnotation?: string | null;
   }
 
-  let { field, value, onChange, onRemove }: Props = $props();
+  let {
+    field,
+    value,
+    onChange,
+    onRemove,
+    typeAnnotation = null,
+  }: Props = $props();
 
   const primitive = $derived(field.typeRef.primitiveName ?? "string");
   const isBool = $derived(primitive === "bool");
@@ -165,7 +173,7 @@
 
 <div>
   <div class="mb-1 flex items-center justify-between gap-2">
-    <FieldTitle name={field.name} optional={field.optional} />
+    <FieldTitle name={field.name} optional={field.optional} {typeAnnotation} />
     <div class="flex items-center">
       {#if !isDatetime}
         <Tooltip content={`Clear ${field.name}`} side="left">

@@ -7,7 +7,11 @@
   } from "@varavel/vdl-plugin-sdk";
   import ArrayField from "./ArrayField.svelte";
   import EnumField from "./EnumField.svelte";
-  import { expandNamedField, type FormSchema } from "./fields";
+  import {
+    describeFieldType,
+    expandNamedField,
+    type FormSchema,
+  } from "./fields";
   import MapField from "./MapField.svelte";
   import ObjectField from "./ObjectField.svelte";
   import PrimitiveField from "./PrimitiveField.svelte";
@@ -49,6 +53,10 @@
 
   let field = $derived(expandNamedField(originalField, schema, seen));
 
+  let typeAnnotation = $derived(
+    describeFieldType(originalField.typeRef, schema, seen),
+  );
+
   let arrayDims = $derived(
     field.typeRef.kind === "array" ? (field.typeRef.arrayDims ?? 1) : 0,
   );
@@ -74,6 +82,7 @@
     {field}
     {depth}
     {railed}
+    {typeAnnotation}
     itemRef={arrayItemRef}
     {types}
     {enums}
@@ -87,6 +96,7 @@
     {field}
     {depth}
     {railed}
+    {typeAnnotation}
     {types}
     {enums}
     seen={childSeen}
@@ -100,6 +110,7 @@
       {field}
       {depth}
       {railed}
+      {typeAnnotation}
       valueRef={field.typeRef.mapType}
       {types}
       {enums}
@@ -114,9 +125,9 @@
     </p>
   {/if}
 {:else if field.typeRef.kind === "enum"}
-  <EnumField {field} {enums} {value} {onChange} {onRemove} />
+  <EnumField {field} {enums} {value} {onChange} {onRemove} {typeAnnotation} />
 {:else if field.typeRef.kind === "primitive"}
-  <PrimitiveField {field} {value} {onChange} {onRemove} />
+  <PrimitiveField {field} {value} {onChange} {onRemove} {typeAnnotation} />
 {:else}
   <p class="text-sm text-content-muted italic">
     {field.name} references an unknown type.
