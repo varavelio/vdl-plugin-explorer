@@ -33,12 +33,12 @@ Use it when you want to:
 
 - share schema docs with teammates, clients, or external partners
 - browse docs, HTTP RPCs, types, enums, and constants in one place
-- inspect HTTP RPC services and procedures with input/output previews
+- try every HTTP RPC procedure from built-in playgrounds, an HTTP client in the style of Insomnia or Postman but specific to your procedures, with a form builder for inputs
 - ship a responsive schema reference as a single HTML file that can be hosted anywhere
 
 ## Demo
 
-[Open the live demo](https://vdl-explorer-demo.varavel.com/) or explore [it's source code](https://github.com/varavelio/vdl-plugin-explorer/tree/main/demo).
+[Open the live demo](https://vdl-explorer-demo.varavel.com/) or explore [its source code](https://github.com/varavelio/vdl-plugin-explorer/tree/main/demo).
 
 <img src="./screenshot.png" alt="VDL Plugin Explorer Demo" />
 
@@ -73,10 +73,10 @@ By default, the plugin writes one self-contained HTML file inside your `outDir`.
 
 All options are optional.
 
-| Option           | Type     | Default               | What it changes                                                                                                                       |
-| ---------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `outFile`        | `string` | `"index.html"`        | Sets the output filename inside `outDir`. The value must end with `.html`.                                                            |
-| `httpRpcBaseUrl` | `string` | `"https://<baseURL>"` | Comma-separated base URLs for HTTP HTTP RPC procedure endpoints, snippets and executions. Switch between them in the settings dialog. |
+| Option           | Type     | Default               | What it changes                                                                                                                  |
+| ---------------- | -------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `outFile`        | `string` | `"index.html"`        | Sets the output filename inside `outDir`. The value must end with `.html`.                                                       |
+| `httpRpcBaseUrl` | `string` | `"https://<baseURL>"` | Comma-separated base URLs for HTTP RPC procedure endpoints, snippets and executions. Switch between them in the settings dialog. |
 
 Example with all options:
 
@@ -103,6 +103,8 @@ const config = {
 - Overview dashboard with counts for docs, HTTP RPCs, types, enums, and constants.
 - Sidebar navigation grouped by resource kind.
 - Dedicated pages for docs, HTTP RPC services, HTTP RPC procedures, types, enums, and constants.
+- Per-procedure HTTP playgrounds with a form builder, JSON editor, code snippets, custom headers, and request history.
+- Form builder previews for object types.
 - Full-text search across titles, names, docs, summaries, and VDL source snippets.
 - Syntax-highlighted VDL source rendering.
 - Internal cross-links between referenced schema nodes.
@@ -142,6 +144,7 @@ When HTTP RPC services are present, the explorer includes:
 - one page per HTTP RPC service
 - one page per procedure
 - input and output VDL source previews for each procedure
+- one HTTP playground per procedure: execute requests against your base URLs, build inputs with the form builder or raw JSON, copy code snippets, set custom headers, and revisit past requests from the history
 
 ## Output Behavior
 
