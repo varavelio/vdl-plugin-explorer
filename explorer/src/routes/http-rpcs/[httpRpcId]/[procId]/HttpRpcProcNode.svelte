@@ -1,12 +1,5 @@
 <script lang="ts">
-  import {
-    Badge,
-    Button,
-    CodeBlock,
-    Dialog,
-    Heading,
-    Prose,
-  } from "@varavel/ui";
+  import { Badge, CodeBlock, Dialog, Heading, Prose } from "@varavel/ui";
   import { theme as runtimeTheme, viewport } from "@varavel/ui/runtime";
   import { pluralize } from "@varavel/vdl-plugin-sdk/utils/strings";
   import { fly } from "svelte/transition";
