@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BrushCleaning, PackageOpen, Plus, Trash } from "@lucide/svelte";
-  import { Button, Card, Input, Tooltip } from "@varavel/ui";
+  import { Button, Input, Tooltip } from "@varavel/ui";
   import type {
     EnumDef,
     Field,
@@ -203,12 +203,12 @@
 {/snippet}
 
 {#if depth === 0}
-  <Card>
+  <div>
     {@render header()}
     {@render body()}
-  </Card>
+  </div>
 {:else}
-  <div class="rounded-r-lg border-l-2 border-base-400 py-1 pr-1 pl-4">
+  <div class="border-l-2 border-dashed border-base-400 pl-4">
     {@render header()}
     {@render body()}
   </div>

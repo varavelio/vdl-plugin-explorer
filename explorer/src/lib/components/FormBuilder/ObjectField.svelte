@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BrushCleaning, Trash } from "@lucide/svelte";
-  import { Button, Card, Tooltip } from "@varavel/ui";
+  import { Button, Tooltip } from "@varavel/ui";
   import type { EnumDef, Field, TypeDef } from "@varavel/vdl-plugin-sdk";
   import FieldDoc from "./FieldDoc.svelte";
   import FieldNode from "./FieldNode.svelte";
@@ -17,6 +17,8 @@
     seen: string[];
     /** Nesting depth for styling only; nested objects render as guided groups. */
     depth?: number;
+    /** True when the parent list already indents this node with its own rail. */
+    railed?: boolean;
     /** Current slice of the form value for this field. */
     value: unknown;
     /** Reports an updated slice to the parent node. */
@@ -31,6 +33,7 @@
     enums,
     seen,
     depth = 0,
+    railed = false,
     value,
     onChange,
     onRemove,
@@ -104,7 +107,13 @@
 
 {#snippet body()}
   {#key rev}
-    <div class="mt-2 space-y-4">
+    <div
+      class="mt-2 space-y-4"
+      class:border-l-2={depth > 0}
+      class:border-dashed={depth > 0}
+      class:border-base-400={depth > 0}
+      class:pl-4={depth > 0}
+    >
       {#each field.typeRef.objectFields ?? [] as childField (childField.name)}
         <FieldNode
           field={childField}
@@ -112,6 +121,7 @@
           {enums}
           seen={childSeen}
           depth={depth + 1}
+          railed={depth > 0}
           value={object[childField.name]}
           onChange={(next) => updateChild(childField.name, next)}
           onRemove={() => removeChild(childField.name)}
@@ -121,13 +131,13 @@
   {/key}
 {/snippet}
 
-{#if depth === 0}
-  <Card>
+{#if depth === 0 || railed}
+  <div>
     {@render header()}
     {@render body()}
-  </Card>
+  </div>
 {:else}
-  <div class="rounded-r-lg border-l-2 border-base-400 py-1 pr-1 pl-4">
+  <div class="border-l-2 border-dashed border-base-400 pl-4">
     {@render header()}
     {@render body()}
   </div>

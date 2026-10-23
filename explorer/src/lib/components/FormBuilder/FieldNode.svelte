@@ -23,6 +23,8 @@
     seen: string[];
     /** Nesting depth for styling only; containers group children when nested. */
     depth?: number;
+    /** True when the parent list already indents this node with its own rail. */
+    railed?: boolean;
     /** Current slice of the form value for this field. */
     value: unknown;
     /** Reports an updated slice to the parent node. */
@@ -37,6 +39,7 @@
     enums,
     seen,
     depth = 0,
+    railed = false,
     value,
     onChange,
     onRemove,
@@ -70,6 +73,7 @@
   <ArrayField
     {field}
     {depth}
+    {railed}
     itemRef={arrayItemRef}
     {types}
     {enums}
@@ -82,6 +86,7 @@
   <ObjectField
     {field}
     {depth}
+    {railed}
     {types}
     {enums}
     seen={childSeen}

@@ -166,7 +166,7 @@
   });
 </script>
 
-<div class="space-y-4">
+<div class="space-y-4 rounded-lg border border-base-400 bg-base-200 p-4">
   <div class="flex items-center justify-between gap-2">
     <div class="flex items-center gap-3">
       {#if title}

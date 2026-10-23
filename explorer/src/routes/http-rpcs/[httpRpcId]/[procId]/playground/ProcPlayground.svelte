@@ -73,7 +73,6 @@
   let isMac = $derived(browser && /mac/i.test(navigator.platform ?? ""));
 
   let tab = $state("input");
-  let tabButtons = $state<(HTMLButtonElement | null)[]>([]);
 
   const PANEL_TABS = [
     { value: "input", label: "Input" },
@@ -94,7 +93,12 @@
     if (next === null) return;
     event.preventDefault();
     tab = PANEL_TABS[next].value;
-    tabButtons[next]?.focus();
+    const target = event.currentTarget;
+    if (target instanceof HTMLElement) {
+      target.parentElement
+        ?.querySelectorAll<HTMLElement>('[role="tab"]')
+        [next]?.focus();
+    }
   }
 
   let historyOpen = $state(false);
@@ -296,31 +300,24 @@
   <div
     role="tablist"
     aria-label="Playground panels"
-    class="grid grid-cols-2 gap-1 rounded-xl border border-base-300 bg-base-200 p-1"
+    class="flex divide-x divide-base-400 overflow-hidden rounded-md border border-base-400"
   >
     {#each PANEL_TABS as item, index (item.value)}
-      <button
-        type="button"
+      <Button
+        size="sm"
+        variant={tab === item.value ? "solid" : "ghost"}
+        class="flex-1 rounded-none border-0"
         role="tab"
         aria-selected={tab === item.value}
         tabindex={tab === item.value ? 0 : -1}
-        bind:this={tabButtons[index]}
         onclick={() => (tab = item.value)}
         onkeydown={(event) => handleTabKeydown(event, index)}
-        class="flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-        class:bg-base-100={tab === item.value}
-        class:text-content={tab === item.value}
-        class:font-medium={tab === item.value}
-        class:shadow-sm={tab === item.value}
-        class:text-content-muted={tab !== item.value}
-        class:hover:bg-base-100={tab !== item.value}
-        class:hover:text-content={tab !== item.value}
       >
         {#if item.value === "output" && isExecuting}
           <Loader class="size-4 animate-spin" aria-hidden="true" />
         {/if}
         {item.label}
-      </button>
+      </Button>
     {/each}
   </div>
 

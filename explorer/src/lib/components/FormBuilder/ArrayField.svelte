@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BrushCleaning, PackageOpen, Plus, Trash } from "@lucide/svelte";
-  import { Button, Card, Tooltip } from "@varavel/ui";
+  import { Button, Tooltip } from "@varavel/ui";
   import type {
     EnumDef,
     Field,
@@ -25,6 +25,8 @@
     seen: string[];
     /** Nesting depth for styling only; nested arrays render as guided groups. */
     depth?: number;
+    /** True when the parent list already indents this node with its own rail. */
+    railed?: boolean;
     /** Current slice of the form value for this field. */
     value: unknown;
     /** Reports an updated slice to the parent node. */
@@ -40,6 +42,7 @@
     enums,
     seen,
     depth = 0,
+    railed = false,
     value,
     onChange,
     onRemove,
@@ -125,37 +128,38 @@
           No items, add one using the button above.
         </p>
       </div>
+    {:else}
+      <div class="mt-2 space-y-4 border-l-2 border-dashed border-base-400 pl-4">
+        {#each items as item, index (index)}
+          <FieldNode
+            field={{
+              ...field,
+              doc: undefined,
+              name: `${field.name}[${index}]`,
+              typeRef: itemRef,
+            }}
+            {types}
+            {enums}
+            {seen}
+            depth={depth + 1}
+            railed
+            value={item}
+            onChange={(next) => updateItem(index, next)}
+            onRemove={() => removeItem(index)}
+          />
+        {/each}
+      </div>
     {/if}
-
-    <div class="mt-2 space-y-4">
-      {#each items as item, index (index)}
-        <FieldNode
-          field={{
-            ...field,
-            doc: undefined,
-            name: `${field.name}[${index}]`,
-            typeRef: itemRef,
-          }}
-          {types}
-          {enums}
-          {seen}
-          depth={depth + 1}
-          value={item}
-          onChange={(next) => updateItem(index, next)}
-          onRemove={() => removeItem(index)}
-        />
-      {/each}
-    </div>
   {/key}
 {/snippet}
 
-{#if depth === 0}
-  <Card>
+{#if depth === 0 || railed}
+  <div>
     {@render header()}
     {@render body()}
-  </Card>
+  </div>
 {:else}
-  <div class="rounded-r-lg border-l-2 border-base-400 py-1 pr-1 pl-4">
+  <div class="border-l-2 border-dashed border-base-400 pl-4">
     {@render header()}
     {@render body()}
   </div>
