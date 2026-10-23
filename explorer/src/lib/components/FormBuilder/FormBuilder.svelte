@@ -201,7 +201,7 @@
         </Button>
       </div>
     </div>
-    <div class="flex gap-2">
+    <div class="flex">
       <Button
         size="sm"
         variant="ghost"
