@@ -315,7 +315,8 @@ function createHttpRpcProcDocument(proc: {
     urlPath: proc.urlPath,
     name: proc.name,
     title: `${proc.httpRpcName}.${proc.name}`,
-    summary: summarizeText(proc.doc) || "HTTP RPC Procedure",
+    summary:
+      summarizeText(proc.doc) || `Procedure in ${proc.httpRpcName} HTTP RPC`,
     body: joinSearchParts([
       proc.httpRpcName,
       proc.name,

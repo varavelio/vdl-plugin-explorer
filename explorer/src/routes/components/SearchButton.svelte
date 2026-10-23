@@ -90,6 +90,29 @@
   }
 
   /**
+   * Returns the muted page-kind tag shown next to a search result title.
+   *
+   * @param result - Search hit returned by the search engine.
+   * @returns Short kind label such as Type, Enum or Procedure.
+   */
+  function getKindLabel(result: SearchResult): string {
+    switch (result.kind) {
+      case "doc":
+        return "Doc";
+      case "httpRpc":
+        return "HTTP RPC";
+      case "procedure":
+        return "Procedure";
+      case "type":
+        return "Type";
+      case "enum":
+        return "Enum";
+      case "constant":
+        return "Const";
+    }
+  }
+
+  /**
    * Escapes regular-expression special characters in a plain string.
    *
    * @param value - Raw value that will be interpolated into a RegExp.
@@ -290,6 +313,9 @@
 
             <div class="min-w-0 flex-1 space-y-1.5">
               <div class="flex items-center gap-2">
+                <span class="shrink-0 text-xs text-content-muted">
+                  {getKindLabel(result)}
+                </span>
                 <span class="truncate text-sm font-medium text-content">
                   {#each highlightText(
                     getLabel(result),
