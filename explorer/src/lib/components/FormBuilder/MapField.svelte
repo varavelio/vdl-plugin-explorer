@@ -69,13 +69,18 @@
     return {};
   }
 
+  /**
+   * Rename a key keeping its position, so the row stays mounted and the
+   * input keeps focus while typing.
+   */
   function renameEntry(oldKey: string, nextKey: string) {
     const current = record();
     if (nextKey === oldKey || nextKey === "") return;
     if (nextKey in current) return;
-    const next = { ...current };
-    next[nextKey] = next[oldKey];
-    delete next[oldKey];
+    const next: Record<string, unknown> = {};
+    for (const [key, entryValue] of Object.entries(current)) {
+      next[key === oldKey ? nextKey : key] = entryValue;
+    }
     onChange(next);
   }
 
