@@ -239,7 +239,11 @@
   {#if isBool}
     <Switch bind:checked />
   {:else if isDatetime}
-    <DateTimePicker granularity="second" bind:value={dateValue} />
+    <DateTimePicker
+      granularity="second"
+      showClear={false}
+      bind:value={dateValue}
+    />
   {:else}
     <Input
       type={isNumber ? "number" : "text"}
@@ -253,20 +257,3 @@
 
   <FieldDoc doc={field.doc} />
 </div>
-
-<style>
-  /*
-   * note: hides the Clear button in the @varavel/ui date picker popover.
-   * The kit offers no prop for this and its own clear only empties the
-   * popup without reaching the form value, while the form-level Delete
-   * button already covers this. The selector targets the second button of
-   * the popover footer (Now is always first), so it degrades to a no-op
-   * if the kit markup ever changes.
-   */
-  :global(
-    div.mt-3.flex.items-center.justify-between.gap-3.border-t.border-base-400.pt-3
-      > button:nth-child(2)
-  ) {
-    display: none;
-  }
-</style>
