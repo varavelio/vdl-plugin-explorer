@@ -15,6 +15,8 @@
     enums: EnumDef[];
     /** Type names expanded above this node, guarding recursive types. */
     seen: string[];
+    /** Nesting depth for styling only; nested objects render as guided groups. */
+    depth?: number;
     /** Current slice of the form value for this field. */
     value: unknown;
     /** Reports an updated slice to the parent node. */
@@ -23,8 +25,16 @@
     onRemove?: () => void;
   }
 
-  let { field, types, enums, seen, value, onChange, onRemove }: Props =
-    $props();
+  let {
+    field,
+    types,
+    enums,
+    seen,
+    depth = 0,
+    value,
+    onChange,
+    onRemove,
+  }: Props = $props();
 
   const childSeen = $derived(
     field.typeRef.kind === "type" && field.typeRef.typeName
@@ -60,7 +70,7 @@
   }
 </script>
 
-<Card>
+{#snippet header()}
   <div class="mb-1 flex items-center justify-between gap-2">
     <FieldTitle name={field.name} optional={field.optional} />
     <div class="flex items-center">
@@ -90,7 +100,9 @@
   </div>
 
   <FieldDoc doc={field.doc} />
+{/snippet}
 
+{#snippet body()}
   {#key rev}
     <div class="mt-2 space-y-4">
       {#each field.typeRef.objectFields ?? [] as childField (childField.name)}
@@ -99,6 +111,7 @@
           {types}
           {enums}
           seen={childSeen}
+          depth={depth + 1}
           value={object[childField.name]}
           onChange={(next) => updateChild(childField.name, next)}
           onRemove={() => removeChild(childField.name)}
@@ -106,4 +119,16 @@
       {/each}
     </div>
   {/key}
-</Card>
+{/snippet}
+
+{#if depth === 0}
+  <Card>
+    {@render header()}
+    {@render body()}
+  </Card>
+{:else}
+  <div class="rounded-r-lg border-l-2 border-base-400 py-1 pr-1 pl-4">
+    {@render header()}
+    {@render body()}
+  </div>
+{/if}

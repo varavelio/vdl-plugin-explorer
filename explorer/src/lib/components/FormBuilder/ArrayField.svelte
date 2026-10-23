@@ -23,6 +23,8 @@
     enums: EnumDef[];
     /** Type names expanded above this node, guarding recursive types. */
     seen: string[];
+    /** Nesting depth for styling only; nested arrays render as guided groups. */
+    depth?: number;
     /** Current slice of the form value for this field. */
     value: unknown;
     /** Reports an updated slice to the parent node. */
@@ -31,8 +33,17 @@
     onRemove?: () => void;
   }
 
-  let { field, itemRef, types, enums, seen, value, onChange, onRemove }: Props =
-    $props();
+  let {
+    field,
+    itemRef,
+    types,
+    enums,
+    seen,
+    depth = 0,
+    value,
+    onChange,
+    onRemove,
+  }: Props = $props();
 
   const schema: FormSchema = $derived({ types, enums });
 
@@ -63,7 +74,7 @@
   }
 </script>
 
-<Card>
+{#snippet header()}
   <div class="mb-1 flex items-center justify-between gap-2">
     <FieldTitle name={field.name} optional={field.optional} />
     <div class="flex items-center">
@@ -103,7 +114,9 @@
   </div>
 
   <FieldDoc doc={field.doc} />
+{/snippet}
 
+{#snippet body()}
   {#key rev}
     {#if items.length === 0}
       <div class="flex flex-col items-center gap-1 py-2">
@@ -126,6 +139,7 @@
           {types}
           {enums}
           {seen}
+          depth={depth + 1}
           value={item}
           onChange={(next) => updateItem(index, next)}
           onRemove={() => removeItem(index)}
@@ -133,4 +147,16 @@
       {/each}
     </div>
   {/key}
-</Card>
+{/snippet}
+
+{#if depth === 0}
+  <Card>
+    {@render header()}
+    {@render body()}
+  </Card>
+{:else}
+  <div class="rounded-r-lg border-l-2 border-base-400 py-1 pr-1 pl-4">
+    {@render header()}
+    {@render body()}
+  </div>
+{/if}

@@ -21,6 +21,8 @@
     enums: EnumDef[];
     /** Type names expanded above this node, guarding recursive types. */
     seen: string[];
+    /** Nesting depth for styling only; containers group children when nested. */
+    depth?: number;
     /** Current slice of the form value for this field. */
     value: unknown;
     /** Reports an updated slice to the parent node. */
@@ -34,6 +36,7 @@
     types,
     enums,
     seen,
+    depth = 0,
     value,
     onChange,
     onRemove,
@@ -66,6 +69,7 @@
 {#if field.typeRef.kind === "array" && arrayItemRef}
   <ArrayField
     {field}
+    {depth}
     itemRef={arrayItemRef}
     {types}
     {enums}
@@ -77,6 +81,7 @@
 {:else if field.typeRef.kind === "object"}
   <ObjectField
     {field}
+    {depth}
     {types}
     {enums}
     seen={childSeen}
@@ -88,6 +93,7 @@
   {#if field.typeRef.mapType}
     <MapField
       {field}
+      {depth}
       valueRef={field.typeRef.mapType}
       {types}
       {enums}

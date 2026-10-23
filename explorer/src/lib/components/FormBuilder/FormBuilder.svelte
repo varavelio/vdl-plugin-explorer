@@ -225,6 +225,7 @@
             {types}
             {enums}
             seen={[]}
+            depth={0}
             value={value[field.name]}
             onChange={(next) => updateField(field.name, next)}
             onRemove={() => removeField(field.name)}
