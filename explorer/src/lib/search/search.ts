@@ -306,8 +306,7 @@ function createHttpRpcProcDocument(proc: {
   doc?: string;
   httpRpcId: string;
   httpRpcName: string;
-  inputSourceCode?: { raw: string };
-  outputSourceCode?: { raw: string };
+  sourceCode: { raw: string };
 }): SearchDocument {
   return {
     id: `procedure:${proc.httpRpcId}/${proc.id}`,
@@ -322,8 +321,7 @@ function createHttpRpcProcDocument(proc: {
       proc.name,
       "procedure",
       proc.doc,
-      proc.inputSourceCode?.raw,
-      proc.outputSourceCode?.raw,
+      proc.sourceCode.raw,
     ]),
   };
 }

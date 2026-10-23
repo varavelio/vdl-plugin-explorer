@@ -79,12 +79,7 @@
     return code.htmlLight;
   }
 
-  let hlHttpRpcInputSourceCode = $derived(
-    pickSourceCode(httpRpcProc.inputSourceCode),
-  );
-  let hlHttpRpcOutputSourceCode = $derived(
-    pickSourceCode(httpRpcProc.outputSourceCode),
-  );
+  let hlHttpRpcSourceCode = $derived(pickSourceCode(httpRpcProc.sourceCode));
 
   type SourceCodeDialog = SourceCodeReference & {
     key: string;
@@ -178,35 +173,18 @@
       onSnippetsToggle={toggleSnippets}
     />
 
-    {#if httpRpcProc.inputSourceCode}
-      <section class="space-y-6">
-        <Heading level="2" size="2xl">Input</Heading>
-        <div use:interceptSourceCodeLinks={linkParams}>
-          <CodeBlock
-            rawCode={httpRpcProc.inputSourceCode.raw}
-            highlightedHtml={hlHttpRpcInputSourceCode}
-            title="VDL"
-            fileName="input.vdl"
-            bordered
-          />
-        </div>
-      </section>
-    {/if}
-
-    {#if httpRpcProc.outputSourceCode}
-      <section class="space-y-6">
-        <Heading level="2" size="2xl">Output</Heading>
-        <div use:interceptSourceCodeLinks={linkParams}>
-          <CodeBlock
-            rawCode={httpRpcProc.outputSourceCode.raw}
-            highlightedHtml={hlHttpRpcOutputSourceCode}
-            title="VDL"
-            fileName="output.vdl"
-            bordered
-          />
-        </div>
-      </section>
-    {/if}
+    <section class="space-y-6">
+      <Heading level="2" size="2xl">Source</Heading>
+      <div use:interceptSourceCodeLinks={linkParams}>
+        <CodeBlock
+          rawCode={httpRpcProc.sourceCode.raw}
+          highlightedHtml={hlHttpRpcSourceCode}
+          title="VDL"
+          fileName="source.vdl"
+          bordered
+        />
+      </div>
+    </section>
   </div>
 
   {#if viewport.isDesktop && snippetsOpen}

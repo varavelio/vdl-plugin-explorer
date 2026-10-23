@@ -71,10 +71,8 @@ export type RichIrSchemaHttpRpcProc = Field & {
   httpRpcName: string;
   /** The procedure field doc converted from markdown to HTML. */
   htmlDoc?: string;
-  /** Highlighted VDL snippet for the procedure input when present. */
-  inputSourceCode?: SourceCode;
-  /** Highlighted VDL snippet for the procedure output when present. */
-  outputSourceCode?: SourceCode;
+  /** Valid VDL snippet for the procedure wrapped in its parent RPC. */
+  sourceCode: SourceCode;
   /** The original IR node */
   sourceIr: Field;
 };

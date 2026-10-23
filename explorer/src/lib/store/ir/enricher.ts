@@ -43,71 +43,31 @@ function isHttpRpcProc(field: Field): boolean {
 }
 
 /**
- * Find the "input" or "output" field of an HTTP RPC procedure field, if it exists and is properly structured.
+ * Generate valid VDL source for a procedure by synthesizing its parent RPC
+ * type with only this proc inside. Bare `input {}`/`output {}` blocks are
+ * not valid VDL, so they break highlighting and reference links; the full
+ * wrapper keeps every snippet parseable with no sibling bloat.
  *
- * @param procField The field representing the HTTP RPC procedure, which should be an object type containing "input" and/or "output" fields.
- * @param name The name of the field to find, either "input" or "output".
- * @returns The "input" or "output" field if it exists and is properly structured, or undefined if it does not exist or is not properly structured.
+ * @param rpc The parent RPC type carrying the name and annotations.
+ * @param proc The procedure field carrying its own annotations.
+ * @returns Canonical VDL source for the single-proc RPC.
  */
-function findHttpRpcInputOutputField(
-  procField: Field,
-  name: "input" | "output",
-): Field | undefined {
-  if (procField.typeRef.kind !== "object") {
-    return undefined;
-  }
-
-  return procField.typeRef.objectFields?.find((field) => field.name === name);
-}
-
-/**
- * Create a temporary type definition for a field to generate source code
- * sice the field itself can't be generated without its parent type.
- *
- * Used exclusively for `generateFieldSource` function.
- */
-function createFieldPreviewType(field: Field): TypeDef {
-  return {
-    position: field.position,
-    name: "__preview__",
-    annotations: [],
+function generateProcSource(rpc: TypeDef, proc: Field): string {
+  const ioFields = (
+    proc.typeRef.kind === "object" ? (proc.typeRef.objectFields ?? []) : []
+  ).filter((field) => field.name === "input" || field.name === "output");
+  const preview: TypeDef = {
+    position: rpc.position,
+    name: rpc.name,
+    annotations: rpc.annotations,
     typeRef: {
       kind: "object",
-      objectFields: [field],
+      objectFields: [
+        { ...proc, typeRef: { kind: "object", objectFields: ioFields } },
+      ],
     },
   };
-}
-
-/**
- * Remove the temporary type definition wrapper added by `createFieldPreviewType`
- * to get clean source code for a field.
- *
- * Used exclusively for `generateFieldSource` function.
- */
-function unwrapPreviewFieldSource(raw: string): string {
-  const lines = raw.split("\n");
-  if (lines.length <= 2) {
-    return raw.trim();
-  }
-
-  return lines
-    .slice(1, -1)
-    .map((line) => (line.startsWith("  ") ? line.slice(2) : line))
-    .join("\n")
-    .trim();
-}
-
-/**
- * Generate VDL source code for a field.;
- *
- * @param field The field for which to generate source code.
- * @returns A string containing the generated VDL source code for the field, with the temporary type definition wrapper removed.
- */
-function generateFieldSource(field: Field): string {
-  const raw = generateVdl(createFieldPreviewType(field), {
-    docstrings: "strip-top-level",
-  });
-  return unwrapPreviewFieldSource(raw);
+  return generateVdl(preview, { docstrings: "strip-top-level" });
 }
 
 /**
@@ -198,21 +158,9 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
                   const { id: procId, urlPath: procUrlPath } =
                     createHttpRpcProcRoute(httpRpcName, field.name);
 
-                  const inputField = findHttpRpcInputOutputField(
-                    field,
-                    "input",
+                  const sourceCode = await toSourceCode(
+                    generateProcSource(type, field),
                   );
-                  const outputField = findHttpRpcInputOutputField(
-                    field,
-                    "output",
-                  );
-
-                  const inputSourceCode = inputField
-                    ? await toSourceCode(generateFieldSource(inputField))
-                    : undefined;
-                  const outputSourceCode = outputField
-                    ? await toSourceCode(generateFieldSource(outputField))
-                    : undefined;
 
                   const sourceIr = { ...field };
                   return {
@@ -223,8 +171,7 @@ export async function enrichIrSchema(ir: IrSchema): Promise<RichIrSchema> {
                     httpRpcUrlPath,
                     httpRpcName,
                     htmlDoc: markdownToHtmlDoc(field.doc),
-                    inputSourceCode,
-                    outputSourceCode,
+                    sourceCode,
                     sourceIr,
                   };
                 },
